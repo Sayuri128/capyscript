@@ -12,7 +12,7 @@ void main() {
   final String input = file.readAsStringSync();
 
   final interpreter = Interpreter(source: input);
-  print(interpreter.interpret());
+  // print(interpreter.interpret());
 
-  // interpreter.dumpAST("../AST.capyast");
+  interpreter.dumpAST("../AST.capyast");
 }

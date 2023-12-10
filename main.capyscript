@@ -1,0 +1,7 @@
+function main() {
+   variable = 5 + 5;
+}
+
+function test(param1, param2) {
+
+}

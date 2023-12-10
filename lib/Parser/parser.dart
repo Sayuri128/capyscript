@@ -1,3 +1,5 @@
+import 'package:capyscript/AST/ast_result.dart';
+import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 
@@ -26,17 +28,24 @@ class Parser {
     _currentToken = _lexer.getNextToken();
   }
 
-  List<ASTFunctionDeclarationNode> parse() {
+  ASTResult parse() {
     final List<ASTFunctionDeclarationNode> functions = [];
-    while (_currentToken?.type == TokenType.FUNCTION) {
-      functions.add(_parseFunctionDeclaration());
+    final List<ASTImportNode> imports = [];
+
+    while (_currentToken?.type == TokenType.FUNCTION ||
+        _currentToken?.type == TokenType.IMPORT) {
+      if (_currentToken?.type == TokenType.FUNCTION) {
+        functions.add(_parseFunctionDeclaration());
+      } else if (_currentToken?.type == TokenType.IMPORT) {
+        imports.add(_parseImport());
+      }
     }
     try {
       functions.firstWhere((element) => element.functionName == "main");
     } catch (e) {
       throw Exception("main function not found");
     }
-    return functions;
+    return ASTResult(functions: functions, modules: imports);
   }
 
   void eat(TokenType expectedToken) {
@@ -46,6 +55,14 @@ class Parser {
     }
 
     throw Exception("Unexpected token! ${_currentToken!.type}");
+  }
+
+  void eatOr(List<TokenType> expectedTokens) {
+    if (expectedTokens.any((element) => element == _currentToken!.type)) {
+      _currentToken = _lexer.getNextToken();
+      return;
+    }
+    throw Exception("Unexpected Token! ${_currentToken!.type}");
   }
 
   bool canEat(List<TokenType> tokens) {
@@ -131,6 +148,19 @@ class Parser {
       }
     }
     return arguments;
+  }
+
+  ASTImportNode _parseImport() {
+    if (_currentToken!.type == TokenType.IMPORT) {
+      eat(TokenType.IMPORT);
+      eatOr([TokenType.SINGLE_QUOTE, TokenType.DOUBLE_QUOTES]);
+      final moduleName = _currentToken!.value;
+      eat(TokenType.IDENTIFIER);
+      eatOr([TokenType.SINGLE_QUOTE, TokenType.DOUBLE_QUOTES]);
+      eat(TokenType.SEMICOLON);
+      return ASTImportNode(moduleName: moduleName);
+    }
+    throw Exception("Cannot parse import module");
   }
 
   ASTFunctionDeclarationNode _parseFunctionDeclaration() {

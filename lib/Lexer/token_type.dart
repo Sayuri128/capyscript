@@ -13,15 +13,8 @@ enum TokenType {
   COMMA,
   LBRACE,
   RBRACE,
-  EQUALS
+  EQUALS,
+  IMPORT,
+  SINGLE_QUOTE,
+  DOUBLE_QUOTES
 }
-
-const Map<TokenType, String> tokenTypeRegExes = {
-  TokenType.PLUS: "+",
-  TokenType.MINUS: "-",
-  TokenType.MULTIPLY: "*",
-  TokenType.DIVIDE: "/",
-  TokenType.LPAREN: "(",
-  TokenType.RPAREN: ")",
-  TokenType.SEMICOLON: ";",
-};

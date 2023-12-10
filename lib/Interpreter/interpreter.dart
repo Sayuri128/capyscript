@@ -6,11 +6,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:capyscript/AST/ast_result.dart';
 import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/Parser/parser.dart';
-
-import '../AST/ast_node.dart';
 
 class Interpreter {
   late final Parser parser;
@@ -23,10 +22,10 @@ class Interpreter {
   }
 
   dynamic interpret() {
-    final functions = parser.parse();
-    print("functions number: ${functions.length}");
+    final tree = parser.parse();
+    print("functions number: ${tree.functions.length}");
 
-    for (final function in functions) {
+    for (final function in tree.functions) {
       _functions[function.functionName] = function;
     }
 
@@ -39,12 +38,8 @@ class Interpreter {
     output.writeAsBytesSync(utf8.encode(_dumpAST(parser.parse())));
   }
 
-  dynamic _dumpAST(List<ASTNode> nodes) {
-    final arr = [];
-    for (var value in nodes) {
-      arr.add(value.toJson());
-    }
+  dynamic _dumpAST(ASTResult nodes) {
     final jsonEncoder = JsonEncoder.withIndent(" ");
-    return jsonEncoder.convert(arr);
+    return jsonEncoder.convert(nodes.toJson());
   }
 }

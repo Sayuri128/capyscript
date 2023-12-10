@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../../Lexer/token_type.dart';
 import '../ast_node.dart';
@@ -20,25 +21,26 @@ class ASTBinaryOperatorNode extends ASTNode {
   final ASTNode right;
   final TokenType op;
 
-  // @override
-  // dynamic execute() {
-  //   final leftRes = left.execute();
-  //   final rightRes = right.execute();
-  //   print(leftRes.toString() + " ${op} " + rightRes.toString());
-  //
-  //   switch (op) {
-  //     case TokenType.PLUS:
-  //       return leftRes + rightRes;
-  //     case TokenType.MINUS:
-  //       return leftRes - rightRes;
-  //     case TokenType.MULTIPLY:
-  //       return leftRes * rightRes;
-  //     case TokenType.DIVIDE:
-  //       return leftRes / rightRes;
-  //     default:
-  //       return leftRes + rightRes;
-  //   }
-  // }
+  @override
+  dynamic execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) {
+    final leftRes = left.execute(memory, functions);
+    final rightRes = right.execute(memory, functions);
+    // print(leftRes.toString() + " ${op} " + rightRes.toString());
+
+    switch (op) {
+      case TokenType.PLUS:
+        return leftRes + rightRes;
+      case TokenType.MINUS:
+        return leftRes - rightRes;
+      case TokenType.MULTIPLY:
+        return leftRes * rightRes;
+      case TokenType.DIVIDE:
+        return leftRes / rightRes;
+      default:
+        return leftRes + rightRes;
+    }
+  }
 
   @override
   ASTNodeType getType() {

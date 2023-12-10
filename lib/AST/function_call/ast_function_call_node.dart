@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 import '../ast_node_type.dart';
@@ -26,5 +27,26 @@ class ASTFunctionCallNode extends ASTNode {
   @override
   ASTNodeType getType() {
     return ASTNodeType.FUNCTION_CALL;
+  }
+
+  @override
+  execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) {
+    late final ASTFunctionDeclarationNode function;
+
+    try {
+      function = functions[functionName]!;
+      memory[functionName] = {};
+    } catch (e) {
+      throw Exception("function ${functionName} not found");
+    }
+
+    final mem = memory[functionName]!;
+    for (int i = 0; i < function.parameters.length; i++) {
+      mem[function.parameters[i].paramName] =
+          arguments[i].execute(memory, functions);
+    }
+
+    return function.execute(memory, functions);
   }
 }

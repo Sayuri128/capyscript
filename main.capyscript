@@ -1,5 +1,7 @@
 function main() {
-   variable = 5 + 5;
+   variable = (5 + 5) / 2 * 2 * 3.14;
+
+   return variable;
 }
 
 function test(param1, param2) {

@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 import '../ast_node_type.dart';
@@ -24,5 +25,15 @@ class ASTBlockNode extends ASTNode {
   @override
   ASTNodeType getType() {
     return ASTNodeType.BLOCK;
+  }
+
+  @override
+  execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) {
+    dynamic result;
+    for (var statement in statements) {
+      result = statement.execute(memory, functions);
+    }
+    return result; // Return the result of the last statement
   }
 }

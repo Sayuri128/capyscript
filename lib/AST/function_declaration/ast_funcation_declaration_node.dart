@@ -32,4 +32,10 @@ class ASTFunctionDeclarationNode extends ASTNode {
   ASTNodeType getType() {
     return ASTNodeType.FUNCTION_DECLARATION;
   }
+
+  @override
+  execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) {
+    return body.execute(memory, functions);
+  }
 }

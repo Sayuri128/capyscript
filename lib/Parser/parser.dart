@@ -1,3 +1,6 @@
+import 'package:capyscript/AST/return/ast_return_node.dart';
+import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
+
 import '../AST/assignment/ast_assignment_node.dart';
 import '../AST/binary_operator/ast_binary_operator_node.dart';
 import '../AST/block/ast_block_node.dart';
@@ -23,16 +26,17 @@ class Parser {
     _currentToken = _lexer.getNextToken();
   }
 
-  List<ASTNode> parse() {
-    final List<ASTNode> functions = [];
+  List<ASTFunctionDeclarationNode> parse() {
+    final List<ASTFunctionDeclarationNode> functions = [];
     while (_currentToken?.type == TokenType.FUNCTION) {
       functions.add(_parseFunctionDeclaration());
     }
+    try {
+      functions.firstWhere((element) => element.functionName == "main");
+    } catch (e) {
+      throw Exception("main function not found");
+    }
     return functions;
-  }
-
-  ASTNode _parseExpression() {
-    return _parseTerm();
   }
 
   void eat(TokenType expectedToken) {
@@ -48,8 +52,12 @@ class Parser {
     return tokens.any((element) => element == _currentToken!.type);
   }
 
-  ASTNode _parseTerm() {
-    ASTNode left = _parseFactor();
+  ASTNode _parseExpression({required String functionName}) {
+    return _parseTerm(functionName: functionName);
+  }
+
+  ASTNode _parseTerm({required String functionName}) {
+    ASTNode left = _parseFactor(functionName: functionName);
 
     while (canEat([
       TokenType.PLUS,
@@ -60,14 +68,14 @@ class Parser {
       final TokenType op = _currentToken!.type;
 
       eat(op);
-      left = ASTBinaryOperatorNode(left: left, right: _parseFactor(), op: op);
+      left = ASTBinaryOperatorNode(
+          left: left, right: _parseFactor(functionName: functionName), op: op);
     }
 
     return left;
   }
 
-  ASTNode _parseFactor() {
-
+  ASTNode _parseFactor({required String functionName}) {
     if (_currentToken!.type == TokenType.NUMBER) {
       double value = double.parse(_currentToken!.value);
       eat(TokenType.NUMBER);
@@ -76,53 +84,56 @@ class Parser {
 
     if (_currentToken!.type == TokenType.PLUS) {
       eat(TokenType.PLUS);
-      return _parseFactor();
+      return _parseFactor(functionName: functionName);
     }
 
     if (_currentToken!.type == TokenType.MINUS) {
       eat(TokenType.MINUS);
       return ASTBinaryOperatorNode(
           left: ASTNumberNode(value: 0),
-          right: _parseFactor(),
+          right: _parseFactor(functionName: functionName),
           op: TokenType.MINUS);
     }
 
     if (_currentToken!.type == TokenType.LPAREN) {
       eat(TokenType.LPAREN);
-      final node = _parseTerm(); // Parse expression within parentheses
+      final node = _parseTerm(
+          functionName: functionName); // Parse expression within parentheses
       eat(TokenType.RPAREN);
       return node;
     }
 
     if (_currentToken!.type == TokenType.IDENTIFIER) {
-      String functionName = _currentToken!.value;
+      String callFunctionName = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
       if (_currentToken!.type == TokenType.LPAREN) {
         eat(TokenType.RPAREN);
-        final arguments = _parseFunctionArguments();
+        final arguments = _parseFunctionArguments(functionName: functionName);
         eat(TokenType.RPAREN);
         return ASTFunctionCallNode(
-            functionName: functionName, arguments: arguments);
+            functionName: callFunctionName, arguments: arguments);
       }
+
+      return ASTVariableNode(
+          variableName: callFunctionName, functionName: functionName);
     }
 
     throw Exception("Unexpected token");
   }
 
-  List<ASTNode> _parseFunctionArguments() {
-
+  List<ASTNode> _parseFunctionArguments({required String functionName}) {
     final arguments = <ASTNode>[];
     if (_currentToken!.type != TokenType.RPAREN) {
-      arguments.add(_parseExpression());
+      arguments.add(_parseExpression(functionName: functionName));
       while (canEat([TokenType.COMMA])) {
         eat(TokenType.COMMA);
-        arguments.add(_parseExpression());
+        arguments.add(_parseExpression(functionName: functionName));
       }
     }
     return arguments;
   }
 
-  ASTNode _parseFunctionDeclaration() {
+  ASTFunctionDeclarationNode _parseFunctionDeclaration() {
     eat(TokenType.FUNCTION);
 
     final functionName = _currentToken!.value;
@@ -132,14 +143,13 @@ class Parser {
     final parameters = _parseParameters();
     eat(TokenType.RPAREN);
 
-    final body = _parseBlock();
+    final body = _parseBlock(functionName);
 
     return ASTFunctionDeclarationNode(
         body: body, functionName: functionName, parameters: parameters);
   }
 
   List<ASTParameterNode> _parseParameters() {
-
     final parameters = <ASTParameterNode>[];
     if (_currentToken!.type != TokenType.RPAREN) {
       parameters.add(ASTParameterNode(_currentToken!.value));
@@ -153,15 +163,16 @@ class Parser {
     return parameters;
   }
 
-  ASTNode _parseBlock() {
+  ASTNode _parseBlock(String functionName) {
     eat(TokenType.LBRACE); // Assuming TokenType.LBRACE represents '{'
 
     final statements = <ASTNode>[]; // Store parsed statements or expressions
 
     while (!canEat([TokenType.RBRACE])) {
       // Assuming TokenType.RBRACE represents '}'
-      statements.add(
-          _parseStatement()); // Parse individual statements or expressions
+      statements.add(_parseStatement(
+          functionName:
+              functionName)); // Parse individual statements or expressions
     }
 
     eat(TokenType.RBRACE); // Consume the closing curly brace
@@ -170,8 +181,7 @@ class Parser {
     return ASTBlockNode(statements: statements);
   }
 
-  ASTNode _parseStatement() {
-
+  ASTNode _parseStatement({required String functionName}) {
     if (_currentToken!.type == TokenType.IDENTIFIER) {
       final variableName = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
@@ -179,10 +189,18 @@ class Parser {
       if (_currentToken!.type == TokenType.EQUALS) {
         // Assuming TokenType.EQUALS represents '=' for assignment
         eat(TokenType.EQUALS);
-        final expression = _parseExpression();
+        final expression = _parseExpression(functionName: functionName);
         eat(TokenType.SEMICOLON); // Assuming TokenType.SEMICOLON represents ';'
         return ASTAssignmentNode(
-            variableName: variableName, expression: expression);
+            variableName: variableName,
+            expression: expression,
+            functionName: functionName);
+      }
+
+      if (variableName == "return") {
+        final expression = _parseExpression(functionName: functionName);
+        eat(TokenType.SEMICOLON);
+        return ASTReturnNode(expression: expression);
       }
     }
 

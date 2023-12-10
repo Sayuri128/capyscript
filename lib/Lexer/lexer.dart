@@ -67,7 +67,7 @@ class Lexer {
 
   Token _parseNumber() {
     var number = '';
-    while (_pos < source.length && RegExp(r'\d').hasMatch(source[_pos])) {
+    while (_pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
       number += source[_pos];
       _pos++;
     }

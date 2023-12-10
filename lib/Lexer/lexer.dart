@@ -28,31 +28,37 @@ class Lexer {
         return _parseNumber();
       }
 
+      if (RegExp(r'[a-zA-Z_]\w*').hasMatch(currentChar)) {
+        return parseIdentifier();
+      }
+
       // Handle other token types
+      _pos++;
       switch (currentChar) {
         case '+':
-          _pos++;
           return Token(TokenType.PLUS, '+');
         case '-':
-          _pos++;
           return Token(TokenType.MINUS, '-');
         case '*':
-          _pos++;
           return Token(TokenType.MULTIPLY, '*');
         case '/':
-          _pos++;
           return Token(TokenType.DIVIDE, '/');
         case '(':
-          _pos++;
           return Token(TokenType.LPAREN, '(');
         case ')':
-          _pos++;
           return Token(TokenType.RPAREN, ')');
         case ';':
-          _pos++;
           return Token(TokenType.SEMICOLON, ';');
+        case ",":
+          return Token(TokenType.COMMA, ",");
+        case "{":
+          return Token(TokenType.LBRACE, "{");
+        case "}":
+          return Token(TokenType.RBRACE, "}");
+        case "=":
+          return Token(TokenType.EQUALS, "=");
         default:
-          throw Exception('Invalid token');
+          throw Exception('Invalid token at ${--_pos}');
       }
     }
 
@@ -66,5 +72,17 @@ class Lexer {
       _pos++;
     }
     return Token(TokenType.NUMBER, number);
+  }
+
+  Token parseIdentifier() {
+    var identifier = '';
+    while (_pos < source.length && RegExp(r'\w').hasMatch(source[_pos])) {
+      identifier += source[_pos];
+      _pos++;
+    }
+    if(identifier == "function") {
+      return Token(TokenType.FUNCTION, identifier);
+    }
+    return Token(TokenType.IDENTIFIER, identifier);
   }
 }

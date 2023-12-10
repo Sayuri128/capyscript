@@ -1,5 +1,6 @@
 enum TokenType {
   NUMBER,
+  FUNCTION,
   IDENTIFIER,
   PLUS,
   MINUS,
@@ -8,7 +9,11 @@ enum TokenType {
   LPAREN,
   RPAREN,
   SEMICOLON,
-  END
+  END,
+  COMMA,
+  LBRACE,
+  RBRACE,
+  EQUALS
 }
 
 const Map<TokenType, String> tokenTypeRegExes = {

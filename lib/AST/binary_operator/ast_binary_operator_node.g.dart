@@ -38,4 +38,5 @@ const _$TokenTypeEnumMap = {
   TokenType.LBRACE: 'LBRACE',
   TokenType.RBRACE: 'RBRACE',
   TokenType.EQUALS: 'EQUALS',
+  TokenType.IMPORT: 'IMPORT',
 };

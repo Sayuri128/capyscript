@@ -1,3 +1,4 @@
+
 import 'token.dart';
 import 'token_type.dart';
 
@@ -57,17 +58,30 @@ class Lexer {
           return Token(TokenType.RBRACE, "}");
         case "=":
           return Token(TokenType.EQUALS, "=");
+        case "\"":
+          return Token(TokenType.DOUBLE_QUOTES, "\"");
+        case "'":
+          return Token(TokenType.SINGLE_QUOTE, "'");
         default:
-          throw Exception('Invalid token at ${--_pos}');
+          throw Exception(
+              'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
       }
     }
 
     return Token(TokenType.END, '');
   }
 
+  String getRangeTokens(int range) {
+    final start = _pos - range / 2;
+    final end = _pos + range / 2;
+    return source.substring(start.clamp(0, source.length).toInt(),
+        end.clamp(0, source.length).toInt());
+  }
+
   Token _parseNumber() {
     var number = '';
-    while (_pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
+    while (
+        _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
       number += source[_pos];
       _pos++;
     }
@@ -80,8 +94,10 @@ class Lexer {
       identifier += source[_pos];
       _pos++;
     }
-    if(identifier == "function") {
+    if (identifier == "function") {
       return Token(TokenType.FUNCTION, identifier);
+    } else if (identifier == "import") {
+      return Token(TokenType.IMPORT, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

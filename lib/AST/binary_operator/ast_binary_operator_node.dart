@@ -22,10 +22,10 @@ class ASTBinaryOperatorNode extends ASTNode {
   final TokenType op;
 
   @override
-  dynamic execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
-    final leftRes = left.execute(memory, functions);
-    final rightRes = right.execute(memory, functions);
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
+    final leftRes = await left.execute(memory, functions);
+    final rightRes = await right.execute(memory, functions);
     // print(leftRes.toString() + " ${op} " + rightRes.toString());
 
     switch (op) {

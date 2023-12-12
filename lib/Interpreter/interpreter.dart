@@ -21,7 +21,7 @@ class Interpreter {
     this.parser = Parser(source: source);
   }
 
-  dynamic interpret() {
+  Future<dynamic> interpret() async {
     final tree = parser.parse();
     print("functions number: ${tree.functions.length}");
 
@@ -30,7 +30,7 @@ class Interpreter {
     }
 
     final mainCall = ASTFunctionCallNode(functionName: "main", arguments: []);
-    return mainCall.execute(_memory, _functions);
+    return await mainCall.execute(_memory, _functions);
   }
 
   void dumpAST(String path) {

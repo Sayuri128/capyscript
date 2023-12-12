@@ -11,7 +11,6 @@ part 'ast_result.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTResult {
-  @JsonSerializable()
   factory ASTResult.fromJson(Map<String, dynamic> json) =>
       _$ASTResultFromJson(json);
 

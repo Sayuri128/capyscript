@@ -28,11 +28,11 @@ class ASTBlockNode extends ASTNode {
   }
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
     dynamic result;
     for (var statement in statements) {
-      result = statement.execute(memory, functions);
+      result = await statement.execute(memory, functions);
     }
     return result; // Return the result of the last statement
   }

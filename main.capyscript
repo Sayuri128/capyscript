@@ -2,10 +2,11 @@ import "http";
 
 function main() {
    variable = (5 + 5) / 2 * 2 * 3.14;
+   variable = 5;
 
-   return variable;
+   return variable + test(5, 5);
 }
 
 function test(param1, param2) {
-
+    return param1 + param2;
 }

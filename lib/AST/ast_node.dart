@@ -1,6 +1,5 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'ast_node_type.dart';
 
 part 'ast_node.g.dart';
 
@@ -12,10 +11,6 @@ class ASTNode {
       _$ASTNodeFromJson(json);
 
   Map<String, dynamic> toJson() => _$ASTNodeToJson(this);
-
-  ASTNodeType getType() {
-    return ASTNodeType.NUMBER;
-  }
 
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
       Map<String, ASTFunctionDeclarationNode> functions) async {

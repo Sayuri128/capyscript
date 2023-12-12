@@ -5,7 +5,6 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
-import '../ast_node_type.dart';
 import '../parameter/ast_parameter_node.dart';
 
 part 'ast_funcation_declaration_node.g.dart';
@@ -26,11 +25,6 @@ class ASTFunctionDeclarationNode extends ASTNode {
     required this.parameters,
     required this.body,
   });
-
-  @override
-  ASTNodeType getType() {
-    return ASTNodeType.FUNCTION_DECLARATION;
-  }
 
   @override
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,

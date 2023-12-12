@@ -7,7 +7,6 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:json_annotation/json_annotation.dart';
 import '../../Lexer/token_type.dart';
 import '../ast_node.dart';
-import '../ast_node_type.dart';
 
 part 'ast_binary_operator_node.g.dart';
 
@@ -40,11 +39,6 @@ class ASTBinaryOperatorNode extends ASTNode {
       default:
         return leftRes + rightRes;
     }
-  }
-
-  @override
-  ASTNodeType getType() {
-    return ASTNodeType.BINARY_OPERATION;
   }
 
   const ASTBinaryOperatorNode({

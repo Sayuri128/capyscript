@@ -1,6 +1,7 @@
 import 'package:capyscript/AST/ast_result.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
+import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/modules/base_module.dart';
 
@@ -114,6 +115,12 @@ class Parser {
       return ASTNumberNode(value: value);
     }
 
+    if (canEat([TokenType.STRING])) {
+      final string = _currentToken!.value;
+      eat(TokenType.STRING);
+      return ASTStringNode(value: string);
+    }
+
     if (_currentToken!.type == TokenType.PLUS) {
       eat(TokenType.PLUS);
       return _parseFactor(functionName: functionName);
@@ -168,10 +175,8 @@ class Parser {
   ASTImportNode _parseImport() {
     if (_currentToken!.type == TokenType.IMPORT) {
       eat(TokenType.IMPORT);
-      eatOr([TokenType.SINGLE_QUOTE, TokenType.DOUBLE_QUOTES]);
       final moduleName = _currentToken!.value;
-      eat(TokenType.IDENTIFIER);
-      eatOr([TokenType.SINGLE_QUOTE, TokenType.DOUBLE_QUOTES]);
+      eat(TokenType.STRING);
       eat(TokenType.SEMICOLON);
       return ASTImportNode(moduleName: moduleName);
     }

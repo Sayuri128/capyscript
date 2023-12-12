@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 /*
  * Copyright (c) 2023 armatura24
  * All right reserved
@@ -13,9 +14,7 @@ class HttpModule extends BaseModule {
   HttpModule() {
     this.functions["get"] = ASTFunctionDeclarationNode(
         functionName: "get",
-        parameters: [
-          // ASTParameterNode("url")
-        ],
+        parameters: [ASTParameterNode("url")],
         body: HttpGetNode());
   }
 }
@@ -25,13 +24,13 @@ class HttpGetNode extends ModuleFunctionBody {
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
       Map<String, ASTFunctionDeclarationNode> functions) async {
     late final String url;
-    // try {
-    //   url = memory["get"]!["url"]!;
-    // } catch (e) {
-    //   throw Exception("URL not found");
-    // }
+    try {
+      url = memory["get"]!["url"]!;
+    } catch (e) {
+      throw Exception("URL not found");
+    }
 
-    final response = await http.get(Uri.parse("https://google.com"));
+    final response = await http.get(Uri.parse(url));
 
     return response.body;
   }

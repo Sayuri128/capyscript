@@ -33,9 +33,9 @@ class ASTAssignmentNode extends ASTNode {
   }
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
-    final res = expression.execute(memory, functions);
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
+    final res = await expression.execute(memory, functions);
     memory[functionName]?[variableName] = res;
     return res;
   }

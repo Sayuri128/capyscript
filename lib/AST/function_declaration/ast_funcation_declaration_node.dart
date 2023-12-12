@@ -18,7 +18,6 @@ class ASTFunctionDeclarationNode extends ASTNode {
   Map<String, dynamic> toJson() => _$ASTFunctionDeclarationNodeToJson(this);
 
   final String functionName;
-  @JsonSerializable()
   final List<ASTParameterNode> parameters;
   final ASTNode body;
 
@@ -34,8 +33,8 @@ class ASTFunctionDeclarationNode extends ASTNode {
   }
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
-    return body.execute(memory, functions);
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
+    return await body.execute(memory, functions);
   }
 }

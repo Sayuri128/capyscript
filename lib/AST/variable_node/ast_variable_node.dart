@@ -23,8 +23,8 @@ class ASTVariableNode extends ASTNode {
       {required this.variableName, required this.functionName});
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
     return memory[functionName]?[variableName];
   }
 }

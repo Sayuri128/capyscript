@@ -17,8 +17,8 @@ class ASTNode {
     return ASTNodeType.NUMBER;
   }
 
-  dynamic execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
     throw UnsupportedError("ASTNode cannot be executed");
   }
 }

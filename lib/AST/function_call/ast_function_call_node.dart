@@ -30,8 +30,8 @@ class ASTFunctionCallNode extends ASTNode {
   }
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
+  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
     late final ASTFunctionDeclarationNode function;
 
     try {
@@ -44,9 +44,9 @@ class ASTFunctionCallNode extends ASTNode {
     final mem = memory[functionName]!;
     for (int i = 0; i < function.parameters.length; i++) {
       mem[function.parameters[i].paramName] =
-          arguments[i].execute(memory, functions);
+          await arguments[i].execute(memory, functions);
     }
 
-    return function.execute(memory, functions);
+    return await function.execute(memory, functions);
   }
 }

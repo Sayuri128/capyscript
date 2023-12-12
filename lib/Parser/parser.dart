@@ -2,6 +2,7 @@ import 'package:capyscript/AST/ast_result.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
+import 'package:capyscript/modules/base_module.dart';
 
 import '../AST/assignment/ast_assignment_node.dart';
 import '../AST/binary_operator/ast_binary_operator_node.dart';
@@ -45,6 +46,20 @@ class Parser {
     } catch (e) {
       throw Exception("main function not found");
     }
+
+    for (final import in imports) {
+      final module = modules[import.moduleName];
+      if (module == null) {
+        throw Exception("Module ${import.moduleName} not found");
+      }
+      module.functions.forEach((key, value) {
+        if (functions.any((element) => element.functionName == key)) {
+          throw Exception("Found Function duplicates - ${key}");
+        }
+        functions.add(value);
+      });
+    }
+
     return ASTResult(functions: functions, modules: imports);
   }
 

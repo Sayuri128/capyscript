@@ -3,6 +3,7 @@ import "http";
 function main() {
    variable = (5 + 5) / 2 * 2 * 3.14;
    variable = 5;
+   str = "String Test";
 
    return get_google();
 }
@@ -12,5 +13,5 @@ function test(param1, param2) {
 }
 
 function get_google() {
-    return get();
+    return get("https://google.com");
 }

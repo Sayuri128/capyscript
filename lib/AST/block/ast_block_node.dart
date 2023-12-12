@@ -6,7 +6,6 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
-import '../ast_node_type.dart';
 
 part 'ast_block_node.g.dart';
 
@@ -21,11 +20,6 @@ class ASTBlockNode extends ASTNode {
   const ASTBlockNode({
     required this.statements,
   });
-
-  @override
-  ASTNodeType getType() {
-    return ASTNodeType.BLOCK;
-  }
 
   @override
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,

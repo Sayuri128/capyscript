@@ -5,7 +5,6 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
-import '../ast_node_type.dart';
 
 part 'ast_parameter_node.g.dart';
 
@@ -20,8 +19,4 @@ class ASTParameterNode extends ASTNode {
 
   ASTParameterNode(this.paramName);
 
-  @override
-  ASTNodeType getType() {
-    return ASTNodeType.PARAMETER;
-  }
 }

@@ -1,4 +1,3 @@
-
 import 'token.dart';
 import 'token_type.dart';
 
@@ -27,6 +26,11 @@ class Lexer {
 
       if (RegExp(r'\d').hasMatch(currentChar)) {
         return _parseNumber();
+      }
+
+      if (source[_pos] == "\'" ||
+          source[_pos] == "\"") {
+        return parseString();
       }
 
       if (RegExp(r'[a-zA-Z_]\w*').hasMatch(currentChar)) {
@@ -82,17 +86,33 @@ class Lexer {
     var number = '';
     while (
         _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
-      number += source[_pos];
-      _pos++;
+      number += source[_pos++];
     }
     return Token(TokenType.NUMBER, number);
+  }
+
+  Token parseString() {
+    var string = '';
+    _pos++;
+
+    while (
+        _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
+      string += source[_pos++];
+    }
+
+    if (_pos >= source.length ||
+        (source[_pos] != "'" && source[_pos] != '\"')) {
+      throw Exception('Unclosed string literal');
+    }
+
+    _pos++; // Move past the closing quote
+    return Token(TokenType.STRING, string);
   }
 
   Token parseIdentifier() {
     var identifier = '';
     while (_pos < source.length && RegExp(r'\w').hasMatch(source[_pos])) {
-      identifier += source[_pos];
-      _pos++;
+      identifier += source[_pos++];
     }
     if (identifier == "function") {
       return Token(TokenType.FUNCTION, identifier);

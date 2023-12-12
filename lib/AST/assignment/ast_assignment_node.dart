@@ -6,7 +6,6 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
-import '../ast_node_type.dart';
 
 part 'ast_assignment_node.g.dart';
 
@@ -26,11 +25,6 @@ class ASTAssignmentNode extends ASTNode {
     required this.functionName,
     required this.expression,
   });
-
-  @override
-  ASTNodeType getType() {
-    return ASTNodeType.ASSIGNMENT;
-  }
 
   @override
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,

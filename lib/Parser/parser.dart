@@ -124,7 +124,7 @@ class Parser {
       String callFunctionName = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
       if (_currentToken!.type == TokenType.LPAREN) {
-        eat(TokenType.RPAREN);
+        eat(TokenType.LPAREN);
         final arguments = _parseFunctionArguments(functionName: functionName);
         eat(TokenType.RPAREN);
         return ASTFunctionCallNode(

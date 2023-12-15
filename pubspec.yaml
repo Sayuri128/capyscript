@@ -9,6 +9,7 @@ dependencies:
   json_annotation: ^4.8.1
   http: ^1.1.2
   args: ^2.4.2
+  path: ^1.9.0
 
 dev_dependencies:
   build_runner: ^2.4.7

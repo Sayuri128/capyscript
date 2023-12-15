@@ -1,5 +1,5 @@
 import 'package:capyscript/AST/array/ast_array_node.dart';
-import 'package:capyscript/AST/ast_result.dart';
+import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
@@ -10,16 +10,14 @@ import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Lexer/lexer.dart';
 import 'package:capyscript/Lexer/token.dart';
 import 'package:capyscript/Lexer/token_type.dart';
-import 'package:capyscript/modules/base_module.dart';
-
-import '../AST/assignment/ast_assignment_node.dart';
-import '../AST/binary_operator/ast_binary_operator_node.dart';
-import '../AST/block/ast_block_node.dart';
-import '../AST/function_declaration/ast_funcation_declaration_node.dart';
-import '../AST/function_call/ast_function_call_node.dart';
-import '../AST/ast_node.dart';
-import '../AST/number/ast_number_node.dart';
-import '../AST/parameter/ast_parameter_node.dart';
+import 'package:capyscript/AST/assignment/ast_assignment_node.dart';
+import 'package:capyscript/AST/binary_operator/ast_binary_operator_node.dart';
+import 'package:capyscript/AST/block/ast_block_node.dart';
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
+import 'package:capyscript/AST/ast_node.dart';
+import 'package:capyscript/AST/number/ast_number_node.dart';
+import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 
 class Parser {
   final String source;
@@ -27,14 +25,12 @@ class Parser {
   late final Lexer _lexer;
   Token? _currentToken;
 
-  Parser({
-    required this.source,
-  }) {
+  Parser({required this.source}) {
     _lexer = Lexer(source: source);
     _currentToken = _lexer.getNextToken();
   }
 
-  ASTResult parse() {
+  ASTTree parse() {
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
 
@@ -46,32 +42,14 @@ class Parser {
         imports.add(_parseImport());
       }
     }
-    try {
-      functions.firstWhere((element) => element.functionName == "main");
-    } catch (e) {
-      throw Exception("main function not found");
-    }
 
-    for (final import in imports) {
-      final module = modules[import.moduleName];
-      if (module == null) {
-        throw Exception("Module ${import.moduleName} not found");
-      }
-      module.functions.forEach((key, value) {
-        if (functions.any((element) => element.functionName == key)) {
-          throw Exception("Found Function duplicates - ${key}");
-        }
-        functions.add(value);
-      });
-    }
-
-    return ASTResult(functions: functions, modules: imports);
+    return ASTTree(functions: functions, modules: imports);
   }
 
   void eat(TokenType expectedToken) {
     if (_currentToken!.type == expectedToken) {
       _currentToken = _lexer.getNextToken();
-      print("eat ${_currentToken.toString()}");
+      // print("eat ${_currentToken.toString()}");
       return;
     }
 

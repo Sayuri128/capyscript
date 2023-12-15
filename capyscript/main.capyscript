@@ -1,5 +1,6 @@
 import "http";
 import "io";
+import "lib/lib.capyscript";
 
 function main() {
    variable = (5 + 5) / 2 * 2 * 3.14;
@@ -13,6 +14,8 @@ function main() {
    arr.push(25, 10);
    print(arr.pop());
    print(arr.elementAt(2));
+
+   print(sum(35, 15));
 
    if(variable > 5) {
       print("if block");

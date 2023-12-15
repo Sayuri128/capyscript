@@ -7,19 +7,19 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 
-part 'ast_result.g.dart';
+part 'ast_tree.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class ASTResult {
-  factory ASTResult.fromJson(Map<String, dynamic> json) =>
-      _$ASTResultFromJson(json);
+class ASTTree {
 
-  Map<String, dynamic> toJson() => _$ASTResultToJson(this);
+	factory ASTTree.fromJson(Map<String, dynamic> json) => _$ASTTreeFromJson(json);
+	Map<String, dynamic> toJson() => _$ASTTreeToJson(this);
+
 
   final List<ASTFunctionDeclarationNode> functions;
   final List<ASTImportNode> modules;
 
-  const ASTResult({
+  const ASTTree({
     required this.functions,
     required this.modules,
   });

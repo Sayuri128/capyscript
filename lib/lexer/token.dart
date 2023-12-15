@@ -5,4 +5,9 @@ class Token {
   final String value;
 
   Token(this.type, this.value);
+
+  @override
+  String toString() {
+    return 'Token{type: $type, value: $value}';
+  }
 }

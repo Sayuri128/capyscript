@@ -1,9 +1,12 @@
 import "http";
+import "io";
 
 function main() {
    variable = (5 + 5) / 2 * 2 * 3.14;
    variable = 5;
    str = "String Test";
+
+   print(str);
 
    return get_google();
 }

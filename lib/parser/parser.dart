@@ -67,6 +67,7 @@ class Parser {
   void eat(TokenType expectedToken) {
     if (_currentToken!.type == expectedToken) {
       _currentToken = _lexer.getNextToken();
+      print("eat ${_currentToken.toString()}");
       return;
     }
 
@@ -245,6 +246,14 @@ class Parser {
             variableName: variableName,
             expression: expression,
             functionName: functionName);
+      }
+      if (_currentToken!.type == TokenType.LPAREN) {
+        eat(TokenType.LPAREN);
+        final arguments = _parseFunctionArguments(functionName: functionName);
+        eat(TokenType.RPAREN);
+        eat(TokenType.SEMICOLON);
+        return ASTFunctionCallNode(
+            functionName: variableName, arguments: arguments);
       }
 
       if (variableName == "return") {

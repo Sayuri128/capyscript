@@ -1,6 +1,7 @@
 import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_result.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
+import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
@@ -68,7 +69,7 @@ class Parser {
   void eat(TokenType expectedToken) {
     if (_currentToken!.type == expectedToken) {
       _currentToken = _lexer.getNextToken();
-      print("eat ${_currentToken.toString()}");
+      // print("eat ${_currentToken.toString()}");
       return;
     }
 
@@ -122,7 +123,7 @@ class Parser {
       final List<ASTNode> values = [];
       while (!canEat([TokenType.RSQUARE_BRACE])) {
         values.add(_parseExpression(functionName: functionName));
-        if(canEat([TokenType.COMMA])) {
+        if (canEat([TokenType.COMMA])) {
           eat(TokenType.COMMA);
         }
       }
@@ -158,18 +159,32 @@ class Parser {
     }
 
     if (_currentToken!.type == TokenType.IDENTIFIER) {
-      String callFunctionName = _currentToken!.value;
+      String identifier = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
       if (_currentToken!.type == TokenType.LPAREN) {
         eat(TokenType.LPAREN);
         final arguments = _parseFunctionArguments(functionName: functionName);
         eat(TokenType.RPAREN);
         return ASTFunctionCallNode(
-            functionName: callFunctionName, arguments: arguments);
+            functionName: identifier, arguments: arguments);
+      }
+
+      if (canEat([TokenType.DOT])) {
+        eat(TokenType.DOT);
+        final methodName = _currentToken!.value;
+        eat(TokenType.IDENTIFIER);
+        eat(TokenType.LPAREN);
+        final arguments = _parseFunctionArguments(functionName: methodName);
+        eat(TokenType.RPAREN);
+        return ASTMethodCallNode(
+            variable: ASTVariableNode(
+                functionName: functionName, variableName: identifier),
+            methodName: methodName,
+            arguments: arguments);
       }
 
       return ASTVariableNode(
-          variableName: callFunctionName, functionName: functionName);
+          variableName: identifier, functionName: functionName);
     }
 
     throw Exception("Unexpected token ${_currentToken.toString()}");
@@ -248,7 +263,7 @@ class Parser {
 
   ASTNode _parseStatement({required String functionName}) {
     if (_currentToken!.type == TokenType.IDENTIFIER) {
-      final variableName = _currentToken!.value;
+      final identifier = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
 
       if (_currentToken!.type == TokenType.EQUALS) {
@@ -257,7 +272,7 @@ class Parser {
         final expression = _parseExpression(functionName: functionName);
         eat(TokenType.SEMICOLON); // Assuming TokenType.SEMICOLON represents ';'
         return ASTAssignmentNode(
-            variableName: variableName,
+            variableName: identifier,
             expression: expression,
             functionName: functionName);
       }
@@ -267,10 +282,26 @@ class Parser {
         eat(TokenType.RPAREN);
         eat(TokenType.SEMICOLON);
         return ASTFunctionCallNode(
-            functionName: variableName, arguments: arguments);
+            functionName: identifier, arguments: arguments);
       }
 
-      if (variableName == "return") {
+      if (canEat([TokenType.DOT])) {
+        eat(TokenType.DOT);
+        final methodName = _currentToken!.value;
+        eat(TokenType.IDENTIFIER);
+        eat(TokenType.LPAREN);
+        final arguments = _parseFunctionArguments(functionName: functionName);
+        eat(TokenType.RPAREN);
+        eat(TokenType.SEMICOLON);
+
+        return ASTMethodCallNode(
+            variable: ASTVariableNode(
+                variableName: identifier, functionName: functionName),
+            methodName: methodName,
+            arguments: arguments);
+      }
+
+      if (identifier == "return") {
         final expression = _parseExpression(functionName: functionName);
         eat(TokenType.SEMICOLON);
         return ASTReturnNode(expression: expression);

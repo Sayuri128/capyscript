@@ -11,7 +11,7 @@ ASTBinaryOperatorNode _$ASTBinaryOperatorNodeFromJson(
     ASTBinaryOperatorNode(
       left: ASTNode.fromJson(json['left'] as Map<String, dynamic>),
       right: ASTNode.fromJson(json['right'] as Map<String, dynamic>),
-      op: $enumDecode(_$TokenTypeEnumMap, json['op']),
+      op: const TokenTypeJsonConverter().fromJson(json['op'] as String),
     );
 
 Map<String, dynamic> _$ASTBinaryOperatorNodeToJson(
@@ -19,26 +19,5 @@ Map<String, dynamic> _$ASTBinaryOperatorNodeToJson(
     <String, dynamic>{
       'left': instance.left.toJson(),
       'right': instance.right.toJson(),
-      'op': _$TokenTypeEnumMap[instance.op]!,
+      'op': const TokenTypeJsonConverter().toJson(instance.op),
     };
-
-const _$TokenTypeEnumMap = {
-  TokenType.NUMBER: 'NUMBER',
-  TokenType.FUNCTION: 'FUNCTION',
-  TokenType.IDENTIFIER: 'IDENTIFIER',
-  TokenType.PLUS: 'PLUS',
-  TokenType.MINUS: 'MINUS',
-  TokenType.MULTIPLY: 'MULTIPLY',
-  TokenType.DIVIDE: 'DIVIDE',
-  TokenType.LPAREN: 'LPAREN',
-  TokenType.RPAREN: 'RPAREN',
-  TokenType.SEMICOLON: 'SEMICOLON',
-  TokenType.END: 'END',
-  TokenType.COMMA: 'COMMA',
-  TokenType.LBRACE: 'LBRACE',
-  TokenType.RBRACE: 'RBRACE',
-  TokenType.EQUALS: 'EQUALS',
-  TokenType.IMPORT: 'IMPORT',
-  TokenType.SINGLE_QUOTE: 'SINGLE_QUOTE',
-  TokenType.DOUBLE_QUOTES: 'DOUBLE_QUOTES',
-};

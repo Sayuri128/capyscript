@@ -8,7 +8,13 @@ function main() {
 
    print(str);
 
-   return get_google();
+   arr = [25, 10, 10 + 5, str];
+
+   return array_test(arr, [10, 5]);
+}
+
+function array_test(arr1, arr2) {
+    return arr1 + arr2;
 }
 
 function test(param1, param2) {

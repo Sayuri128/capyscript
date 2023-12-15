@@ -18,6 +18,8 @@ class ASTBinaryOperatorNode extends ASTNode {
   Map<String, dynamic> toJson() => _$ASTBinaryOperatorNodeToJson(this);
   final ASTNode left;
   final ASTNode right;
+
+  @TokenTypeJsonConverter()
   final TokenType op;
 
   @override
@@ -46,4 +48,18 @@ class ASTBinaryOperatorNode extends ASTNode {
     required this.right,
     required this.op,
   });
+}
+
+class TokenTypeJsonConverter extends JsonConverter<TokenType, String> {
+  const TokenTypeJsonConverter();
+
+  @override
+  TokenType fromJson(String json) {
+    return TokenType.values.firstWhere((element) => element.toString() == json);
+  }
+
+  @override
+  String toJson(TokenType object) {
+    return object.toString();
+  }
 }

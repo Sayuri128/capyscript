@@ -9,10 +9,18 @@ class Lexer {
     required this.source,
   }) : _pos = 0;
 
-  Token lookupNextToken() {
+  Token lookUpNextToken() {
     final Token nextToken = getNextToken();
     _pos--;
     return nextToken;
+  }
+
+  String peekNextChar() {
+    return source[_pos + 1];
+  }
+
+  void _advance() {
+    _pos++; // Move to the next character
   }
 
   Token getNextToken() {
@@ -20,7 +28,7 @@ class Lexer {
       final currentChar = source[_pos];
 
       if (RegExp(r'\s').hasMatch(currentChar)) {
-        _pos++; // Skip whitespace
+        _advance(); // Skip whitespace
         continue;
       }
 
@@ -28,8 +36,7 @@ class Lexer {
         return _parseNumber();
       }
 
-      if (source[_pos] == "\'" ||
-          source[_pos] == "\"") {
+      if (source[_pos] == "\'" || source[_pos] == "\"") {
         return parseString();
       }
 
@@ -37,8 +44,21 @@ class Lexer {
         return parseIdentifier();
       }
 
-      // Handle other token types
-      _pos++;
+      if (currentChar == '=' && peekNextChar() == '=') {
+        _advance();
+        _advance();
+        return Token(TokenType.EQUAL_EQUAL, '==');
+      } else if (currentChar == '<' && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.LESS_EQUAL, '<=');
+      } else if (currentChar == '>' && peekNextChar() == '=') {
+        _advance();
+        _advance();
+        return Token(TokenType.GREATER_EQUAL, '>=');
+      }
+
+      _advance();
       switch (currentChar) {
         case '+':
           return Token(TokenType.PLUS, '+');
@@ -74,6 +94,10 @@ class Lexer {
           return Token(TokenType.COLON, ":");
         case ".":
           return Token(TokenType.DOT, ".");
+        case "<":
+          return Token(TokenType.LESS, "<");
+        case ">":
+          return Token(TokenType.GREATER, '>');
         default:
           throw Exception(
               'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
@@ -93,7 +117,7 @@ class Lexer {
   Token _parseNumber() {
     var number = '';
     while (
-    _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
+        _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
       number += source[_pos++];
     }
     return Token(TokenType.NUMBER, number);
@@ -101,10 +125,10 @@ class Lexer {
 
   Token parseString() {
     var string = '';
-    _pos++;
+    _advance();
 
     while (
-    _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
+        _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
       string += source[_pos++];
     }
 
@@ -113,19 +137,28 @@ class Lexer {
       throw Exception('Unclosed string literal');
     }
 
-    _pos++; // Move past the closing quote
+    _advance();
     return Token(TokenType.STRING, string);
   }
 
   Token parseIdentifier() {
     var identifier = '';
     while (_pos < source.length && RegExp(r'\w').hasMatch(source[_pos])) {
-      identifier += source[_pos++];
+      identifier += source[_pos];
+      _advance();
     }
     if (identifier == "function") {
       return Token(TokenType.FUNCTION, identifier);
     } else if (identifier == "import") {
       return Token(TokenType.IMPORT, identifier);
+    } else if (identifier == "if") {
+      return Token(TokenType.IF, 'if');
+    } else if (identifier == 'else') {
+      return Token(TokenType.ELSE, 'else');
+    } else if (identifier == "true") {
+      return Token(TokenType.TRUE, 'true');
+    } else if (identifier == "false") {
+      return Token(TokenType.FALSE, 'false');
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

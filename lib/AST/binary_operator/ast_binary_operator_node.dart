@@ -38,6 +38,16 @@ class ASTBinaryOperatorNode extends ASTNode {
         return leftRes * rightRes;
       case TokenType.DIVIDE:
         return leftRes / rightRes;
+      case TokenType.EQUAL_EQUAL:
+        return leftRes == rightRes;
+      case TokenType.LESS:
+        return leftRes < rightRes;
+      case TokenType.GREATER:
+        return leftRes > rightRes;
+      case TokenType.LESS_EQUAL:
+        return leftRes <= rightRes;
+      case TokenType.GREATER_EQUAL:
+        return leftRes >= rightRes;
       default:
         return leftRes + rightRes;
     }

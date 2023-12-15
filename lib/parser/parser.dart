@@ -1,8 +1,12 @@
+import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_result.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
+import 'package:capyscript/Lexer/lexer.dart';
+import 'package:capyscript/Lexer/token.dart';
+import 'package:capyscript/Lexer/token_type.dart';
 import 'package:capyscript/modules/base_module.dart';
 
 import '../AST/assignment/ast_assignment_node.dart';
@@ -13,9 +17,6 @@ import '../AST/function_call/ast_function_call_node.dart';
 import '../AST/ast_node.dart';
 import '../AST/number/ast_number_node.dart';
 import '../AST/parameter/ast_parameter_node.dart';
-import '../Lexer/lexer.dart';
-import '../Lexer/token.dart';
-import '../Lexer/token_type.dart';
 
 class Parser {
   final String source;
@@ -116,6 +117,19 @@ class Parser {
       return ASTNumberNode(value: value);
     }
 
+    if (canEat([TokenType.LSQUARE_BRACE])) {
+      eat(TokenType.LSQUARE_BRACE);
+      final List<ASTNode> values = [];
+      while (!canEat([TokenType.RSQUARE_BRACE])) {
+        values.add(_parseExpression(functionName: functionName));
+        if(canEat([TokenType.COMMA])) {
+          eat(TokenType.COMMA);
+        }
+      }
+      eat(TokenType.RSQUARE_BRACE);
+      return ASTArrayNode(expressions: values);
+    }
+
     if (canEat([TokenType.STRING])) {
       final string = _currentToken!.value;
       eat(TokenType.STRING);
@@ -158,7 +172,7 @@ class Parser {
           variableName: callFunctionName, functionName: functionName);
     }
 
-    throw Exception("Unexpected token");
+    throw Exception("Unexpected token ${_currentToken.toString()}");
   }
 
   List<ASTNode> _parseFunctionArguments({required String functionName}) {

@@ -66,6 +66,12 @@ class Lexer {
           return Token(TokenType.DOUBLE_QUOTES, "\"");
         case "'":
           return Token(TokenType.SINGLE_QUOTE, "'");
+        case "[":
+          return Token(TokenType.LSQUARE_BRACE, '[');
+        case "]":
+          return Token(TokenType.RSQUARE_BRACE, ']');
+        case ":":
+          return Token(TokenType.COLON, ":");
         default:
           throw Exception(
               'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
@@ -85,7 +91,7 @@ class Lexer {
   Token _parseNumber() {
     var number = '';
     while (
-        _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
+    _pos < source.length && RegExp(r'^\d*\.?\d*$').hasMatch(source[_pos])) {
       number += source[_pos++];
     }
     return Token(TokenType.NUMBER, number);
@@ -96,7 +102,7 @@ class Lexer {
     _pos++;
 
     while (
-        _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
+    _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
       string += source[_pos++];
     }
 

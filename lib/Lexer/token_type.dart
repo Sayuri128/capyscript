@@ -12,6 +12,7 @@ enum TokenType {
   COLON,
   END,
   COMMA,
+  DOT,
   LBRACE,
   RBRACE,
   LSQUARE_BRACE,

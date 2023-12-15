@@ -72,6 +72,8 @@ class Lexer {
           return Token(TokenType.RSQUARE_BRACE, ']');
         case ":":
           return Token(TokenType.COLON, ":");
+        case ".":
+          return Token(TokenType.DOT, ".");
         default:
           throw Exception(
               'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');

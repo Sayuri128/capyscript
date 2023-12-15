@@ -6,9 +6,11 @@ function main() {
    variable = 5;
    str = "String Test";
 
-   print(str);
-
    arr = [25, 10, 10 + 5, str];
+
+   arr.push(25, 10);
+   print(arr.pop());
+   print(arr.elementAt(2));
 
    return array_test(arr, [10, 5]);
 }

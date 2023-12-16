@@ -33,8 +33,12 @@ function main() {
         "test": 5,
         "test2": 10
    };
-
    print(map);
+   map.remove("test");
+
+   if(map.containsKey("test2")) {
+        print("test2");
+   }
 
    print("after if statement");
 

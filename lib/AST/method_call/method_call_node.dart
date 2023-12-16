@@ -47,6 +47,31 @@ class ASTMethodCallNode extends ASTNode {
           return obj.removeAt(
               ((await arguments.first.execute(memory, functions)) as double)
                   .toInt());
+        case "isEmpty":
+          return obj.isEmpty;
+        case "isNotEmpty":
+          return obj.isNotEmpty;
+      }
+    } else if (obj is Map) {
+      switch (methodName) {
+        case "values":
+          return obj.values;
+        case "keys":
+          return obj.keys;
+        case "isEmpty":
+          return obj.isEmpty;
+        case "isNotEmpty":
+          return obj.isNotEmpty;
+        case "containsKey":
+          return obj
+              .containsKey(await arguments.first.execute(memory, functions));
+        case "clear":
+          return obj.clear();
+        case "containsValue":
+          return obj
+              .containsValue(await arguments.first.execute(memory, functions));
+        case "remove":
+          return obj.remove(await arguments.first.execute(memory, functions));
       }
     }
   }

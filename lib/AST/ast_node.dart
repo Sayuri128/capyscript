@@ -13,7 +13,5 @@ class ASTNode {
   Map<String, dynamic> toJson() => _$ASTNodeToJson(this);
 
   Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    throw UnsupportedError("ASTNode cannot be executed");
-  }
+      Map<String, ASTFunctionDeclarationNode> functions) async {}
 }

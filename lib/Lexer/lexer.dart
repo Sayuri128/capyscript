@@ -56,48 +56,56 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.GREATER_EQUAL, '>=');
+      } else if (currentChar == "+" && peekNextChar() == "+") {
+        _advance();
+        _advance();
+        return Token(TokenType.INCREMENT, "++");
+      } else if (currentChar == "-" && peekNextChar() == "-") {
+        _advance();
+        _advance();
+        return Token(TokenType.DECREMENT, "--");
       }
 
       _advance();
       switch (currentChar) {
         case '+':
-          return Token(TokenType.PLUS, '+');
+          return Token(TokenType.PLUS, currentChar);
         case '-':
-          return Token(TokenType.MINUS, '-');
+          return Token(TokenType.MINUS, currentChar);
         case '*':
-          return Token(TokenType.MULTIPLY, '*');
+          return Token(TokenType.MULTIPLY, currentChar);
         case '/':
-          return Token(TokenType.DIVIDE, '/');
+          return Token(TokenType.DIVIDE, currentChar);
         case '(':
-          return Token(TokenType.LPAREN, '(');
+          return Token(TokenType.LPAREN, currentChar);
         case ')':
-          return Token(TokenType.RPAREN, ')');
+          return Token(TokenType.RPAREN, currentChar);
         case ';':
-          return Token(TokenType.SEMICOLON, ';');
+          return Token(TokenType.SEMICOLON, currentChar);
         case ",":
-          return Token(TokenType.COMMA, ",");
+          return Token(TokenType.COMMA, currentChar);
         case "{":
-          return Token(TokenType.LBRACE, "{");
+          return Token(TokenType.LBRACE, currentChar);
         case "}":
-          return Token(TokenType.RBRACE, "}");
+          return Token(TokenType.RBRACE, currentChar);
         case "=":
-          return Token(TokenType.EQUALS, "=");
+          return Token(TokenType.EQUALS, currentChar);
         case "\"":
-          return Token(TokenType.DOUBLE_QUOTES, "\"");
+          return Token(TokenType.DOUBLE_QUOTES, currentChar);
         case "'":
-          return Token(TokenType.SINGLE_QUOTE, "'");
+          return Token(TokenType.SINGLE_QUOTE, currentChar);
         case "[":
-          return Token(TokenType.LSQUARE_BRACE, '[');
+          return Token(TokenType.LSQUARE_BRACE, currentChar);
         case "]":
-          return Token(TokenType.RSQUARE_BRACE, ']');
+          return Token(TokenType.RSQUARE_BRACE, currentChar);
         case ":":
-          return Token(TokenType.COLON, ":");
+          return Token(TokenType.COLON, currentChar);
         case ".":
-          return Token(TokenType.DOT, ".");
+          return Token(TokenType.DOT, currentChar);
         case "<":
-          return Token(TokenType.LESS, "<");
+          return Token(TokenType.LESS, currentChar);
         case ">":
-          return Token(TokenType.GREATER, '>');
+          return Token(TokenType.GREATER, currentChar);
         default:
           throw Exception(
               'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
@@ -152,13 +160,15 @@ class Lexer {
     } else if (identifier == "import") {
       return Token(TokenType.IMPORT, identifier);
     } else if (identifier == "if") {
-      return Token(TokenType.IF, 'if');
+      return Token(TokenType.IF, identifier);
     } else if (identifier == 'else') {
-      return Token(TokenType.ELSE, 'else');
+      return Token(TokenType.ELSE, identifier);
     } else if (identifier == "true") {
-      return Token(TokenType.TRUE, 'true');
+      return Token(TokenType.TRUE, identifier);
     } else if (identifier == "false") {
-      return Token(TokenType.FALSE, 'false');
+      return Token(TokenType.FALSE, identifier);
+    } else if (identifier == "for") {
+      return Token(TokenType.FOR, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

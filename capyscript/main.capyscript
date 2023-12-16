@@ -17,6 +17,10 @@ function main() {
 
    print(sum(35, 15));
 
+   for(i = 0; i < 10;) {
+        print(i++);
+   }
+
    if(variable > 5) {
       print("if block");
    } else if(variable >= 5) {

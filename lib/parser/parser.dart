@@ -2,6 +2,8 @@ import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
 import 'package:capyscript/AST/decrement/ast_decrement_node.dart';
+import 'package:capyscript/AST/for_loop/ast_break_node.dart';
+import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
 import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
@@ -340,6 +342,16 @@ class Parser {
 
     if (canEat([TokenType.FOR])) {
       return _parseForLoopNode(functionName: functionName);
+    }
+
+    if (canEat([TokenType.BREAK])) {
+      eat(TokenType.BREAK);
+      return ASTBreakNode();
+    }
+
+    if (canEat([TokenType.CONTINUE])) {
+      eat(TokenType.CONTINUE);
+      return ASTContinueNode();
     }
 
     throw Exception('Invalid statement');

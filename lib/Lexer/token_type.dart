@@ -33,5 +33,7 @@ enum TokenType {
   FALSE,
   FOR,
   INCREMENT,
-  DECREMENT
+  DECREMENT,
+  BREAK,
+  CONTINUE
 }

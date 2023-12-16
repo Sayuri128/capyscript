@@ -8,6 +8,7 @@ import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
+import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
@@ -115,6 +116,7 @@ class Parser {
       return node;
     }
 
+    // array
     if (canEat([TokenType.LSQUARE_BRACE])) {
       eat(TokenType.LSQUARE_BRACE);
       final List<ASTNode> values = [];
@@ -126,6 +128,27 @@ class Parser {
       }
       eat(TokenType.RSQUARE_BRACE);
       return ASTArrayNode(expressions: values);
+    }
+
+    // map
+    if (canEat([TokenType.LBRACE])) {
+      eat(TokenType.LBRACE);
+      final Map<ASTNode, ASTNode> mapEntities = {};
+      if (!canEat([TokenType.RBRACE])) {
+        while (!canEat([TokenType.RBRACE])) {
+          final keyToken = _parseExpression(functionName: functionName);
+          eat(TokenType.COLON);
+          final valueToken = _parseExpression(functionName: functionName);
+          mapEntities[keyToken] = valueToken;
+
+          if (canEat([TokenType.COMMA])) {
+            eat(TokenType.COMMA);
+          }
+        }
+      }
+      eat(TokenType.RBRACE);
+      return ASTMapNode(
+          keys: mapEntities.keys.toList(), values: mapEntities.values.toList());
     }
 
     if (canEat([TokenType.STRING])) {

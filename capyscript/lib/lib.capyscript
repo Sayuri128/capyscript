@@ -2,3 +2,12 @@
 function sum(number1, number2) {
     return number1 + number2;
 }
+
+function array_test(arr1, arr2) {
+    return arr1 + arr2;
+}
+
+function test(param1, param2) {
+    return param1 + param2;
+}
+

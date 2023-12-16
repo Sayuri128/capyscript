@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:capyscript/AST/ast_node.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
@@ -23,8 +24,9 @@ class ASTReturnNode extends ASTNode {
   });
 
   @override
-  execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
-    return expression.execute(memory, functions);
+  Future<void> execute(Map<String, Map<String, dynamic>> memory,
+      Map<String, ASTFunctionDeclarationNode> functions) async {
+    throw ASTReturnValue<dynamic>(
+        value: await expression.execute(memory, functions));
   }
 }

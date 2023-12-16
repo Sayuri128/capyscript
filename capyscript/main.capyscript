@@ -9,7 +9,7 @@ function main() {
 
    print(5 * 5);
 
-   arr = [25, 10, 10 + 5, str];
+   arr = [25, 10, 10 + 5, str] + [0, test(25, 25)];
 
    arr.push(25, 10);
    print(arr.pop());
@@ -21,19 +21,14 @@ function main() {
       print("if block");
    } else if(variable >= 5) {
       print("else if block");
+      return 0;
    } else {
       print("else block");
    }
 
+   print("after if statement");
+
    return array_test(arr, [10, 5]);
-}
-
-function array_test(arr1, arr2) {
-    return arr1 + arr2;
-}
-
-function test(param1, param2) {
-    return param1 + param2;
 }
 
 function get_google() {

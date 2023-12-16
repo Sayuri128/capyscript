@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
@@ -41,6 +42,10 @@ class ASTFunctionCallNode extends ASTNode {
           await arguments[i].execute(memory, functions);
     }
 
-    return await function.execute(memory, functions);
+    try {
+      return await function.execute(memory, functions);
+    } on ASTReturnValue<dynamic> catch (res) {
+      return res.execute(memory, functions);
+    }
   }
 }

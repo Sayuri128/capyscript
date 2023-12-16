@@ -25,10 +25,16 @@ function main() {
       print("if block");
    } else if(variable >= 5) {
       print("else if block");
-      return 0;
    } else {
       print("else block");
    }
+
+   map = {
+        "test": 5,
+        "test2": 10
+   };
+
+   print(map);
 
    print("after if statement");
 

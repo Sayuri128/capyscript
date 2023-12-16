@@ -169,6 +169,10 @@ class Lexer {
       return Token(TokenType.FALSE, identifier);
     } else if (identifier == "for") {
       return Token(TokenType.FOR, identifier);
+    } else if (identifier == "break") {
+      return Token(TokenType.BREAK, identifier);
+    } else if (identifier == "continue") {
+      return Token(TokenType.CONTINUE, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

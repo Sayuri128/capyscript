@@ -8,7 +8,7 @@ part of 'ast_number_node.dart';
 
 ASTNumberNode _$ASTNumberNodeFromJson(Map<String, dynamic> json) =>
     ASTNumberNode(
-      value: (json['value'] as num).toDouble(),
+      value: json['value'] as num,
     );
 
 Map<String, dynamic> _$ASTNumberNodeToJson(ASTNumberNode instance) =>

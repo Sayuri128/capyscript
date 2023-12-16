@@ -10,6 +10,8 @@ import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
+import 'package:capyscript/AST/object/ast_object_get_node.dart';
+import 'package:capyscript/AST/object/ast_object_set_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
@@ -105,7 +107,7 @@ class Parser {
 
   ASTNode _parseFactor({required String functionName}) {
     if (_currentToken!.type == TokenType.NUMBER) {
-      double value = double.parse(_currentToken!.value);
+      final num value = num.parse(_currentToken!.value);
       eat(TokenType.NUMBER);
       return ASTNumberNode(value: value);
     }
@@ -181,12 +183,19 @@ class Parser {
     if (_currentToken!.type == TokenType.IDENTIFIER) {
       String identifier = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
-      if (_currentToken!.type == TokenType.LPAREN) {
+      if (canEat([TokenType.LPAREN])) {
         eat(TokenType.LPAREN);
         final arguments = _parseFunctionArguments(functionName: functionName);
         eat(TokenType.RPAREN);
         return ASTFunctionCallNode(
             functionName: identifier, arguments: arguments);
+      }
+
+      if (canEat([TokenType.LSQUARE_BRACE])) {
+        return _parseObjectGet(
+            target: ASTVariableNode(
+                variableName: identifier, functionName: functionName),
+            functionName: functionName);
       }
 
       if (canEat([TokenType.DOT])) {
@@ -228,6 +237,25 @@ class Parser {
     }
 
     throw Exception("Unexpected token ${_currentToken.toString()}");
+  }
+
+  ASTNode _parseObjectGet(
+      {required ASTNode target, required String functionName}) {
+    eat(TokenType.LSQUARE_BRACE);
+    final key = _parseExpression(functionName: functionName);
+    eat(TokenType.RSQUARE_BRACE);
+    return ASTObjectGetNode(targetExpression: target, keyExpression: key);
+  }
+
+  ASTNode _parseObjectSet(
+      {required ASTNode target, required String functionName}) {
+    eat(TokenType.LSQUARE_BRACE);
+    final ASTNode key = _parseExpression(functionName: functionName);
+    eat(TokenType.RSQUARE_BRACE);
+    eat(TokenType.EQUALS);
+    final ASTNode value = _parseExpression(functionName: functionName);
+    return ASTObjectSetNode(
+        targetExpression: target, keyExpression: key, valueExpression: value);
   }
 
   ASTNode _parseIfStatement({required String functionName}) {
@@ -356,6 +384,13 @@ class Parser {
         eat(TokenType.DECREMENT);
         return ASTDecrementNode(
             variable: identifier, functionName: functionName);
+      }
+
+      if (canEat([TokenType.LSQUARE_BRACE])) {
+        return _parseObjectSet(
+            target: ASTVariableNode(
+                variableName: identifier, functionName: functionName),
+            functionName: functionName);
       }
     }
 

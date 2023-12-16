@@ -41,11 +41,11 @@ class ASTMethodCallNode extends ASTNode {
           return obj.removeLast();
         case 'elementAt':
           return obj.elementAt(
-              ((await arguments.first.execute(memory, functions)) as double)
+              ((await arguments.first.execute(memory, functions)) as num)
                   .toInt());
         case "removeAt":
           return obj.removeAt(
-              ((await arguments.first.execute(memory, functions)) as double)
+              ((await arguments.first.execute(memory, functions)) as num)
                   .toInt());
         case "isEmpty":
           return obj.isEmpty;

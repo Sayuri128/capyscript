@@ -30,5 +30,8 @@ enum TokenType {
   LESS_EQUAL,
   GREATER_EQUAL,
   TRUE,
-  FALSE
+  FALSE,
+  FOR,
+  INCREMENT,
+  DECREMENT
 }

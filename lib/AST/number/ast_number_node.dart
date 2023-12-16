@@ -16,7 +16,7 @@ class ASTNumberNode extends ASTNode {
 
   Map<String, dynamic> toJson() => _$ASTNumberNodeToJson(this);
 
-  final double value;
+  final num value;
 
   const ASTNumberNode({
     required this.value,

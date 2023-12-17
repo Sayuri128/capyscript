@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -24,12 +25,11 @@ class ASTMapNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future execute(InterpreterEnvironment environment) async {
     final Map<dynamic, dynamic> map = {};
     for (int i = 0; i < keys.length; i++) {
-      map[await keys[i].execute(memory, functions)] =
-          await values[i].execute(memory, functions);
+      map[await keys[i].execute(environment)] =
+          await values[i].execute(environment);
     }
     return map;
   }

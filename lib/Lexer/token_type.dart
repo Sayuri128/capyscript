@@ -32,8 +32,11 @@ enum TokenType {
   TRUE,
   FALSE,
   FOR,
+  RETURN,
   INCREMENT,
   DECREMENT,
   BREAK,
-  CONTINUE
+  CONTINUE,
+  CLASS,
+  NEW
 }

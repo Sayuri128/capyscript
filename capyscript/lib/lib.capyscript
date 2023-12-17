@@ -11,3 +11,56 @@ function test(param1, param2) {
     return param1 + param2;
 }
 
+function test1() {
+       variable = (5 + 5) / 2 * 2 * 3.14;
+       variable = 5;
+       str = "String Test";
+
+       print(5 * 5);
+
+       arr = [25, 10, 10 + 5, str] + [0, test(25, 25)];
+       print(arr[0]);
+
+       arr.push(25, 10);
+       print(arr.pop());
+       print(arr.elementAt(2));
+
+       print(sum(35, 15));
+
+       for(i = 0; i < 10;) {
+            print(i++);
+       }
+
+       if(variable > 5) {
+          print("if block");
+       } else if(variable >= 5) {
+          print("else if block");
+       } else {
+          print("else block");
+       }
+
+       map = {
+            "test": 5,
+            "test2": 10
+       };
+       print(map);
+       map.remove("test");
+
+       if(map.containsKey("test2")) {
+
+       }
+
+        first_arr_element = arr[0];
+        print(first_arr_element);
+
+        map["test2"] = 15;
+        map_element = map["test2"];
+        print(map_element);
+        print(map);
+       print("after if statement");
+
+       arr[0] = 0;
+       print(arr[0]);
+
+       return array_test(arr, [10, 5]);
+}

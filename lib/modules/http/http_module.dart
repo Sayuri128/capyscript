@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/ast_tree.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
@@ -27,17 +28,16 @@ class HttpModule extends BaseModule {
         functionName: "get",
         parameters: [ASTParameterNode("url")],
         body: HttpGetNode()));
-    body = ASTTree(functions: functions, modules: []);
+    body = ASTTree(functions: functions, modules: [], classes: []);
   }
 }
 
 class HttpGetNode extends ModuleFunctionBody {
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
     late final String url;
     try {
-      url = memory["get"]!["url"]!;
+      url = environment.getVariable("url");
     } catch (e) {
       throw Exception("URL not found");
     }

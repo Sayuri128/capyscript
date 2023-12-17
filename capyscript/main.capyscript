@@ -1,59 +1,55 @@
 import "http";
 import "io";
-import "lib/lib.capyscript";
+
+class Food {
+    _value = 1;
+
+    function getValue() {
+        return this.value;
+    }
+}
+
+class Capy {
+
+    hp = 2;
+    food = new Food();
+
+    function getHp() {
+        return this.hp;
+    }
+
+    function getFood() {
+        return this.food;
+    }
+
+
+}
 
 function main() {
-   variable = (5 + 5) / 2 * 2 * 3.14;
-   variable = 5;
-   str = "String Test";
+    capy = new Capy();
 
-   print(5 * 5);
+    print(capy.getHp());
 
-   arr = [25, 10, 10 + 5, str] + [0, test(25, 25)];
-   print(arr[0]);
+    map = {
+        "map": {
+            "value": 2
+        },
+        "value": 1
+    };
 
-   arr.push(25, 10);
-   print(arr.pop());
-   print(arr.elementAt(2));
+    print(map["map"]["value"]);
 
-   print(sum(35, 15));
+    arr = [[0, 1], [2, 3]];
 
-   for(i = 0; i < 10;) {
-        print(i++);
-   }
+    print(arr[1][0]);
+    arr[0][0] = 5;
+    print(arr[0][0]);
 
-   if(variable > 5) {
-      print("if block");
-   } else if(variable >= 5) {
-      print("else if block");
-   } else {
-      print("else block");
-   }
+    return capy.getHp();
+}
 
-   map = {
-        "test": 5,
-        "test2": 10
-   };
-   print(map);
-   map.remove("test");
-
-   if(map.containsKey("test2")) {
-
-   }
-
-    first_arr_element = arr[0];
-    print(first_arr_element);
-
-    map["test2"] = 15;
-    map_element = map["test2"];
-    print(map_element);
-    print(map);
-   print("after if statement");
-
-   arr[0] = 0;
-   print(arr[0]);
-
-   return array_test(arr, [10, 5]);
+function public_get() {
+   return get_google;
 }
 
 function get_google() {

@@ -1,4 +1,6 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_class.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -27,26 +29,23 @@ class ASTMethodCallNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final obj = await variable.execute(memory, functions);
+  Future execute(InterpreterEnvironment environment) async {
+    final obj = await variable.execute(environment);
     if (obj is List) {
       switch (methodName) {
         case "push":
           for (final arg in arguments) {
-            obj.add(await arg.execute(memory, functions));
+            obj.add(await arg.execute(environment));
           }
           return null;
         case "pop":
           return obj.removeLast();
         case 'elementAt':
           return obj.elementAt(
-              ((await arguments.first.execute(memory, functions)) as num)
-                  .toInt());
+              ((await arguments.first.execute(environment)) as num).toInt());
         case "removeAt":
           return obj.removeAt(
-              ((await arguments.first.execute(memory, functions)) as num)
-                  .toInt());
+              ((await arguments.first.execute(environment)) as num).toInt());
         case "isEmpty":
           return obj.isEmpty;
         case "isNotEmpty":
@@ -63,16 +62,27 @@ class ASTMethodCallNode extends ASTNode {
         case "isNotEmpty":
           return obj.isNotEmpty;
         case "containsKey":
-          return obj
-              .containsKey(await arguments.first.execute(memory, functions));
+          return obj.containsKey(await arguments.first.execute(environment));
         case "clear":
           return obj.clear();
         case "containsValue":
-          return obj
-              .containsValue(await arguments.first.execute(memory, functions));
+          return obj.containsValue(await arguments.first.execute(environment));
         case "remove":
-          return obj.remove(await arguments.first.execute(memory, functions));
+          return obj.remove(await arguments.first.execute(environment));
       }
     }
+    if (obj is InterpreterClass) {
+      environment.setCurrentInstance(obj);
+      final method = obj.methods[methodName];
+      if (method == null) {
+        environment.removeCurrentInstance();
+        throw Exception(
+            "${obj.className} does not have defined method ${methodName}");
+      }
+      final res = await method.call();
+      environment.removeCurrentInstance();
+      return res;
+    }
+    ;
   }
 }

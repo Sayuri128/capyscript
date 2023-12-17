@@ -5,6 +5,7 @@
 
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 
@@ -16,36 +17,41 @@ class ASTFunctionCallNode extends ASTNode {
       _$ASTFunctionCallNodeFromJson(json);
 
   Map<String, dynamic> toJson() => _$ASTFunctionCallNodeToJson(this);
-  final String functionName;
+  final ASTNode function;
   final List<ASTNode> arguments;
 
   const ASTFunctionCallNode({
-    required this.functionName,
+    required this.function,
     required this.arguments,
   });
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    late final ASTFunctionDeclarationNode function;
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    late final ASTFunctionDeclarationNode functionDec;
 
     try {
-      function = functions[functionName]!;
-      memory[functionName] = {};
+      functionDec = environment.functions[await function.execute(environment)]!;
     } catch (e) {
-      throw Exception("function ${functionName} not found");
+      throw Exception("function ${function.toString()} not found");
     }
 
-    final mem = memory[functionName]!;
-    for (int i = 0; i < function.parameters.length; i++) {
-      mem[function.parameters[i].paramName] =
-          await arguments[i].execute(memory, functions);
+    environment.enterScope();
+
+    for (int i = 0; i < functionDec.parameters.length; i++) {
+      environment.setVariable(functionDec.parameters[i].paramName,
+          await arguments[i].execute(environment));
     }
+
+    late final dynamic res;
 
     try {
-      return await function.execute(memory, functions);
-    } on ASTReturnValue<dynamic> catch (res) {
-      return res.execute(memory, functions);
+      res = await functionDec.execute(environment);
+    } on ASTReturnValue<dynamic> catch (r) {
+      res = await r.execute(environment);
     }
+
+    environment.exitScope();
+    return res;
+
   }
 }

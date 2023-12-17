@@ -1,22 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ast_function_call_node.dart';
+part of 'ast_class_intantiation_node.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ASTFunctionCallNode _$ASTFunctionCallNodeFromJson(Map<String, dynamic> json) =>
-    ASTFunctionCallNode(
-      function: ASTNode.fromJson(json['function'] as Map<String, dynamic>),
+ASTClassInstantiationNode _$ASTClassInstantiationNodeFromJson(
+        Map<String, dynamic> json) =>
+    ASTClassInstantiationNode(
+      className: json['className'] as String,
       arguments: (json['arguments'] as List<dynamic>)
           .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
           .toList(),
+      functionName: json['functionName'] as String,
     );
 
-Map<String, dynamic> _$ASTFunctionCallNodeToJson(
-        ASTFunctionCallNode instance) =>
+Map<String, dynamic> _$ASTClassInstantiationNodeToJson(
+        ASTClassInstantiationNode instance) =>
     <String, dynamic>{
-      'function': instance.function.toJson(),
+      'className': instance.className,
       'arguments': instance.arguments.map((e) => e.toJson()).toList(),
+      'functionName': instance.functionName,
     };

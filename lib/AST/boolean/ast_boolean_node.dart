@@ -5,6 +5,7 @@
 
 import 'package:capyscript/AST/ast_node.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 
 class ASTBooleanNode extends ASTNode {
   final bool value;
@@ -14,8 +15,7 @@ class ASTBooleanNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future execute(InterpreterEnvironment environment) async {
     return value;
   }
 }

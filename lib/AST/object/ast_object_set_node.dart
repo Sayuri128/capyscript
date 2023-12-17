@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 /*
@@ -18,21 +19,30 @@ class ASTObjectSetNode extends ASTNode {
   Map<String, dynamic> toJson() => _$ASTObjectSetNodeToJson(this);
 
   final ASTNode targetExpression;
-  final ASTNode keyExpression;
+  final List<ASTNode> keyExpressions;
   final ASTNode valueExpression;
 
   const ASTObjectSetNode({
     required this.targetExpression,
-    required this.keyExpression,
+    required this.keyExpressions,
     required this.valueExpression,
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final target = await targetExpression.execute(memory, functions);
-    final key = await keyExpression.execute(memory, functions);
-    final value = await valueExpression.execute(memory, functions);
+  Future execute(InterpreterEnvironment environment) async {
+    dynamic target = await targetExpression.execute(environment);
+    dynamic key;
+
+    final value = await valueExpression.execute(environment);
+
+    for (final keyExp in keyExpressions) {
+      if (keyExp == keyExpressions.last) {
+        break;
+      }
+      key = await keyExp.execute(environment);
+      target = target[key];
+    }
+
     target[key] = value;
     return null;
   }

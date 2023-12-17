@@ -4,6 +4,7 @@
  */
 
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 
@@ -27,10 +28,9 @@ class ASTAssignmentNode extends ASTNode {
   });
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final res = await expression.execute(memory, functions);
-    memory[functionName]?[variableName] = res;
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    final res = await expression.execute(environment);
+    environment.setVariable(variableName, res);
     return res;
   }
 }

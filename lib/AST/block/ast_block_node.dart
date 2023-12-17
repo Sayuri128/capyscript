@@ -6,6 +6,7 @@
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 
@@ -24,11 +25,10 @@ class ASTBlockNode extends ASTNode {
   });
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
     dynamic result;
     for (var statement in statements) {
-      result = await statement.execute(memory, functions);
+      result = await statement.execute(environment);
     }
     return result; // Return the result of the last statement
   }

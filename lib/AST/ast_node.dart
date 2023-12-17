@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ast_node.g.dart';
@@ -12,6 +13,5 @@ class ASTNode {
 
   Map<String, dynamic> toJson() => _$ASTNodeToJson(this);
 
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {}
+  Future<dynamic> execute(InterpreterEnvironment environment) async {}
 }

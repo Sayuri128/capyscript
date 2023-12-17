@@ -8,8 +8,10 @@ import 'dart:io';
 
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
+import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/Interpreter/interpreter_class.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/abstract/imported/imported_module.dart';
@@ -21,12 +23,13 @@ class Interpreter {
 
   late final File _mainFile;
 
-  final Map<String, Map<String, dynamic>> _memory = {};
-  final Map<String, ASTFunctionDeclarationNode> _functions = {};
+  late final InterpreterEnvironment _environment;
 
   Interpreter({required String mainPath}) {
     _mainFile = File(mainPath);
     final String input = _mainFile.readAsStringSync();
+
+    _environment = InterpreterEnvironment(functions: {});
 
     this.parser = Parser(source: input);
   }
@@ -41,8 +44,9 @@ class Interpreter {
       throw Exception("main function not found");
     }
 
-    final mainCall = ASTFunctionCallNode(functionName: "main", arguments: []);
-    return await mainCall.execute(_memory, _functions);
+    final mainCall = ASTFunctionCallNode(
+        function: ASTStringNode(value: 'main'), arguments: []);
+    return await mainCall.execute(_environment);
   }
 
   InterpreterTree _runParser() {
@@ -60,7 +64,10 @@ class Interpreter {
 
   void _importModule(ASTTree result) {
     for (final function in result.functions) {
-      _functions[function.functionName] = function;
+      _environment.functions[function.functionName] = function;
+    }
+    for (final clazz in result.classes) {
+      _environment.addClass(className: clazz.className, clazz: clazz);
     }
   }
 

@@ -1,21 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ast_object_get_node.dart';
+part of 'ast_class_get_node.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ASTObjectGetNode _$ASTObjectGetNodeFromJson(Map<String, dynamic> json) =>
-    ASTObjectGetNode(
+ASTClassGetNode _$ASTClassGetNodeFromJson(Map<String, dynamic> json) =>
+    ASTClassGetNode(
       targetExpression:
           ASTNode.fromJson(json['targetExpression'] as Map<String, dynamic>),
-      keyExpression:
-          ASTNode.fromJson(json['keyExpression'] as Map<String, dynamic>),
+      fieldNames: (json['fieldNames'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
     );
 
-Map<String, dynamic> _$ASTObjectGetNodeToJson(ASTObjectGetNode instance) =>
+Map<String, dynamic> _$ASTClassGetNodeToJson(ASTClassGetNode instance) =>
     <String, dynamic>{
       'targetExpression': instance.targetExpression.toJson(),
-      'keyExpression': instance.keyExpression.toJson(),
+      'fieldNames': instance.fieldNames,
     };

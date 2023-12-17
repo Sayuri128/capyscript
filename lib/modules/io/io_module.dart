@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/ast_tree.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -27,17 +28,16 @@ class IOModule extends BaseModule {
         parameters: [ASTParameterNode("data")],
         body: IOPrintNode()));
 
-    body = ASTTree(functions: functions, modules: []);
+    body = ASTTree(functions: functions, modules: [], classes: []);
   }
 }
 
 class IOPrintNode extends ModuleFunctionBody {
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future execute(InterpreterEnvironment environment) async {
     late final dynamic data;
     try {
-      data = memory["print"]!["data"];
+      data = environment.getVariable("data");
     } catch (e) {
       throw Exception("data not found");
     }

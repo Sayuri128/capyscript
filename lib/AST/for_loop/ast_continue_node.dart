@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -16,8 +17,7 @@ class ASTContinueNode extends ASTNode {
   Map<String, dynamic> toJson() => _$ASTContinueNodeToJson(this);
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future execute(InterpreterEnvironment environment) async {
     throw this;
   }
 

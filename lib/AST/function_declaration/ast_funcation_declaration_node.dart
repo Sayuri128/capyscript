@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 import '../parameter/ast_parameter_node.dart';
@@ -27,8 +28,7 @@ class ASTFunctionDeclarationNode extends ASTNode {
   });
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    return await body.execute(memory, functions);
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    return await body.execute(environment);
   }
 }

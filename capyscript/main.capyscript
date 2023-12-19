@@ -1,35 +1,24 @@
 import "http";
 import "io";
 
-class Food {
-    _value = 1;
-
-    function getValue() {
-        return this.value;
-    }
-}
-
-class Capy {
-
-    hp = 2;
-    food = new Food();
-
-    function getHp() {
-        return this.hp;
-    }
-
-    function getFood() {
-        return this.food;
-    }
-
-
+function getCapy() {
+    return new Capy();
 }
 
 function main() {
+
     capy = new Capy();
 
+    print(capy.getChildren().getFood().value);
+    print(capy.getChildren().getFood().value);
+
+    print(capy.getHp());
+    capy.setHp(3);
     print(capy.getHp());
 
+}
+
+function map_tests() {
     map = {
         "map": {
             "value": 2
@@ -46,12 +35,55 @@ function main() {
     print(arr[0][0]);
 
     return capy.getHp();
+
 }
 
 function public_get() {
    return get_google;
 }
 
-function get_google() {
-    return get("https://google.com");
+class Food {
+    value = 1;
+
+    function getValue() {
+        return this.value;
+    }
+
+    function setValue(value) {
+        this.value = value;
+    }
+}
+
+class Children {
+    food = new Food();
+
+    function getFood() {
+        return this.food;
+    }
+
+
+}
+
+class Capy {
+
+    hp = 2;
+    food = new Food();
+    children = new Children();
+
+    function getHp() {
+        return this.hp;
+    }
+
+    function getFood() {
+        return this.food;
+    }
+
+    function getChildren() {
+        return this.children;
+    }
+
+    function setHp(hp) {
+        this.hp = hp;
+    }
+
 }

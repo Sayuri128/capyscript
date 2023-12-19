@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ast_class_get_node.dart';
+part of 'ast_property_access_node.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ASTClassGetNode _$ASTClassGetNodeFromJson(Map<String, dynamic> json) =>
-    ASTClassGetNode(
+ASTPropertyAccessNode _$ASTPropertyAccessNodeFromJson(
+        Map<String, dynamic> json) =>
+    ASTPropertyAccessNode(
       targetExpression:
           ASTNode.fromJson(json['targetExpression'] as Map<String, dynamic>),
-      fieldNames: (json['fieldNames'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      fieldName: json['fieldName'] as String,
     );
 
-Map<String, dynamic> _$ASTClassGetNodeToJson(ASTClassGetNode instance) =>
+Map<String, dynamic> _$ASTPropertyAccessNodeToJson(
+        ASTPropertyAccessNode instance) =>
     <String, dynamic>{
       'targetExpression': instance.targetExpression.toJson(),
-      'fieldNames': instance.fieldNames,
+      'fieldName': instance.fieldName,
     };

@@ -22,4 +22,8 @@ class InterpreterClass {
   String toString() {
     return 'InterpreterClass{className: $className, methods: $methods, properties: $properties}';
   }
+
+  operator [](String field) {
+    return properties[field] ?? methods[field] ?? null;
+  }
 }

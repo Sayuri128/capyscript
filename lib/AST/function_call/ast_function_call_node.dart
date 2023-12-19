@@ -46,7 +46,7 @@ class ASTFunctionCallNode extends ASTNode {
 
     try {
       res = await functionDec.execute(environment);
-    } on ASTReturnValue<dynamic> catch (r) {
+    } on ASTReturnValue catch (r) {
       res = await r.execute(environment);
     }
 

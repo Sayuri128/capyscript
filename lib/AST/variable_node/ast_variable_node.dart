@@ -1,3 +1,4 @@
+import 'package:capyscript/AST/ast_reference.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -24,9 +25,29 @@ class ASTVariableNode extends ASTNode {
 
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
-    if(variableName == "this") {
-      return environment.getCurrentInstance();
+    try {
+      if (variableName == "this") {
+        return environment.getCurrentInstance();
+      }
+      return environment.getVariable(variableName);
+    } catch (e) {
+      return variableName;
     }
-    return environment.getVariable(variableName);
+  }
+
+  @override
+  ASTReference getReference() {
+    return ASTReference(getter: (InterpreterEnvironment environment) async {
+      return this.execute(environment);
+    }, setter: (InterpreterEnvironment environment, dynamic value) async {
+      try {
+        if (variableName == "this") {
+          return environment.setCurrentInstance(value);
+        }
+        return environment.setVariable(variableName, value);
+      } catch (e) {
+        return;
+      }
+    });
   }
 }

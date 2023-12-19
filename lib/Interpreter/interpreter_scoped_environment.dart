@@ -37,7 +37,9 @@ class InterpreterScopedEnvironment {
     final reference = variables[name];
     if (reference != null) {
       return reference.value;
-    } else if (parentScope != null && level < 1) {
+    } else if (_currentInstance != null) {
+      return _currentInstance!.properties[name];
+    } else if (parentScope != null) {
       return parentScope!.getVariable(name, level: level + 1);
     }
 

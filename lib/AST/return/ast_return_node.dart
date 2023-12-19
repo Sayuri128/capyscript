@@ -28,6 +28,6 @@ class ASTReturnNode extends ASTNode {
 
   @override
   Future<void> execute(InterpreterEnvironment environment) async {
-    throw ASTReturnValue<dynamic>(value: await expression.execute(environment));
+    throw ASTReturnValue(value: await expression.execute(environment));
   }
 }

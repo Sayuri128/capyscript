@@ -1,3 +1,4 @@
+import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/Interpreter/interpreter_class.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
@@ -72,14 +73,26 @@ class ASTMethodCallNode extends ASTNode {
       }
     }
     if (obj is InterpreterClass) {
+      environment.enterScope();
       environment.setCurrentInstance(obj);
       final method = obj.methods[methodName];
       if (method == null) {
         environment.removeCurrentInstance();
+        environment.exitScope();
         throw Exception(
             "${obj.className} does not have defined method ${methodName}");
       }
-      final res = await method.call();
+
+
+      late final dynamic res;
+
+      try {
+        res = await method.call();
+      } on ASTReturnValue catch (r) {
+        res = await r.execute(environment);
+      }
+
+      environment.exitScope();
       environment.removeCurrentInstance();
       return res;
     }

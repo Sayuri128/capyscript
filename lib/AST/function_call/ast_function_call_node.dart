@@ -5,6 +5,7 @@
 
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
@@ -38,8 +39,24 @@ class ASTFunctionCallNode extends ASTNode {
     environment.enterScope();
 
     for (int i = 0; i < functionDec.parameters.length; i++) {
-      environment.setVariable(functionDec.parameters[i].paramName,
-          await arguments[i].execute(environment));
+      final arg = arguments[0];
+      final paramName = functionDec.parameters[i].paramName;
+      bool foundInMap = false;
+      if (arg is ASTMapNode) {
+        for (int j = 0; i < arg.keys.length; j++) {
+          final key = await arg.keys[j];
+          if (await key.execute(environment) == paramName) {
+            environment.setVariable(
+                paramName, await arg.values[j].execute(environment));
+            foundInMap = true;
+            break;
+          }
+        }
+      }
+      if (!foundInMap) {
+        environment.setVariable(functionDec.parameters[i].paramName,
+            await arguments[i].execute(environment));
+      }
     }
 
     late final dynamic res;
@@ -52,6 +69,5 @@ class ASTFunctionCallNode extends ASTNode {
 
     environment.exitScope();
     return res;
-
   }
 }

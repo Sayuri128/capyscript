@@ -1,6 +1,7 @@
 import "http";
 import "io";
-
+import "json";
+import "date";
 
 function main() {
 
@@ -24,9 +25,22 @@ function map_tests() {
     arr[0][0] = 5;
     print(arr[0][0]);
 
+    response = public_post({
+                      "url": "http://httpbin.org/post",
+                      "body": jsonSerialize({}),
+                      "headers": {
+                          "Content-Type": "application/json"
+                      }
+                  });
+
+    parser = createDateFormatter("yyyy-MM-dd hh:mm");
+    print(parser.format("2018-01-01 12:00"));
+
+    return jsonDeserialize(response["body"]);
+
 }
 
-function public_get() {
-   return get_google;
+function public_post(url, body, headers) {
+   return httpPost(url, body, headers);
 }
 

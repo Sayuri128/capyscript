@@ -4,6 +4,9 @@
  */
 
 import 'package:capyscript/AST/ast_tree.dart';
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/modules/json/json_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -29,9 +32,23 @@ class BaseModule {
   BaseModule({required this.moduleName}) {}
 }
 
-class ModuleFunctionBody extends ASTNode {}
+class ModuleFunctionBody extends ASTNode {
+  dynamic getVariable(String name, InterpreterEnvironment environment) {
+    try {
+      return environment.getVariable(name);
+    } catch (e) {
+      throw Exception("$name not found");
+    }
+  }
+
+  ASTFunctionDeclarationNode toDeclarationNode() {
+    return ASTFunctionDeclarationNode(
+        functionName: "", body: this, parameters: []);
+  }
+}
 
 final Map<String, BaseModule> modules = {
   HttpModule.module_name: HttpModule(),
-  IOModule.module_name: IOModule()
+  IOModule.module_name: IOModule(),
+  JsonModule.module_name: JsonModule(),
 };

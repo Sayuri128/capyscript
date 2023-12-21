@@ -1,4 +1,3 @@
-
 import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
@@ -10,6 +9,7 @@ import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
+import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/object/ast_object_get_node.dart';
 import 'package:capyscript/AST/object/ast_object_set_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
@@ -76,7 +76,6 @@ class Parser {
   bool canEat(List<TokenType> tokens) {
     return tokens.any((element) => element == _currentToken!.type);
   }
-
 
   ASTNode _parseExpression({required String functionName}) {
     return _parseTerm(functionName: functionName);
@@ -194,7 +193,13 @@ class Parser {
     ASTNode factor = _parsePrimary(functionName: functionName);
 
     while (true) {
-      if (canEat([TokenType.LPAREN])) {
+      if (canEat([TokenType.DOT])) {
+        eat(TokenType.DOT);
+        final field = eat(TokenType.IDENTIFIER);
+        if (canEat([TokenType.LPAREN])) {
+          factor = _parseMethodCall(functionName, factor, field);
+        }
+      } else if (canEat([TokenType.LPAREN])) {
         final arguments = _parseFunctionArguments(functionName: functionName);
         factor = ASTFunctionCallNode(function: factor, arguments: arguments);
       } else if (canEat([TokenType.LSQUARE_BRACE])) {
@@ -208,6 +213,14 @@ class Parser {
     }
 
     return factor;
+  }
+
+  ASTMethodCallNode _parseMethodCall(
+      String functionName, ASTNode target, String methodName) {
+    final arguments = _parseFunctionArguments(functionName: functionName);
+
+    return ASTMethodCallNode(
+        variable: target, methodName: methodName, arguments: arguments);
   }
 
   ASTNode _parseObjectSet(
@@ -350,13 +363,18 @@ class Parser {
       }
 
       while (true) {
-        if (canEat([TokenType.LSQUARE_BRACE])) {
+        if (canEat([TokenType.DOT])) {
+          eat(TokenType.DOT);
+          final field = eat(TokenType.IDENTIFIER);
+          if (canEat([TokenType.LPAREN])) {
+            factor = _parseMethodCall(functionName, factor, field);
+          }
+        } else if (canEat([TokenType.LSQUARE_BRACE])) {
           factor = _parseObjectSet(target: factor, functionName: functionName);
         } else {
           break;
         }
       }
-
       if (canEat([TokenType.EQUALS])) {
         // Assuming TokenType.EQUALS represents '=' for assignment
         return _parseAssignment(functionName, factor);

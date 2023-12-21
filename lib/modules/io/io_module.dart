@@ -28,7 +28,7 @@ class IOModule extends BaseModule {
         parameters: [ASTParameterNode("data")],
         body: IOPrintNode()));
 
-    body = ASTTree(functions: functions, modules: [], classes: []);
+    body = ASTTree(functions: functions, modules: []);
   }
 }
 

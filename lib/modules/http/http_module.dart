@@ -28,7 +28,7 @@ class HttpModule extends BaseModule {
         functionName: "get",
         parameters: [ASTParameterNode("url")],
         body: HttpGetNode()));
-    body = ASTTree(functions: functions, modules: [], classes: []);
+    body = ASTTree(functions: functions, modules: []);
   }
 }
 

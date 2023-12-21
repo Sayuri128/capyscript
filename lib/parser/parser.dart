@@ -1,10 +1,7 @@
-import 'dart:math';
 
 import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
-import 'package:capyscript/AST/class_declaration/ast_class_declaration_node.dart';
-import 'package:capyscript/AST/class_instantiation/ast_class_intantiation_node.dart';
 import 'package:capyscript/AST/decrement/ast_decrement_node.dart';
 import 'package:capyscript/AST/for_loop/ast_break_node.dart';
 import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
@@ -13,15 +10,10 @@ import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
-import 'package:capyscript/AST/method_call/method_call_node.dart';
-import 'package:capyscript/AST/method_declaration/ast_method_declrataion_node.dart';
 import 'package:capyscript/AST/object/ast_object_get_node.dart';
 import 'package:capyscript/AST/object/ast_object_set_node.dart';
-import 'package:capyscript/AST/property/ast_property_node.dart';
-import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
-import 'package:capyscript/AST/this/ast_this_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Lexer/lexer.dart';
 import 'package:capyscript/Lexer/token.dart';
@@ -49,19 +41,16 @@ class Parser {
   ASTTree parse() {
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
-    final List<ASTClassDeclarationNode> classes = [];
 
     while (canEat([TokenType.FUNCTION, TokenType.IMPORT, TokenType.CLASS])) {
       if (canEat([TokenType.FUNCTION])) {
         functions.add(_parseFunctionDeclaration());
       } else if (canEat([TokenType.IMPORT])) {
         imports.add(_parseImport());
-      } else if (canEat([TokenType.CLASS])) {
-        classes.add(_parseClassDeclaration());
       }
     }
 
-    return ASTTree(functions: functions, modules: imports, classes: classes);
+    return ASTTree(functions: functions, modules: imports);
   }
 
   String eat(TokenType expectedToken) {
@@ -88,63 +77,6 @@ class Parser {
     return tokens.any((element) => element == _currentToken!.type);
   }
 
-  ASTClassInstantiationNode _parseClassInstantiation(
-      {required String functionName}) {
-    eat(TokenType.NEW);
-    final className = _currentToken!.value;
-    eat(TokenType.IDENTIFIER);
-    eat(TokenType.LPAREN);
-    final arguments = _parseArguments();
-    eat(TokenType.RPAREN);
-
-    return ASTClassInstantiationNode(
-        className: className, arguments: arguments, functionName: functionName);
-  }
-
-  ASTClassDeclarationNode _parseClassDeclaration() {
-    eat(TokenType.CLASS);
-
-    final className = _currentToken!.value;
-    eat(TokenType.IDENTIFIER);
-
-    eat(TokenType.LBRACE);
-
-    final List<ASTMethodDeclarationNode> methods = [];
-    final List<ASTPropertyNode> properties = [];
-
-    while (true) {
-      if (canEat([TokenType.FUNCTION])) {
-        methods.add(_parseMethodDeclaration(className: className));
-      } else if (canEat([TokenType.IDENTIFIER])) {
-        final propertyName = _currentToken!.value;
-        eat(TokenType.IDENTIFIER);
-
-        ASTNode? value;
-
-        if (canEat([TokenType.EQUALS])) {
-          eat(TokenType.EQUALS);
-          value = _parseExpression(functionName: "");
-          eat(TokenType.SEMICOLON);
-        }
-
-        properties.add(ASTPropertyNode(
-            className: className,
-            name: propertyName,
-            defaultValue: value ?? ASTNode()));
-      }
-
-      if (canEat([TokenType.RBRACE])) {
-        eat(TokenType.RBRACE);
-        break;
-      }
-    }
-
-    return ASTClassDeclarationNode(
-        className: className,
-        methods: Map.fromEntries(methods.map((e) => MapEntry(e.methodName, e))),
-        properties:
-            Map.fromEntries(properties.map((e) => MapEntry(e.name, e))));
-  }
 
   ASTNode _parseExpression({required String functionName}) {
     return _parseTerm(functionName: functionName);
@@ -213,10 +145,6 @@ class Parser {
       return node;
     }
 
-    if (canEat([TokenType.NEW])) {
-      return _parseClassInstantiation(functionName: functionName);
-    }
-
     if (canEat([TokenType.IDENTIFIER])) {
       final identifier = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
@@ -266,18 +194,7 @@ class Parser {
     ASTNode factor = _parsePrimary(functionName: functionName);
 
     while (true) {
-      if (canEat([TokenType.DOT])) {
-        eat(TokenType.DOT);
-        final field = eat(TokenType.IDENTIFIER);
-        if (canEat([TokenType.LPAREN])) {
-          final arguments = _parseFunctionArguments(functionName: functionName);
-          factor = ASTMethodCallNode(
-              variable: factor, methodName: field, arguments: arguments);
-        } else {
-          factor =
-              ASTPropertyAccessNode(targetExpression: factor, fieldName: field);
-        }
-      } else if (canEat([TokenType.LPAREN])) {
+      if (canEat([TokenType.LPAREN])) {
         final arguments = _parseFunctionArguments(functionName: functionName);
         factor = ASTFunctionCallNode(function: factor, arguments: arguments);
       } else if (canEat([TokenType.LSQUARE_BRACE])) {
@@ -357,26 +274,6 @@ class Parser {
     throw Exception("Cannot parse import module");
   }
 
-  ASTMethodDeclarationNode _parseMethodDeclaration(
-      {required String className}) {
-    eat(TokenType.FUNCTION);
-
-    final methodName = _currentToken!.value;
-    eat(TokenType.IDENTIFIER);
-
-    eat(TokenType.LPAREN);
-    final parameters = _parseArguments();
-    eat(TokenType.RPAREN);
-
-    final body = _parseBlock(functionName: methodName);
-
-    return ASTMethodDeclarationNode(
-        methodName: methodName,
-        parameters: parameters,
-        body: body,
-        className: className);
-  }
-
   ASTFunctionDeclarationNode _parseFunctionDeclaration() {
     eat(TokenType.FUNCTION);
 
@@ -453,16 +350,7 @@ class Parser {
       }
 
       while (true) {
-        if (canEat([TokenType.DOT])) {
-          eat(TokenType.DOT);
-          final field = eat(TokenType.IDENTIFIER);
-          if (canEat([TokenType.LPAREN])) {
-            factor = _parseMethodCall(functionName, factor, field);
-          } else {
-            factor = ASTPropertyAccessNode(
-                targetExpression: factor, fieldName: field);
-          }
-        } else if (canEat([TokenType.LSQUARE_BRACE])) {
+        if (canEat([TokenType.LSQUARE_BRACE])) {
           factor = _parseObjectSet(target: factor, functionName: functionName);
         } else {
           break;
@@ -509,15 +397,6 @@ class Parser {
     return ASTReturnNode(expression: expression);
   }
 
-  ASTMethodCallNode _parseMethodCall(
-      String functionName, ASTNode target, String methodName) {
-    final arguments = _parseFunctionArguments(functionName: functionName);
-    eat(TokenType.SEMICOLON);
-
-    return ASTMethodCallNode(
-        variable: target, methodName: methodName, arguments: arguments);
-  }
-
   ASTForLoopNode _parseForLoopNode({required String functionName}) {
     eat(TokenType.FOR);
     eat(TokenType.LPAREN);
@@ -556,19 +435,11 @@ class Parser {
   }
 
   ASTNode _parseFunctionCall(String functionName, ASTNode target) {
-    ASTNode left = ASTFunctionCallNode(
+    final func = ASTFunctionCallNode(
         function: target,
         arguments: _parseFunctionArguments(functionName: functionName));
-    while (canEat([TokenType.DOT])) {
-      eat(TokenType.DOT);
-      final methodName = _currentToken!.value;
-      eat(TokenType.IDENTIFIER);
-      final arguments = _parseFunctionArguments(functionName: functionName);
-      left = ASTMethodCallNode(
-          variable: left, methodName: methodName, arguments: arguments);
-    }
     eat(TokenType.SEMICOLON);
-    return left;
+    return func;
   }
 
   ASTAssignmentNode _parseAssignment(String functionName, ASTNode target) {

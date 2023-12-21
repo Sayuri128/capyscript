@@ -3,31 +3,16 @@
  * All right reserved
  */
 
-import 'package:capyscript/Interpreter/interpreter_class.dart';
 import 'package:capyscript/Interpreter/interpreter_variable_reference.dart';
 
 class InterpreterScopedEnvironment {
   final Map<String, InterpreterVariableReference> variables;
   final InterpreterScopedEnvironment? parentScope;
-  InterpreterClass? _currentInstance;
 
   InterpreterScopedEnvironment({
     required this.variables,
     this.parentScope,
   });
-
-  void setCurrentInstance(InterpreterClass instance) {
-    _currentInstance = instance;
-  }
-
-  void removeCurrentInstance() {
-    _currentInstance = null;
-  }
-
-  InterpreterClass? getCurrentInstance({int level = 0}) {
-    return _currentInstance ??
-        (level < 1 ? parentScope?.getCurrentInstance(level: level + 1) : null);
-  }
 
   void setVariable<T>(String name, T value) {
     variables[name] = InterpreterVariableReference(value);
@@ -37,8 +22,6 @@ class InterpreterScopedEnvironment {
     final reference = variables[name];
     if (reference != null) {
       return reference.value;
-    } else if (_currentInstance != null) {
-      return _currentInstance!.properties[name];
     } else if (parentScope != null) {
       return parentScope!.getVariable(name, level: level + 1);
     }

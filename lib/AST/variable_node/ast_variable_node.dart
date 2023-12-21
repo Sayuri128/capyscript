@@ -26,9 +26,6 @@ class ASTVariableNode extends ASTNode {
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     try {
-      if (variableName == "this") {
-        return environment.getCurrentInstance();
-      }
       return environment.getVariable(variableName);
     } catch (e) {
       return variableName;
@@ -41,9 +38,6 @@ class ASTVariableNode extends ASTNode {
       return this.execute(environment);
     }, setter: (InterpreterEnvironment environment, dynamic value) async {
       try {
-        if (variableName == "this") {
-          return environment.setCurrentInstance(value);
-        }
         return environment.setVariable(variableName, value);
       } catch (e) {
         return;

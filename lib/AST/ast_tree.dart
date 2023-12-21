@@ -1,4 +1,3 @@
-import 'package:capyscript/AST/class_declaration/ast_class_declaration_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -18,12 +17,10 @@ class ASTTree {
   Map<String, dynamic> toJson() => _$ASTTreeToJson(this);
 
   final List<ASTFunctionDeclarationNode> functions;
-  final List<ASTClassDeclarationNode> classes;
   final List<ASTImportNode> modules;
 
   const ASTTree({
     required this.functions,
-    required this.classes,
     required this.modules,
   });
 }

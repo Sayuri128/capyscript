@@ -10,7 +10,6 @@ import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
-import 'package:capyscript/Interpreter/interpreter_class.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
@@ -65,9 +64,6 @@ class Interpreter {
   void _importModule(ASTTree result) {
     for (final function in result.functions) {
       _environment.functions[function.functionName] = function;
-    }
-    for (final clazz in result.classes) {
-      _environment.addClass(className: clazz.className, clazz: clazz);
     }
   }
 

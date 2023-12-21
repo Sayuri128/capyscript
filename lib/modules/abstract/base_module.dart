@@ -6,6 +6,8 @@
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/modules/converter/converter_module.dart';
+import 'package:capyscript/modules/date/date_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -51,4 +53,6 @@ final Map<String, BaseModule> modules = {
   HttpModule.module_name: HttpModule(),
   IOModule.module_name: IOModule(),
   JsonModule.module_name: JsonModule(),
+  ConverterModule.module_name: ConverterModule(),
+  DateModule.module_name: DateModule(),
 };

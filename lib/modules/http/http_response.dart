@@ -3,7 +3,9 @@
  * All right reserved
  */
 
-class CapyHttpResponse {
+import 'package:capyscript/modules/abstract/external_object.dart';
+
+class CapyHttpResponse extends ExternalObject {
   final int statusCode;
   final String body;
 
@@ -21,6 +23,21 @@ class CapyHttpResponse {
     if (key == "statusCode") return statusCode;
     if (key == "body") return body;
     return null;
+  }
+
+  @override
+  callFunction(String name, {List? ordinalArguments}) {
+    throw Exception("Method $name not found");
+  }
+
+  @override
+  getField(String name) {
+    return this[name];
+  }
+
+  @override
+  void setField(String name, value) {
+    throw Exception("Field $name not found");
   }
 
 }

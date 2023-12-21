@@ -8,6 +8,7 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/converter/converter_module.dart';
 import 'package:capyscript/modules/date/date_module.dart';
+import 'package:capyscript/modules/html/html_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -55,4 +56,5 @@ final Map<String, BaseModule> modules = {
   JsonModule.module_name: JsonModule(),
   ConverterModule.module_name: ConverterModule(),
   DateModule.module_name: DateModule(),
+  HtmlModule.module_name: HtmlModule(),
 };

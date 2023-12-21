@@ -2,6 +2,7 @@ import "http";
 import "io";
 import "json";
 import "date";
+import "html";
 
 function main() {
 
@@ -16,7 +17,10 @@ function main() {
     parser = createDateFormatter("yyyy-MM-dd hh:mm");
     print(parser.format(parseDate("2018-01-01 12:00")));
 
-    return jsonDeserialize(response["body"]);
+    htmlParser = createHTMLParser("<html><body><h1>hello</h1></body></html>");
+    print(htmlParser.getElementsByTagName("h1")[0].outerHtml);
+
+    return jsonDeserialize(response.body);
 
 }
 

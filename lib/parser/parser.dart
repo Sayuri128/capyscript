@@ -12,6 +12,7 @@ import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/object/ast_object_get_node.dart';
 import 'package:capyscript/AST/object/ast_object_set_node.dart';
+import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
@@ -198,6 +199,9 @@ class Parser {
         final field = eat(TokenType.IDENTIFIER);
         if (canEat([TokenType.LPAREN])) {
           factor = _parseMethodCall(functionName, factor, field);
+        } else {
+          factor =
+              ASTPropertyAccessNode(targetExpression: factor, fieldName: field);
         }
       } else if (canEat([TokenType.LPAREN])) {
         final arguments = _parseFunctionArguments(functionName: functionName);
@@ -368,6 +372,9 @@ class Parser {
           final field = eat(TokenType.IDENTIFIER);
           if (canEat([TokenType.LPAREN])) {
             factor = _parseMethodCall(functionName, factor, field);
+          } else {
+            factor =
+                ASTPropertyAccessNode(targetExpression: factor, fieldName: field);
           }
         } else if (canEat([TokenType.LSQUARE_BRACE])) {
           factor = _parseObjectSet(target: factor, functionName: functionName);

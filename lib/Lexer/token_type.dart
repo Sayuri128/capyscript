@@ -20,6 +20,7 @@ enum TokenType {
   EQUALS,
   IMPORT,
   SINGLE_QUOTE,
+  SINGLE_QUTOE_S,
   DOUBLE_QUOTES,
   STRING,
   IF,

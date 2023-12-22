@@ -63,6 +63,36 @@ class ASTMethodCallNode extends ASTNode {
           return obj.remove(await arguments.first.execute(environment));
       }
     }
+
+    if (obj is String) {
+      switch (methodName) {
+        case "contains":
+          return obj.contains(await arguments.first.execute(environment));
+        case "split":
+          return obj.split(await arguments.first.execute(environment));
+        case "replaceAll":
+          return obj.replaceAll(await arguments.first.execute(environment),
+              await arguments[1].execute(environment));
+        case "replaceFirst":
+          return obj.replaceFirst(await arguments.first.execute(environment),
+              await arguments[1].execute(environment));
+        case "trim":
+          return obj.trim();
+        case "trimLeft":
+          return obj.trimLeft();
+        case "trimRight":
+          return obj.trimRight();
+        case "toLowerCase":
+          return obj.toLowerCase();
+        case "toUpperCase":
+          return obj.toUpperCase();
+        case "substring":
+          return obj.substring(
+              ((await arguments.first.execute(environment)) as num).toInt(),
+              ((await arguments[1].execute(environment)) as num).toInt());
+      }
+    }
+
     if (obj is ExternalObject) {
       return obj.callFunction(methodName,
           ordinalArguments: (await Future.wait(

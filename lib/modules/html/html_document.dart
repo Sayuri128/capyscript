@@ -59,4 +59,6 @@ class HtmlDocument extends ExternalObject {
     }
     throw Exception("Method $name not found");
   }
+
+  operator[](String key) => getField(key);
 }

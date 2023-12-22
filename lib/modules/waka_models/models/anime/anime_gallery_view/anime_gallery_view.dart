@@ -64,4 +64,9 @@ class AnimeGalleryView extends GalleryView {
       status: status ?? this.status,
     );
   }
+
+  @override
+  String toString() {
+    return 'AnimeGalleryView{uid: $uid, cover: $cover, title: $title, status: $status, data: $data}';
+  }
 }

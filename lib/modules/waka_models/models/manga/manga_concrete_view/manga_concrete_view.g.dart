@@ -25,7 +25,7 @@ MangaConcreteView _$MangaConcreteViewFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$MangaConcreteViewToJson(MangaConcreteView instance) =>
     <String, dynamic>{
       'uid': instance.uid,
-      'groups': instance.groups,
+      'groups': instance.groups.map((e) => e.toJson()).toList(),
       'title': instance.title,
       'description': instance.description,
       'cover': instance.cover,
@@ -39,6 +39,6 @@ const _$MangaStatusEnumMap = {
   MangaStatus.ONGOING: 'ONGOING',
   MangaStatus.PAUSED: 'PAUSED',
   MangaStatus.ANNOUNCE: 'ANNOUNCE',
-  MangaStatus.CANCELED: 'CENCELED',
+  MangaStatus.CANCELED: 'CANCELED',
   MangaStatus.UNDEFINED: 'UNDEFINED',
 };

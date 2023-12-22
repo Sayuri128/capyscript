@@ -14,7 +14,7 @@ class AnimeBuildVideoNode extends ModuleFunctionBody {
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final uid = getVariable("uid", environment);
     final title = getVariable("title", environment);
-    final timestamp = getVariable("timestamp", environment);
+    final timestamp = getVariable("timestamp", environment, defaultValue: null);
     final data = getVariable("data", environment);
     final type = getVariable("type", environment);
     final src = getVariable("src", environment);

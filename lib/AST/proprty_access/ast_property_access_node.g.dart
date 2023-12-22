@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2023 armatura24
- * All right reserved
- */
-
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'ast_property_access_node.dart';

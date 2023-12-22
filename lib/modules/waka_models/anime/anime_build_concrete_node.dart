@@ -19,9 +19,13 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
     final cover = getVariable("cover", environment);
     final title = getVariable("title", environment);
     final description = getVariable("description", environment);
-    final tags = getVariable("tags", environment);
-    final videos = getVariable("videos", environment);
-    final alternativeTitles = getVariable("alternativeTitles", environment);
+    final tags = (getVariable("tags", environment) as List).map((e) =>
+        e.toString()).toList();
+    final groups = getVariable("groups", environment);
+    final alternativeTitles = ((getVariable(
+        "alternativeTitles", environment, defaultValue: null) ?? []) as List)
+        .map((e) => e.toString())
+        .toList();
     final status = getVariable("status", environment);
     return AnimeConcreteView(
         uid: uid,
@@ -30,8 +34,8 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
         alternativeTitles: alternativeTitles,
         description: description,
         tags: tags,
-        groups: (videos as List<dynamic>)
-            .map((e) => AnimeVideoGroup.fromJson(jsonDecode(e)))
+        groups: (groups as List<dynamic>)
+            .map((e) => AnimeVideoGroup.fromJson(jsonDecode(jsonEncode(e))))
             .toList(),
         status: status);
   }
@@ -46,7 +50,7 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
           ASTParameterNode("title"),
           ASTParameterNode("description"),
           ASTParameterNode("tags"),
-          ASTParameterNode("videos"),
+          ASTParameterNode("groups"),
           ASTParameterNode("alternativeTitles"),
           ASTParameterNode("status"),
         ],

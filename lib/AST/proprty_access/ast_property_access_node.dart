@@ -38,6 +38,17 @@ class ASTPropertyAccessNode extends ASTNode {
       return await obj.getField(fieldName);
     }
 
+    if (obj is String) {
+      switch (fieldName) {
+        case "length":
+          return obj.length;
+        case "isEmpty":
+          return obj.isEmpty;
+        case "isNotEmpty":
+          return obj.isNotEmpty;
+      }
+    }
+
     if (obj is Iterable) {
       switch (fieldName) {
         case "isEmpty":
@@ -48,6 +59,8 @@ class ASTPropertyAccessNode extends ASTNode {
           return obj.length;
         case "first":
           return obj.first;
+        case "last":
+          return obj.last;
       }
     }
 
@@ -61,6 +74,8 @@ class ASTPropertyAccessNode extends ASTNode {
           return obj.isEmpty;
         case "isNotEmpty":
           return obj.isNotEmpty;
+        default:
+          return obj[fieldName];
       }
     }
 

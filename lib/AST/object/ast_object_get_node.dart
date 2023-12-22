@@ -25,6 +25,9 @@ class ASTObjectGetNode extends ASTNode {
   Future execute(InterpreterEnvironment environment) async {
     final target = (await object.execute(environment));
     final keyR  = await key.execute(environment);
+    if(target is Iterable && target.length == 0) {
+      print("asd");
+    }
     return target[keyR];
   }
 }

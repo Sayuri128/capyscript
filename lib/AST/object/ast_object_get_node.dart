@@ -23,6 +23,8 @@ class ASTObjectGetNode extends ASTNode {
 
   @override
   Future execute(InterpreterEnvironment environment) async {
-    return (await object.execute(environment))[await key.execute(environment)];
+    final target = (await object.execute(environment));
+    final keyR  = await key.execute(environment);
+    return target[keyR];
   }
 }

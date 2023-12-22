@@ -8,20 +8,20 @@ import 'package:capyscript/modules/abstract/external_object.dart';
 class CapyHttpResponse extends ExternalObject {
   final int statusCode;
   final String body;
+  final int? contentLength;
+  final Map<String, String> headers;
 
-  const CapyHttpResponse({
-    required this.statusCode,
-    required this.body,
-  });
-
-  @override
-  String toString() {
-    return 'CapyHttpResponse{statusCode: $statusCode, body: $body}';
-  }
+  const CapyHttpResponse(
+      {required this.statusCode,
+      required this.body,
+      required this.contentLength,
+      required this.headers});
 
   operator [](String key) {
     if (key == "statusCode") return statusCode;
     if (key == "body") return body;
+    if (key == "contentLength") return contentLength;
+    if (key == "headers") return headers;
     return null;
   }
 
@@ -39,5 +39,4 @@ class CapyHttpResponse extends ExternalObject {
   void setField(String name, value) {
     throw Exception("Field $name not found");
   }
-
 }

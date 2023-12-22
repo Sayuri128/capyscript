@@ -444,7 +444,7 @@ class Parser {
 
     late final ASTNode increment;
     if (!canEat([TokenType.RPAREN])) {
-      increment = _parseExpression(functionName: functionName);
+      increment = _parseStatement(functionName: functionName);
     } else {
       increment = ASTNode();
     }

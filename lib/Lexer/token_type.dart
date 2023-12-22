@@ -38,6 +38,5 @@ enum TokenType {
   DECREMENT,
   BREAK,
   CONTINUE,
-  CLASS,
-  NEW
+  NULL
 }

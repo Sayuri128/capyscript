@@ -17,7 +17,9 @@ class ASTNode {
 
   Map<String, dynamic> toJson() => _$ASTNodeToJson(this);
 
-  Future<dynamic> execute(InterpreterEnvironment environment) async {}
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    return null;
+  }
 
   factory ASTNode.fromValue(dynamic value) {
     if (value is Map) {

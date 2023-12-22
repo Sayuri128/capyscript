@@ -11,6 +11,7 @@ import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/chapters_group/chapters_group.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_status.dart';
 
 class MangaBuildConcreteNode extends ModuleFunctionBody {
   @override
@@ -21,7 +22,8 @@ class MangaBuildConcreteNode extends ModuleFunctionBody {
     final description = getVariable('description', environment);
     final tags = getVariable('tags', environment);
     final groups = getVariable('groups', environment);
-    final status = getVariable('status', environment);
+    final status =
+        getVariable('status', environment, defaultValue: MangaStatus.UNDEFINED);
     final alternativeTitles = getVariable('alternativeTitles', environment);
     return MangaConcreteView(
         uid: uid,

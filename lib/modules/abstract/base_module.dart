@@ -41,10 +41,14 @@ class ModuleFunctionBody extends ASTNode {
   dynamic getVariable(String name, InterpreterEnvironment environment,
       {dynamic defaultValue}) {
     try {
-      return environment.getVariable(name);
+      final variable = environment.getVariable(name);
+      if (variable == null) {
+        throw Exception();
+      }
+      return variable;
     } catch (e) {
       if (defaultValue != null) {
-        return null;
+        return defaultValue;
       }
       throw Exception("$name not found");
     }

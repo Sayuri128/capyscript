@@ -24,24 +24,41 @@ class HttpGetNode extends ModuleFunctionBody {
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     String url = getVariable("url", environment);
     final params = (getVariable("params", environment) as Map)
-        .map((key, value) => MapEntry(key.toString(), value.toString()));
+        .map((key, value) => MapEntry(key.toString(), value));
     final paths = getVariable("paths", environment);
     final headers =
         (getVariable("headers", environment, defaultValue: {}) as Map)
             .map((key, value) => MapEntry(key.toString(), value.toString()));
     final throughWeb = getVariable("throughWeb", environment);
 
+    url = '$url?';
+
     for (var element in (paths as Map<dynamic, dynamic>).entries) {
       url = url.replaceFirst(element.key, element.value);
     }
-    final uri = Uri.parse(url).replace(queryParameters: params);
+
+    for (var element in params.entries) {
+      if (element.value is Iterable) {
+        url = '$url${url.endsWith('?') ? '' : '&'}${element.key}[]='
+            '${(await Future.wait((element.value as List).map((e) async => e))).join(',')}';
+      } else if (element.value is Map) {
+        url = '$url${url.endsWith('?') ? '' : '&'}'
+            '${(await Future.wait((element.value as Map).entries.map((e) async => '${element.key}[${e.key}]=${e.value}'))).join('&')}';
+      } else {
+        url =
+        '$url${url.endsWith('?') ? '' : '&'}${element.key}=${element.value}';
+      }
+    }
+
+
+    final uri = Uri.parse(url);
 
     final controller = getInterceptorController();
     if (throughWeb && controller != null) {
       _logger.d(
-          "httpGet: $uri through web browser interceptor controller\nheaders: $headers");
+          "httpGet: $url through web browser interceptor controller\nheaders: $headers");
       final response = await controller.loadPage(
-          url: uri.toString(), method: "GET", headers: headers);
+          url: url, method: "GET", headers: headers);
       return CapyHttpBrowserResponse(
           cookies: response.cookies,
           statusCode: response.statusCode,
@@ -49,7 +66,7 @@ class HttpGetNode extends ModuleFunctionBody {
           contentLength: response.body.length,
           headers: headers);
     } else {
-      _logger.d("httpGet: $uri\nheaders: $headers");
+      _logger.d("httpGet: $url\nheaders: $headers");
       final response = await http.get(uri, headers: headers);
 
       return CapyHttpResponse(

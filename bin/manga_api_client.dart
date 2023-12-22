@@ -17,5 +17,7 @@ void main(List<String> args) async {
   final apiClient =
       MangaApiClient(code: interpreter.mainFile!.readAsStringSync());
 
-  print(await apiClient.getGallery(page: 0));
+  // print(await apiClient.getGallery(page: 0));
+  print(await apiClient
+      .getConcrete(uid: "e97fdc93-21ec-47e0-b676-e45d67068932", data: {}));
 }

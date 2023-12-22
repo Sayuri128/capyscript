@@ -15,7 +15,8 @@ class MangaBuildChapterNode extends ModuleFunctionBody {
     final uid = getVariable("uid", environment);
     final title = getVariable("title", environment);
     final timestamp = getVariable("timestamp", environment);
-    final data = getVariable("data", environment);
+    final data = (getVariable("data", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value));
     return Chapter(uid: uid, title: title, data: data, timestamp: timestamp);
   }
 

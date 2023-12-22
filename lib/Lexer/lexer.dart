@@ -177,15 +177,9 @@ class Lexer {
       return Token(TokenType.BREAK, identifier);
     } else if (identifier == "continue") {
       return Token(TokenType.CONTINUE, identifier);
-    } else if (identifier == "class") {
-      return Token(TokenType.CLASS, identifier);
-    } else if (identifier == "new") {
-      return Token(TokenType.NEW, identifier);
-    }
-    // else if (identifier == "this") {
-    //   return Token(TokenType.THIS, identifier);
-    // }
-    else if(identifier == "return") {
+    } else if (identifier == "null") {
+      return Token(TokenType.NULL, identifier);
+    } else if (identifier == "return") {
       return Token(TokenType.RETURN, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);

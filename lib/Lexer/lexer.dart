@@ -64,6 +64,10 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.DECREMENT, "--");
+      } else if (currentChar == "!" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.NOT_EQUAL, "!=");
       }
 
       _advance();

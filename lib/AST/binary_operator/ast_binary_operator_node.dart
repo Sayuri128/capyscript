@@ -3,9 +3,6 @@
  * All right reserved
  */
 
-import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
-import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../../Lexer/token_type.dart';
@@ -52,6 +49,8 @@ class ASTBinaryOperatorNode extends ASTNode {
         return leftRes >= rightRes;
       case TokenType.LSQUARE_BRACE:
         return leftRes[rightRes];
+      case TokenType.NOT_EQUAL:
+        return leftRes != rightRes;
       default:
         return leftRes + rightRes;
     }

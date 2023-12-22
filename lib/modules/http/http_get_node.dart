@@ -6,6 +6,7 @@ import 'package:capyscript/modules/http/http_browser_response.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_response.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 /*
  * Copyright (c) 2023 armatura24
@@ -15,40 +16,32 @@ import 'package:http/http.dart' as http;
 class HttpGetNode extends ModuleFunctionBody {
   final HttpInterceptorController? Function() getInterceptorController;
 
+  final Logger _logger = Logger();
+
   HttpGetNode({required this.getInterceptorController});
 
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
-    final url = getVariable("url", environment);
-    final params = getVariable("params", environment);
-    final paths = getVariable("paths", environment);
-    final headers = (getVariable("headers", environment) as Map)
+    String url = getVariable("url", environment);
+    final params = (getVariable("params", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value.toString()));
+    final paths = getVariable("paths", environment);
+    final headers =
+        (getVariable("headers", environment, defaultValue: {}) as Map)
+            .map((key, value) => MapEntry(key.toString(), value.toString()));
     final throughWeb = getVariable("throughWeb", environment);
 
-    String uri = url;
-
-    for (var element in (params as Map<dynamic, dynamic>).entries) {
-      if (element.value is List) {
-        uri = '$uri${uri.endsWith('?') ? '' : '&'}${element.key}[]='
-            '${(await Future.wait((element.value as List).map((e) async => e))).join(',')}';
-      } else if (element.value is Map) {
-        uri = '$uri${uri.endsWith('?') ? '' : '&'}'
-            '${(await Future.wait((element.value as Map).entries.map((e) async => '${element.key}[${e.key}]=${e.value}'))).join('&')}';
-      } else {
-        uri =
-            '$uri${uri.endsWith('?') ? '' : '&'}${element.key}=${element.value}';
-      }
-    }
-
     for (var element in (paths as Map<dynamic, dynamic>).entries) {
-      uri = uri.replaceFirst(element.key, element.value);
+      url = url.replaceFirst(element.key, element.value);
     }
+    final uri = Uri.parse(url).replace(queryParameters: params);
 
     final controller = getInterceptorController();
     if (throughWeb && controller != null) {
-      final response =
-          await controller.loadPage(url: uri, method: "GET", headers: headers);
+      _logger.d(
+          "httpGet: $uri through web browser interceptor controller\nheaders: $headers");
+      final response = await controller.loadPage(
+          url: uri.toString(), method: "GET", headers: headers);
       return CapyHttpBrowserResponse(
           cookies: response.cookies,
           statusCode: response.statusCode,
@@ -56,7 +49,8 @@ class HttpGetNode extends ModuleFunctionBody {
           contentLength: response.body.length,
           headers: headers);
     } else {
-      final response = await http.get(Uri.parse(uri), headers: headers);
+      _logger.d("httpGet: $uri\nheaders: $headers");
+      final response = await http.get(uri, headers: headers);
 
       return CapyHttpResponse(
           statusCode: response.statusCode,

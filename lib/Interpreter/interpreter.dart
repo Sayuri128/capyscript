@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
+import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
@@ -20,17 +21,38 @@ import 'package:path/path.dart' as path;
 class Interpreter {
   late final Parser parser;
 
-  late final File _mainFile;
+  final File? mainFile;
 
   late final InterpreterEnvironment _environment;
 
-  Interpreter({required String mainPath}) {
-    _mainFile = File(mainPath);
-    final String input = _mainFile.readAsStringSync();
-
+  Interpreter({required String data, this.mainFile}) {
     _environment = InterpreterEnvironment(functions: {});
+    this.parser = Parser(source: data);
+  }
 
-    this.parser = Parser(source: input);
+  factory Interpreter.fromFile({required String path}) {
+    final file = File(path);
+    final String input = file.readAsStringSync();
+
+    return Interpreter(data: input, mainFile: file);
+  }
+
+  Future<dynamic> runFunction(String functionName,
+      {Map<String, dynamic>? arguments}) async {
+    InterpreterTree interpreterResult = _runParser();
+
+    try {
+      interpreterResult.astTree.functions
+          .firstWhere((element) => element.functionName == functionName);
+    } catch (e) {
+      throw Exception("function $functionName not found");
+    }
+
+    final functionCall = ASTFunctionCallNode(
+        function: ASTStringNode(value: functionName),
+        arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
+
+    return await functionCall.execute(_environment);
   }
 
   Future<dynamic> interpret() async {
@@ -68,25 +90,29 @@ class Interpreter {
   }
 
   List<BaseModule> _loadModules({required List<ASTImportNode> imports}) {
-    return imports.map((import) {
-      final module = modules[import.moduleName];
-      if (module == null) {
-        final moduleFilePath =
-            '${path.join(path.dirname(path.normalize(_mainFile.absolute.path)), import.moduleName)}';
+    return imports
+        .map((import) {
+          final module = modules[import.moduleName];
+          if (module == null && mainFile != null) {
+            final moduleFilePath =
+                '${path.join(path.dirname(path.normalize(mainFile!.absolute.path)), import.moduleName)}';
 
-        final file = File(moduleFilePath);
+            final file = File(moduleFilePath);
 
-        if (!file.existsSync()) {
-          throw Exception("Module ${import.moduleName} not found");
-        }
+            if (!file.existsSync()) {
+              throw Exception("Module ${import.moduleName} not found");
+            }
 
-        final moduleParser = Parser(source: file.readAsStringSync());
-        return ImportedModule(
-            body: moduleParser.parse(), moduleName: import.moduleName);
-      }
+            final moduleParser = Parser(source: file.readAsStringSync());
+            return ImportedModule(
+                body: moduleParser.parse(), moduleName: import.moduleName);
+          }
 
-      return module;
-    }).toList();
+          return module;
+        })
+        .where((element) => element != null)
+        .cast<BaseModule>()
+        .toList();
   }
 
   void dumpAST(String path) {

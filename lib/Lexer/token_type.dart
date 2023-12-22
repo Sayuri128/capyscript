@@ -25,6 +25,7 @@ enum TokenType {
   IF,
   ELSE,
   EQUAL_EQUAL,
+  NOT_EQUAL,
   GREATER,
   LESS,
   LESS_EQUAL,

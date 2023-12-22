@@ -50,21 +50,9 @@ class ASTMethodCallNode extends ASTNode {
         case "removeAt":
           return obj.removeAt(
               ((await arguments.first.execute(environment)) as num).toInt());
-        case "isEmpty":
-          return obj.isEmpty;
-        case "isNotEmpty":
-          return obj.isNotEmpty;
       }
     } else if (obj is Map) {
       switch (methodName) {
-        case "values":
-          return obj.values;
-        case "keys":
-          return obj.keys;
-        case "isEmpty":
-          return obj.isEmpty;
-        case "isNotEmpty":
-          return obj.isNotEmpty;
         case "containsKey":
           return obj.containsKey(await arguments.first.execute(environment));
         case "clear":

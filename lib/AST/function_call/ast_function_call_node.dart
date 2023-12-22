@@ -43,9 +43,10 @@ class ASTFunctionCallNode extends ASTNode {
       final paramName = functionDec.parameters[i].paramName;
       bool foundInMap = false;
       if (arg is ASTMapNode) {
-        for (int j = 0; i < arg.keys.length; j++) {
+        for (int j = 0; j < arg.keys.length; j++) {
           final key = await arg.keys[j];
-          if (await key.execute(environment) == paramName) {
+          final keyValue = await key.execute(environment);
+          if (keyValue == paramName) {
             environment.setVariable(
                 paramName, await arg.values[j].execute(environment));
             foundInMap = true;
@@ -54,8 +55,12 @@ class ASTFunctionCallNode extends ASTNode {
         }
       }
       if (!foundInMap) {
-        environment.setVariable(functionDec.parameters[i].paramName,
-            await arguments[i].execute(environment));
+        try {
+          environment.setVariable(functionDec.parameters[i].paramName,
+              await arguments[i].execute(environment));
+        } catch (e) {
+          throw Exception("argument ${i + 1} is not defined - ${arguments.toString()} ${paramName}");
+        }
       }
     }
 

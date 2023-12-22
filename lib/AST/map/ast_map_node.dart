@@ -6,7 +6,6 @@ import 'package:json_annotation/json_annotation.dart';
  */
 
 import 'package:capyscript/AST/ast_node.dart';
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 
 part 'ast_map_node.g.dart';
 
@@ -23,6 +22,18 @@ class ASTMapNode extends ASTNode {
     required this.keys,
     required this.values,
   });
+
+  factory ASTMapNode.fromMap(Map<dynamic, dynamic> map) {
+    final List<ASTNode> keys = [];
+    final List<ASTNode> values = [];
+
+    map.forEach((key, value) {
+      keys.add(ASTNode.fromValue(key));
+      values.add(ASTNode.fromValue(value));
+    });
+
+    return ASTMapNode(keys: keys, values: values);
+  }
 
   @override
   Future execute(InterpreterEnvironment environment) async {

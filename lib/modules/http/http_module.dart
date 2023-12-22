@@ -19,6 +19,16 @@ class HttpModule extends BaseModule {
   static const String module_name = "http";
 
   HttpInterceptorController? _webBrowserInterceptorController;
+  final Map<String, String> _headers = {};
+
+  Map<String, String> getHeaders() {
+    return Map.of(_headers);
+  }
+
+  void setHeaders(Map<String, String> headers) {
+    _headers.clear();
+    _headers.addAll(headers);
+  }
 
   factory HttpModule.fromJson(Map<String, dynamic> json) =>
       _$HttpModuleFromJson(json);

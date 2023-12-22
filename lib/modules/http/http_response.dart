@@ -39,4 +39,9 @@ class CapyHttpResponse extends ExternalObject {
   void setField(String name, value) {
     throw Exception("Field $name not found");
   }
+
+  @override
+  String toString() {
+    return 'CapyHttpResponse{statusCode: $statusCode, body: $body, contentLength: $contentLength, headers: $headers}';
+  }
 }

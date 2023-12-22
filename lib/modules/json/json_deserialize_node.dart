@@ -20,7 +20,7 @@ class JsonDeserializeNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "jsonDeserialize",
+        functionName: "jsonDecode",
         parameters: [ASTParameterNode("value")],
         body: this);
   }

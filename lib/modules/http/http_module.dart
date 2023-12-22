@@ -41,10 +41,12 @@ class HttpModule extends BaseModule {
     final List<ASTFunctionDeclarationNode> functions = [];
 
     functions.add(HttpGetNode(
-            getInterceptorController: () => _webBrowserInterceptorController)
+            getInterceptorController: () => _webBrowserInterceptorController,
+            getHeaders: getHeaders)
         .toDeclarationNode());
     functions.add(HttpPostNode(
-            getInterceptorController: () => _webBrowserInterceptorController)
+            getInterceptorController: () => _webBrowserInterceptorController,
+            getHeaders: getHeaders)
         .toDeclarationNode());
     functions.add(HttpRegisterInterceptorControllerNode(
         registerInterceptorController: (controller) =>

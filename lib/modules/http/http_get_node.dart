@@ -15,10 +15,12 @@ import 'package:logger/logger.dart';
 
 class HttpGetNode extends ModuleFunctionBody {
   final HttpInterceptorController? Function() getInterceptorController;
+  final Map<String, String> Function() getHeaders;
 
   final Logger _logger = Logger();
 
-  HttpGetNode({required this.getInterceptorController});
+  HttpGetNode(
+      {required this.getInterceptorController, required this.getHeaders});
 
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
@@ -26,9 +28,10 @@ class HttpGetNode extends ModuleFunctionBody {
     final params = (getVariable("params", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
     final paths = getVariable("paths", environment);
-    final headers =
-        (getVariable("headers", environment, defaultValue: {}) as Map)
-            .map((key, value) => MapEntry(key.toString(), value.toString()));
+    final headers = (getVariable("headers", environment, defaultValue: {})
+            as Map)
+        .map((key, value) => MapEntry(key.toString(), value.toString()))
+      ..addAll(getHeaders());
     final throughWeb = getVariable("throughWeb", environment);
 
     url = '$url?';
@@ -46,10 +49,9 @@ class HttpGetNode extends ModuleFunctionBody {
             '${(await Future.wait((element.value as Map).entries.map((e) async => '${element.key}[${e.key}]=${e.value}'))).join('&')}';
       } else {
         url =
-        '$url${url.endsWith('?') ? '' : '&'}${element.key}=${element.value}';
+            '$url${url.endsWith('?') ? '' : '&'}${element.key}=${element.value}';
       }
     }
-
 
     final uri = Uri.parse(url);
 
@@ -57,8 +59,8 @@ class HttpGetNode extends ModuleFunctionBody {
     if (throughWeb && controller != null) {
       _logger.d(
           "httpGet: $url through web browser interceptor controller\nheaders: $headers");
-      final response = await controller.loadPage(
-          url: url, method: "GET", headers: headers);
+      final response =
+          await controller.loadPage(url: url, method: "GET", headers: headers);
       return CapyHttpBrowserResponse(
           cookies: response.cookies,
           statusCode: response.statusCode,

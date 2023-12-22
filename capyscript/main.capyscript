@@ -3,9 +3,60 @@ import "io";
 import "json";
 import "date";
 import "html";
+import "manga_models";
+
+function passProtector(data) {
+
+    result = httpGet({
+        url: "https://hentailib.me/manga-list",
+        params: {},
+        paths: {},
+        headers: {},
+        throughWeb: true
+    });
+
+    resultData = result["data"];
+
+    headers = result["headers"];
+
+    headers["x-xsrf-token"] = resultData["cookies-raw"]["XSRF-TOKEN"].replaceAll("%3D", "=");
+    headers["x-requested-with"] = "XMLHttpRequest";
+    headers["Content-Type"] = "application/json;charset=UTF-8";
+
+    document = createWakaHtmlParser(result["body"]);
+
+    metas = document.getElementsByTagName("meta");
+
+
+    for(i = 0; i < metas.length; i = i + 1) {
+       e = metas[i];
+       if(e.attributes["name"] == "_token") {
+          headers["x-csrf-token"] = e.attributes["content"];
+       }
+    }
+
+    print("x-csrf-token");
+    print(headers["x-csrf-token"]);
+    print("x-xsrf-token");
+    print(headers["x-xsrf-token"]);
+    print("user-agent");
+    print(headers["user-agent"]);
+    print("cookie");
+    print(headers["cookie"]);
+
+
+    useHeaders({headers: headers});
+}
 
 function main() {
 
+    passProtector({});
+
+}
+
+function tests() {
+
+}
     response = public_post({
                       "url": "http://httpbin.org/post",
                       "body": jsonSerialize({}),

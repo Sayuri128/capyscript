@@ -2,10 +2,15 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
+import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_response.dart';
 import 'package:http/http.dart' as http;
 
 class HttpPostNode extends ModuleFunctionBody {
+  final HttpInterceptorController? Function() getInterceptorController;
+
+  HttpPostNode({required this.getInterceptorController});
+
   @override
   Future execute(InterpreterEnvironment environment) async {
     final url = getVariable("url", environment);
@@ -18,7 +23,10 @@ class HttpPostNode extends ModuleFunctionBody {
             .map((key, value) => MapEntry(key.toString(), value.toString())));
 
     return CapyHttpResponse(
-        statusCode: response.statusCode, body: response.body);
+        statusCode: response.statusCode,
+        body: response.body,
+        headers: response.headers,
+        contentLength: response.contentLength);
   }
 
   @override

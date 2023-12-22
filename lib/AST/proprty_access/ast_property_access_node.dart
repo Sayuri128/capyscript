@@ -37,7 +37,34 @@ class ASTPropertyAccessNode extends ASTNode {
     if (obj is ExternalObject) {
       return await obj.getField(fieldName);
     }
-    throw Exception("${obj.toString()} is undefined");
+
+    if (obj is Iterable) {
+      switch (fieldName) {
+        case "isEmpty":
+          return obj.isEmpty;
+        case "isNotEmpty":
+          return obj.isNotEmpty;
+        case "length":
+          return obj.length;
+        case "first":
+          return obj.first;
+      }
+    }
+
+    if (obj is Map) {
+      switch (fieldName) {
+        case "values":
+          return obj.values;
+        case "keys":
+          return obj.keys;
+        case "isEmpty":
+          return obj.isEmpty;
+        case "isNotEmpty":
+          return obj.isNotEmpty;
+      }
+    }
+
+    throw Exception("${obj.toString()} - ${fieldName} not found");
   }
 
   @override

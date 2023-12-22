@@ -93,6 +93,7 @@ class Parser {
       TokenType.LESS,
       TokenType.GREATER,
       TokenType.EQUAL_EQUAL,
+      TokenType.NOT_EQUAL,
       TokenType.LESS_EQUAL,
       TokenType.GREATER_EQUAL
     ])) {

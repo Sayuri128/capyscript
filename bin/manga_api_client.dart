@@ -5,6 +5,7 @@
 
 import 'package:args/args.dart';
 import 'package:capyscript/Interpreter/interpreter.dart';
+import 'package:capyscript/api_clients/manga_api_client.dart';
 
 void main(List<String> args) async {
   final argsParser = ArgParser();
@@ -13,5 +14,8 @@ void main(List<String> args) async {
   final results = argsParser.parse(args);
 
   final interpreter = Interpreter.fromFile(path: results['path']);
-  print(await interpreter.interpret());
+  final apiClient =
+      MangaApiClient(code: interpreter.mainFile!.readAsStringSync());
+
+  print(await apiClient.getGallery(page: 0));
 }

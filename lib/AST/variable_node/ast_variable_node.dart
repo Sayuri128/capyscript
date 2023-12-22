@@ -44,4 +44,9 @@ class ASTVariableNode extends ASTNode {
       }
     });
   }
+
+  @override
+  String toString() {
+    return 'ASTVariableNode{functionName: $functionName, variableName: $variableName}';
+  }
 }

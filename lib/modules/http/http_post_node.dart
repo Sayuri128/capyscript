@@ -8,19 +8,21 @@ import 'package:http/http.dart' as http;
 
 class HttpPostNode extends ModuleFunctionBody {
   final HttpInterceptorController? Function() getInterceptorController;
+  final Map<String, String> Function() getHeaders;
 
-  HttpPostNode({required this.getInterceptorController});
+  HttpPostNode(
+      {required this.getInterceptorController, required this.getHeaders});
 
   @override
   Future execute(InterpreterEnvironment environment) async {
     final url = getVariable("url", environment);
     final body = getVariable("body", environment);
-    final headers = getVariable("headers", environment);
+    final headers = (getVariable("headers", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value.toString()))
+      ..addAll(getHeaders());
 
-    final response = await http.post(Uri.parse(url),
-        body: body,
-        headers: (headers as Map)
-            .map((key, value) => MapEntry(key.toString(), value.toString())));
+    final response =
+        await http.post(Uri.parse(url), body: body, headers: headers);
 
     return CapyHttpResponse(
         statusCode: response.statusCode,

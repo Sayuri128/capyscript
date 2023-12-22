@@ -43,7 +43,7 @@ class Parser {
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
 
-    while (canEat([TokenType.FUNCTION, TokenType.IMPORT, TokenType.CLASS])) {
+    while (canEat([TokenType.FUNCTION, TokenType.IMPORT])) {
       if (canEat([TokenType.FUNCTION])) {
         functions.add(_parseFunctionDeclaration());
       } else if (canEat([TokenType.IMPORT])) {
@@ -144,6 +144,11 @@ class Parser {
           functionName: functionName); // Parse expression within parentheses
       eat(TokenType.RPAREN);
       return node;
+    }
+
+    if(canEat([TokenType.NULL])) {
+      eat(TokenType.NULL);
+      return ASTNode();
     }
 
     if (canEat([TokenType.IDENTIFIER])) {

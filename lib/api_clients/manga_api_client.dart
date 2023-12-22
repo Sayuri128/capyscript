@@ -6,6 +6,7 @@
 import 'dart:convert';
 
 import 'package:capyscript/api_clients/api_client.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/data/filters/filter_data.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/manga_gallery_view.dart';
 
@@ -38,5 +39,13 @@ class MangaApiClient extends ApiClient {
     }) as List<dynamic>)
         .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
         .toList();
+  }
+
+  Future<MangaConcreteView> getConcrete(
+      {required String uid, required Map<String, dynamic> data}) async {
+    return (await interpreter.runFunction(getConcreteFunctionName, arguments: {
+      getConcreteUidParameterName: uid,
+      getConcreteDataParameterName: data
+    }));
   }
 }

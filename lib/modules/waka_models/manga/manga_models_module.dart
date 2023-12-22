@@ -7,6 +7,7 @@ import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_chapter_node.dart';
+import 'package:capyscript/modules/waka_models/manga/manga_build_chapters_group_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_concrete_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_gallery_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_pages_node.dart';
@@ -24,7 +25,7 @@ class MangaModelsModule extends BaseModule {
     final List<ASTFunctionDeclarationNode> functions = [];
 
     functions.add(MangaBuildChapterNode().toDeclarationNode());
-    functions.add(MangaBuildChapterNode().toDeclarationNode());
+    functions.add(MangaBuildChaptersGroupNode().toDeclarationNode());
     functions.add(MangaBuildConcreteNode().toDeclarationNode());
     functions.add(MangaBuildGalleryNode().toDeclarationNode());
     functions.add(MangaBuildPagesNode().toDeclarationNode());

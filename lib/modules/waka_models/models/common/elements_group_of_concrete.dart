@@ -15,4 +15,9 @@ abstract class ElementsGroupOfConcrete<T extends ElementOfElementsGroupOfConcret
     required this.data,
     required this.title
   });
+
+  @override
+  String toString() {
+    return 'ElementsGroupOfConcrete{title: $title, elements: $elements, data: $data}';
+  }
 }

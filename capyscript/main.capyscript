@@ -131,7 +131,7 @@ function getGallery(page, query, filters) {
 
 function getChaptersData(uid, offset) {
     return httpGet({
-        "url": "https://api.mangadex.org/manga/mangaId/feed",
+        "url": "https://api.mangadex.org/manga/:mangaId/feed",
         "params": {
             "limit": 100,
             "offset": offset,
@@ -142,7 +142,7 @@ function getChaptersData(uid, offset) {
             }
         },
         "paths": {
-            mangaId: uid
+            ":mangaId": uid
         },
         "headers": {},
         "throughWeb": false
@@ -204,6 +204,7 @@ function getChapters(uid)  {
     chapters = [];
 
     for(i = 0; chapters.length < result["total"]; i = i + 1) {
+        print(result);
         if(i == data.length) {
             firstChapters = getChaptersData({
                 "offset": 0,
@@ -292,6 +293,8 @@ function handleConcreteView(data) {
         "description": description,
         "cover": cover,
         "tags": tags,
+        "status": null,
+        "alternativeTitles": [],
         "groups": [
             buildChapterGroups({
                         "title": "Default",
@@ -305,10 +308,10 @@ function handleConcreteView(data) {
 function getConcrete(uid) {
 
     result = httpGet({
-        "url": "https://api.mangadex.org/manga/uid",
+        "url": "https://api.mangadex.org/manga/:uid",
         "params": {},
         "paths": {
-            uid: uid
+            ":uid": uid
         },
         "throughWeb": false,
         "headers": {
@@ -319,7 +322,7 @@ function getConcrete(uid) {
     body = jsonDecode(result["body"]);
 
     concrete = handleConcreteView({
-        data: body["data"]
+        "data": body["data"]
     });
 
     return concrete;

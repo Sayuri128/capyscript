@@ -13,7 +13,9 @@ class MangaBuildPagesNode extends ModuleFunctionBody {
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final uid = getVariable("uid", environment);
-    final value = getVariable("value", environment);
+    final value = (getVariable("value", environment) as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
     return Pages(chapterUid: uid, value: value);
   }
 

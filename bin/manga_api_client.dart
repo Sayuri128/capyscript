@@ -18,6 +18,10 @@ void main(List<String> args) async {
       MangaApiClient(code: interpreter.mainFile!.readAsStringSync());
 
   // print(await apiClient.getGallery(page: 0));
+  // print(await apiClient
+  //     .getConcrete(uid: "e97fdc93-21ec-47e0-b676-e45d67068932", data: {}));
+  // print(
+  //     await apiClient.getChapters(uid: "e97fdc93-21ec-47e0-b676-e45d67068932"));
   print(await apiClient
-      .getConcrete(uid: "e97fdc93-21ec-47e0-b676-e45d67068932", data: {}));
+      .getPages(uid: "4cda391c-2dcd-4aa8-93a9-0eacec40b9c2", data: {}));
 }

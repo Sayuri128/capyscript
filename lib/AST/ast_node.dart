@@ -1,5 +1,6 @@
 import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_reference.dart';
+import 'package:capyscript/AST/external_value/ast_external_value_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/number/ast_number_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
@@ -34,8 +35,7 @@ class ASTNode {
     if (value is List) {
       return ASTArrayNode.fromList(value);
     }
-
-    return ASTNode();
+    return ASTExternalValueNode(value: value);
   }
 
   ASTReference getReference() {

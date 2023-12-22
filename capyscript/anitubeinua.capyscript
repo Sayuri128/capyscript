@@ -1,0 +1,215 @@
+import "http";
+import "io";
+import "json";
+import "date";
+import "html";
+import "anime_models";
+import "converter";
+
+function getGallery(page, query, filters) {
+
+    result = null;
+
+    if(query == "") {
+        result = httpGet({
+            "url": "https://anitube.in.ua/anime/page/" + parseString(page),
+            "params": {},
+            "paths": {},
+            "throughWeb": false,
+            "headers": {}
+        });
+    } else {
+        result = httpPost({
+            "url": "https://anitube.in.ua/index.php",
+            "params": {
+                "do": "search",
+                "subaction": "search",
+                "full_search": "0",
+                "story": query,
+                "from_page": page
+            },
+            "paths": {},
+            "body": {},
+            "throughWeb": false,
+            "headers": {}
+        });
+    }
+
+    document = createHTMLParser(result["body"]);
+
+
+    stories = document.querySelectorAll("#dle-content > .story");
+
+    items = [];
+
+    for(i = 0; i < stories.length; i = i + 1) {
+        story = stories[i];
+
+        aTitle = story.getElementsByClassName("story_c")[0].getElementsByTagName("h2")[0].getElementsByTagName("a")[0];
+        title = aTitle.text;
+        uid = aTitle.attributes["href"].split("/").last;
+        cover = story.getElementsByClassName("story_post")[0].getElementsByTagName("img")[0]["attributes"]["src"];
+
+        items.push(buildGallery({
+            "title": title,
+            "uid": uid,
+            "cover": "https://anitube.in.ua" + cover,
+            "data": {
+                "cover": cover,
+                "title": title
+            },
+            "status": statusReleased()
+        }));
+
+    }
+
+    return items;
+
+}
+
+function getConcrete(uid, data) {
+    result = httpGet({
+                "url": "https://anitube.in.ua/" + uid,
+                "params": {},
+                "paths": {},
+                "throughWeb": true,
+                "headers": {}
+            });
+    document = createHTMLParser(result["body"]);
+
+    // description = document.querySelector(".my-text").text;
+    description = document.querySelector(".story_c > .rcol > .story_c_r").text;
+
+    tags = [];
+
+    tagElements= document.querySelector(".story_c > .rcol > .story_c_r").getElementsByTagName("a");
+
+    for(i = 0; i < tagElements.length; i = i + 1) {
+        tags.push(tagElements[i].text);
+    }
+
+    jsCode = "";
+
+    playlistVideoPlayer = document.querySelector(".playlists-player");
+
+    if(playlistVideoPlayer != null) {
+
+    jsCode =                 `const items = document.querySelector(".playlists-player").getElementsByClassName("playlists-items");` +
+                             `let dubbers;` +
+                             `let providers;` +
+                             `let videos;` +
+                             `if(items.length == 3) {` +
+                             `    dubbers = Array.from(items[0].getElementsByTagName("li")).map((e) => {` +
+                             `        return {` +
+                             `            title: e.textContent,` +
+                             `            id: e.attributes["data-id"].textContent` +
+                             `        }` +
+                             `    });` +
+                             `}` +
+                             ` providers = Array.from(items[dubbers ? 1 : 0].getElementsByTagName("li")).map((e) => {` +
+                             `    return {` +
+                             `        title: e.textContent,` +
+                             `        id: e.attributes["data-id"].textContent` +
+                             `    }` +
+                             `});` +
+                             ` videos = Array.from(items[dubbers ? 2 : 1].getElementsByTagName("li")).map((e) => {` +
+                             `    return {` +
+                             `        title: e.textContent,` +
+                             `        id: e.attributes["data-id"].textContent,` +
+                             `        src: e.attributes["data-file"].textContent` +
+                             `    }` +
+                             `});` +
+                             `let res;` +
+                             `if(dubbers) {` +
+                             `     res = dubbers.map((dubber) => {` +
+                             `        return providers.filter((p) => p.id.slice(0, 3) === dubber.id).map((provider) => {` +
+                             `            return {` +
+                             `                title: dubber.title + " | " + provider.title,` +
+                             `                videos: videos.filter((video) => video.id === provider.id)` +
+                             `            }` +
+                             `        })` +
+                             `    }).flat(1);` +
+                             `} else {` +
+                             `    res = providers.map((provider) => {` +
+                             `        return {` +
+                             `            title: provider.title,` +
+                             `            videos: videos.filter((video) => video.id === provider.id)` +
+                             `        }` +
+                             `    });` +
+                             `}` +
+                             `return res;`
+                             ;
+
+    } else {
+        jsCode =         `const videoSrc = [];` +
+                             `const select = document.querySelector("#vc-player-selectbox");` +
+                             `const players = document.querySelector("#rl-lenta-top");` +
+                             `for(let j = 0; j < players.children.length; j++) {` +
+                                 `const player = players.children[j];` +
+                                 `RalodePlayer.zborka(j, player);` +
+                                 `const group = {` +
+                                     `title: player.textContent,` +
+                                     `videos: []` +
+                                 `}; ` +
+                                 `for(let i = 0; i < select.children.length; i++) {` +
+                                     `select.value = i;` +
+                                     `RalodePlayer.serie();` +
+                                     `group.videos.push({` +
+                                         `title: select.children[i].textContent,` +
+                                         `src: document.querySelector(".playerCode").getElementsByTagName("iframe")[0].src` +
+                                     `});` +
+                                 `}` +
+                                 `videoSrc.push(group);` +
+                             `}` +
+                             `return videoSrc;`;
+    }
+
+    videosData = executeJsScript({code: jsCode});
+
+    print(videosData);
+
+    videoGroups = [];
+
+    for(i = 0; i < videosData.length; i = i + 1) {
+        player = videosData[i];
+        videos = [];
+
+        for(j = 0; j < player.videos.length; j = j + 1) {
+            video = player.videos[j];
+            videos.push(buildAnimeVideo({
+                "uid": video["src"],
+                "src": video["src"],
+                "title": video["title"],
+                "timestamp": null,
+                "type": typeIframe(),
+                "data": video
+            }));
+        }
+
+        videoGroups.push(buildAnimeVideoGroup({
+                 "title": player.title,
+                 "elements": videos,
+                 "data": {}
+        }));
+
+    }
+
+    return buildConcrete({
+        "uid": uid,
+        "cover": data["cover"],
+        "title": data["title"],
+        "alternativeTitles": [],
+        "status": statusReleased(),
+        "groups": videoGroups,
+        "tags": tags,
+        "description": description
+    });
+}
+
+function passProtector(data) {
+    useHeaders({"headers": data["headers"]});
+}
+
+function passWebBrowserInterceptorController(controller) {
+    registerInterceptorController(controller);
+}

@@ -31,7 +31,7 @@ abstract class ApiClient {
       {required HttpInterceptorController controller}) async {
     return await interpreter.runFunction(
         passWebBrowserInterceptorControllerFunctionName,
-        arguments: {"controller": controller});
+        arguments: {passWebBrowserInterceptorControllerParameterName: controller});
   }
 
   Map<String, String> getProtectorHeaders() {

@@ -15,7 +15,8 @@ class AnimeBuildGalleryNode extends ModuleFunctionBody {
     final uid = getVariable("uid", environment);
     final title = getVariable("title", environment);
     final cover = getVariable("cover", environment);
-    final data = getVariable("data", environment);
+    final data = (getVariable("data", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value));
     final status = getVariable("status", environment);
     return AnimeGalleryView(
         uid: uid, cover: cover, title: title, data: data, status: status);

@@ -17,7 +17,7 @@ ChaptersGroup _$ChaptersGroupFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ChaptersGroupToJson(ChaptersGroup instance) =>
     <String, dynamic>{
+      'title': instance.title,
       'elements': instance.elements,
       'data': instance.data,
-      'title': instance.title,
     };

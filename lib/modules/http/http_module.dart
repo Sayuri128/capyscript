@@ -1,8 +1,10 @@
 import 'package:capyscript/AST/ast_tree.dart';
+import 'package:capyscript/modules/http/http_execute_js_script_node.dart';
 import 'package:capyscript/modules/http/http_get_node.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_post_node.dart';
 import 'package:capyscript/modules/http/http_register_interceptor_controller_node.dart';
+import 'package:capyscript/modules/http/http_use_headers_node.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 /*
@@ -47,6 +49,11 @@ class HttpModule extends BaseModule {
     functions.add(HttpRegisterInterceptorControllerNode(
         registerInterceptorController: (controller) =>
             _webBrowserInterceptorController = controller).toDeclarationNode());
+    functions.add(HttpExecuteJsScriptNode(
+            getInterceptorController: () => _webBrowserInterceptorController)
+        .toDeclarationNode());
+    functions.add(
+        HttpUserHeadersNode(getHttpModule: () => this).toDeclarationNode());
 
     body = ASTTree(functions: functions, modules: []);
   }

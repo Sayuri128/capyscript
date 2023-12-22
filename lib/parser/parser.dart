@@ -32,6 +32,7 @@ class Parser {
   final String source;
 
   late final Lexer _lexer;
+  ASTTree? _astTree;
   Token? _currentToken;
 
   Parser({required this.source}) {
@@ -40,6 +41,8 @@ class Parser {
   }
 
   ASTTree parse() {
+    if(_astTree != null) return _astTree!;
+
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
 
@@ -51,14 +54,15 @@ class Parser {
       }
     }
 
-    return ASTTree(functions: functions, modules: imports);
+    _astTree = ASTTree(functions: functions, modules: imports);;
+    return _astTree!;
   }
 
   String eat(TokenType expectedToken) {
     final cur = _currentToken!;
     if (_currentToken!.type == expectedToken) {
       _currentToken = _lexer.getNextToken();
-      print("eat ${_currentToken.toString()}");
+      // print("eat ${_currentToken.toString()}");
       return cur.value;
     }
 

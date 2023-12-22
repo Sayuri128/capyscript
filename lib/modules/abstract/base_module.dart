@@ -42,8 +42,8 @@ class ModuleFunctionBody extends ASTNode {
       {dynamic defaultValue}) {
     try {
       final variable = environment.getVariable(name);
-      if (variable == null) {
-        throw Exception();
+      if (variable == null && defaultValue != null) {
+        return defaultValue;
       }
       return variable;
     } catch (e) {

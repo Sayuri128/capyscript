@@ -6,6 +6,8 @@
 import 'dart:convert';
 
 import 'package:capyscript/api_clients/api_client.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/chapter/chapter.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/chapter/pages/pages.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/data/filters/filter_data.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/manga_gallery_view.dart';
@@ -46,6 +48,21 @@ class MangaApiClient extends ApiClient {
     return (await interpreter.runFunction(getConcreteFunctionName, arguments: {
       getConcreteUidParameterName: uid,
       getConcreteDataParameterName: data
+    }));
+  }
+
+  Future<List<Chapter>> getChapters({required String uid}) async {
+    return (await interpreter.runFunction(getChaptersFunctionName,
+            arguments: {getChaptersUidParameterName: uid}) as List<dynamic>)
+        .map((e) => Chapter.fromJson(jsonDecode(jsonEncode(e))))
+        .toList();
+  }
+
+  Future<Pages> getPages(
+      {required String uid, required Map<String, dynamic>? data}) async {
+    return (await interpreter.runFunction(getPagesFunctionName, arguments: {
+      getPagesUidParameterName: uid,
+      getPagesDataParameterName: data
     }));
   }
 }

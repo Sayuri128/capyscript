@@ -36,10 +36,10 @@ class ASTObjectSetNode extends ASTNode {
     final value = await valueExpression.execute(environment);
 
     for (final keyExp in keyExpressions) {
+      key = await keyExp.execute(environment);
       if (keyExp == keyExpressions.last) {
         break;
       }
-      key = await keyExp.execute(environment);
       target = target[key];
     }
 

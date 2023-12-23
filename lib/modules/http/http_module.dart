@@ -1,5 +1,6 @@
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/modules/http/http_execute_js_script_node.dart';
+import 'package:capyscript/modules/http/http_get_headers_node.dart';
 import 'package:capyscript/modules/http/http_get_node.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_post_node.dart';
@@ -56,6 +57,8 @@ class HttpModule extends BaseModule {
         .toDeclarationNode());
     functions.add(
         HttpUserHeadersNode(getHttpModule: () => this).toDeclarationNode());
+    functions
+        .add(HttpGetHeadersNode(getHeaders: getHeaders).toDeclarationNode());
 
     body = ASTTree(functions: functions, modules: []);
   }

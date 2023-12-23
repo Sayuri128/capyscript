@@ -61,6 +61,8 @@ class ASTMethodCallNode extends ASTNode {
           return obj.containsValue(await arguments.first.execute(environment));
         case "remove":
           return obj.remove(await arguments.first.execute(environment));
+        case "addAll":
+          return obj.addAll(await arguments.first.execute(environment));
       }
     }
 

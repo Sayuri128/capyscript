@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
  * All right reserved
  */
 
-
 part 'one_of_any.g.dart';
 
 @JsonSerializable()
@@ -19,10 +18,7 @@ class GalleryFilterOneOfAny extends GalleryFilter {
     required String paramName,
     required String param,
     required GalleryFilterType type,
-  }) : super(
-            paramName: paramName,
-            type: type,
-            param: param);
+  }) : super(paramName: paramName, type: type, param: param);
 
   @override
   String toString() {

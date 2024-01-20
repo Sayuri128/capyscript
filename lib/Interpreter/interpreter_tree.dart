@@ -9,13 +9,11 @@ import 'package:capyscript/modules/abstract/base_module.dart';
 
 part 'interpreter_tree.g.dart';
 
-
 @JsonSerializable(explicitToJson: true)
 class InterpreterTree {
-
-	factory InterpreterTree.fromJson(Map<String, dynamic> json) => _$InterpreterTreeFromJson(json);
-	Map<String, dynamic> toJson( ) => _$InterpreterTreeToJson(this);
-
+  factory InterpreterTree.fromJson(Map<String, dynamic> json) =>
+      _$InterpreterTreeFromJson(json);
+  Map<String, dynamic> toJson() => _$InterpreterTreeToJson(this);
 
   final ASTTree astTree;
   final List<BaseModule> parsedModules;

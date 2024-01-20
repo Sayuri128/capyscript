@@ -12,13 +12,11 @@ import 'protector_config/protector_config.dart';
 part 'config_info.g.dart';
 
 enum ConfigInfoType {
-
   @JsonValue(0)
   MANGA,
   @JsonValue(1)
   ANIME
 }
-
 
 int serializeLocalApiClientType(ConfigInfoType type) {
   switch (type) {
@@ -38,7 +36,6 @@ ConfigInfoType deserializeLocalApiClientType(int type) {
   }
   throw Exception("Unknown LocalApiClientType $type");
 }
-
 
 @JsonSerializable()
 class ConfigInfo extends ExternalObject {
@@ -79,7 +76,7 @@ class ConfigInfo extends ExternalObject {
       return protectorConfig;
     } else if (name == 'searchAvailable') {
       return searchAvailable;
-    } else if(name == 'uid') {
+    } else if (name == 'uid') {
       return uid;
     }
   }
@@ -92,16 +89,17 @@ class ConfigInfo extends ExternalObject {
     return 'ConfigInfo{name: $name, logoUrl: $logoUrl, nsfw: $nsfw, language: $language, version: $version, filters: $filters, protectorConfig: $protectorConfig, searchAvailable: $searchAvailable}';
   }
 
-  const ConfigInfo({required this.name,
-    required this.uid,
-    required this.logoUrl,
-    required this.nsfw,
-    required this.language,
-    required this.version,
-    required this.filters,
-    required this.type,
-    this.protectorConfig,
-    required this.searchAvailable});
+  const ConfigInfo(
+      {required this.name,
+      required this.uid,
+      required this.logoUrl,
+      required this.nsfw,
+      required this.language,
+      required this.version,
+      required this.filters,
+      required this.type,
+      this.protectorConfig,
+      required this.searchAvailable});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

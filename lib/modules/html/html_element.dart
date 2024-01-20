@@ -53,7 +53,7 @@ class HtmlElement extends ExternalObject {
     throw Exception("Field $name not found");
   }
 
-  operator[](String key) => getField(key);
+  operator [](String key) => getField(key);
 
   const HtmlElement(this.element);
 }

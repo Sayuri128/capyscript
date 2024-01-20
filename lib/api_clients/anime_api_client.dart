@@ -24,8 +24,7 @@ class AnimeApiClient extends ApiClient {
 
   Future<List<AnimeGalleryView>> getGallery(
       {required int page, String? query, List<FilterData>? filters}) async {
-    return ((await interpreter
-            .runFunction(getGalleryFunctionName, arguments: {
+    return ((await interpreter.runFunction(getGalleryFunctionName, arguments: {
       getGalleryPageParameterName: page,
       getGalleryQueryParameterName: query ?? '',
       getGalleryFiltersParameterName:

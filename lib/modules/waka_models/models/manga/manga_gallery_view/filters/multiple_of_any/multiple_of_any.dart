@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
  * All right reserved
  */
 
-
 part 'multiple_of_any.g.dart';
 
 @JsonSerializable()

@@ -16,15 +16,12 @@ class AnimeBuildEpisodeGroupNode extends ModuleFunctionBody {
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final title = getVariable("title", environment);
-    final videos = (getVariable("videos", environment) as List<dynamic>).map((
-        e) => AnimeVideo.fromJson(jsonDecode(jsonEncode(e))))
+    final videos = (getVariable("videos", environment) as List<dynamic>)
+        .map((e) => AnimeVideo.fromJson(jsonDecode(jsonEncode(e))))
         .toList();
-    final data = (getVariable("data", environment) as Map).map((key, value) =>
-        MapEntry(key.toString(), value));
-    return AnimeVideoGroup(
-        title: title,
-        elements: videos,
-        data: data);
+    final data = (getVariable("data", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value));
+    return AnimeVideoGroup(title: title, elements: videos, data: data);
   }
 
   @override

@@ -10,9 +10,9 @@ part 'protector_config.g.dart';
 
 @JsonSerializable()
 class ProtectorConfig {
-
-	factory ProtectorConfig.fromJson(Map<String, dynamic> json) => _$ProtectorConfigFromJson(json);
-	Map<String, dynamic> toJson() => _$ProtectorConfigToJson(this);
+  factory ProtectorConfig.fromJson(Map<String, dynamic> json) =>
+      _$ProtectorConfigFromJson(json);
+  Map<String, dynamic> toJson() => _$ProtectorConfigToJson(this);
 
   final String pingUrl;
   final bool needToLogin;

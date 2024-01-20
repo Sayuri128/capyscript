@@ -7,16 +7,15 @@ part 'multiple_of_any.g.dart';
 
 @JsonSerializable()
 class FilterDataMultipleOfAny extends FilterData {
-
-	factory FilterDataMultipleOfAny.fromJson(Map<String, dynamic> json) => _$FilterDataMultipleOfAnyFromJson(json);
-	@override
+  factory FilterDataMultipleOfAny.fromJson(Map<String, dynamic> json) =>
+      _$FilterDataMultipleOfAnyFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$FilterDataMultipleOfAnyToJson(this);
   final List<String> selected;
 
-  const FilterDataMultipleOfAny({
-    required this.selected,
-    required GalleryFilter filter
-  }) : super(filter: filter);
+  const FilterDataMultipleOfAny(
+      {required this.selected, required GalleryFilter filter})
+      : super(filter: filter);
 
   @override
   String toString() {

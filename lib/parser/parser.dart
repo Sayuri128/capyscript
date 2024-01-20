@@ -41,7 +41,7 @@ class Parser {
   }
 
   ASTTree parse() {
-    if(_astTree != null) return _astTree!;
+    if (_astTree != null) return _astTree!;
 
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
@@ -54,7 +54,8 @@ class Parser {
       }
     }
 
-    _astTree = ASTTree(functions: functions, modules: imports);;
+    _astTree = ASTTree(functions: functions, modules: imports);
+    ;
     return _astTree!;
   }
 
@@ -150,7 +151,7 @@ class Parser {
       return node;
     }
 
-    if(canEat([TokenType.NULL])) {
+    if (canEat([TokenType.NULL])) {
       eat(TokenType.NULL);
       return ASTNode();
     }
@@ -383,8 +384,8 @@ class Parser {
           if (canEat([TokenType.LPAREN])) {
             factor = _parseMethodCall(functionName, factor, field);
           } else {
-            factor =
-                ASTPropertyAccessNode(targetExpression: factor, fieldName: field);
+            factor = ASTPropertyAccessNode(
+                targetExpression: factor, fieldName: field);
           }
         } else if (canEat([TokenType.LSQUARE_BRACE])) {
           factor = _parseObjectSet(target: factor, functionName: functionName);

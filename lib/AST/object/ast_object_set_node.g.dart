@@ -10,8 +10,9 @@ ASTObjectSetNode _$ASTObjectSetNodeFromJson(Map<String, dynamic> json) =>
     ASTObjectSetNode(
       targetExpression:
           ASTNode.fromJson(json['targetExpression'] as Map<String, dynamic>),
-      keyExpression:
-          ASTNode.fromJson(json['keyExpression'] as Map<String, dynamic>),
+      keyExpressions: (json['keyExpressions'] as List<dynamic>)
+          .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
       valueExpression:
           ASTNode.fromJson(json['valueExpression'] as Map<String, dynamic>),
     );
@@ -19,6 +20,6 @@ ASTObjectSetNode _$ASTObjectSetNodeFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ASTObjectSetNodeToJson(ASTObjectSetNode instance) =>
     <String, dynamic>{
       'targetExpression': instance.targetExpression.toJson(),
-      'keyExpression': instance.keyExpression.toJson(),
+      'keyExpressions': instance.keyExpressions.map((e) => e.toJson()).toList(),
       'valueExpression': instance.valueExpression.toJson(),
     };

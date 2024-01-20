@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -5,7 +6,6 @@ import 'package:json_annotation/json_annotation.dart';
  */
 
 import 'package:capyscript/AST/ast_node.dart';
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 
 part 'ast_map_node.g.dart';
 
@@ -23,13 +23,24 @@ class ASTMapNode extends ASTNode {
     required this.values,
   });
 
+  factory ASTMapNode.fromMap(Map<dynamic, dynamic> map) {
+    final List<ASTNode> keys = [];
+    final List<ASTNode> values = [];
+
+    map.forEach((key, value) {
+      keys.add(ASTNode.fromValue(key));
+      values.add(ASTNode.fromValue(value));
+    });
+
+    return ASTMapNode(keys: keys, values: values);
+  }
+
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
+  Future execute(InterpreterEnvironment environment) async {
     final Map<dynamic, dynamic> map = {};
     for (int i = 0; i < keys.length; i++) {
-      map[await keys[i].execute(memory, functions)] =
-          await values[i].execute(memory, functions);
+      map[await keys[i].execute(environment)] =
+          await values[i].execute(environment);
     }
     return map;
   }

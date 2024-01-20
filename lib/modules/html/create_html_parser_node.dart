@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2023 armatura24
+ * All right reserved
+ */
+
+import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/modules/abstract/base_module.dart';
+import 'package:capyscript/modules/html/html_document.dart';
+import 'package:html/parser.dart';
+
+class CreateHtmlParserNode extends ModuleFunctionBody {
+  @override
+  Future execute(InterpreterEnvironment environment) async {
+    final value = getVariable("value", environment);
+    return HtmlDocument(document: parse(value));
+  }
+
+  @override
+  ASTFunctionDeclarationNode toDeclarationNode() {
+    return ASTFunctionDeclarationNode(
+        functionName: "createHTMLParser",
+        parameters: [ASTParameterNode("value")],
+        body: this);
+  }
+}

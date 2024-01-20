@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -27,16 +28,15 @@ class ASTIfNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final res = await condition.execute(memory, functions);
+  Future execute(InterpreterEnvironment environment) async {
+    final res = await condition.execute(environment);
 
     if (res) {
-      return await trueBranch.execute(memory, functions);
+      return await trueBranch.execute(environment);
     }
 
     if (elseBranch != null) {
-      return await elseBranch!.execute(memory, functions);
+      return await elseBranch!.execute(environment);
     }
 
     return null;

@@ -11,10 +11,10 @@ part 'ast_tree.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTTree {
+  factory ASTTree.fromJson(Map<String, dynamic> json) =>
+      _$ASTTreeFromJson(json);
 
-	factory ASTTree.fromJson(Map<String, dynamic> json) => _$ASTTreeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTTreeToJson(this);
-
+  Map<String, dynamic> toJson() => _$ASTTreeToJson(this);
 
   final List<ASTFunctionDeclarationNode> functions;
   final List<ASTImportNode> modules;

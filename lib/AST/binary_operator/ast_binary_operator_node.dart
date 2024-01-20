@@ -3,7 +3,7 @@
  * All right reserved
  */
 
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../../Lexer/token_type.dart';
 import '../ast_node.dart';
@@ -23,10 +23,9 @@ class ASTBinaryOperatorNode extends ASTNode {
   final TokenType op;
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final leftRes = await left.execute(memory, functions);
-    final rightRes = await right.execute(memory, functions);
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    final leftRes = await left.execute(environment);
+    final rightRes = await right.execute(environment);
     // print(leftRes.toString() + " ${op} " + rightRes.toString());
 
     switch (op) {
@@ -48,6 +47,10 @@ class ASTBinaryOperatorNode extends ASTNode {
         return leftRes <= rightRes;
       case TokenType.GREATER_EQUAL:
         return leftRes >= rightRes;
+      case TokenType.LSQUARE_BRACE:
+        return leftRes[rightRes];
+      case TokenType.NOT_EQUAL:
+        return leftRes != rightRes;
       default:
         return leftRes + rightRes;
     }

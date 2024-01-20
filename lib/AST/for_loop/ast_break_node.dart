@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -11,13 +12,12 @@ part 'ast_break_node.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTBreakNode extends ASTNode {
-
-	factory ASTBreakNode.fromJson(Map<String, dynamic> json) => _$ASTBreakNodeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTBreakNodeToJson(this);
+  factory ASTBreakNode.fromJson(Map<String, dynamic> json) =>
+      _$ASTBreakNodeFromJson(json);
+  Map<String, dynamic> toJson() => _$ASTBreakNodeToJson(this);
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) {
+  Future execute(InterpreterEnvironment environment) {
     throw this;
   }
 

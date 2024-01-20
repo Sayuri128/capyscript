@@ -31,6 +31,8 @@ enum TokenType {
   LESS,
   LESS_EQUAL,
   GREATER_EQUAL,
+  AND,
+  OR,
   TRUE,
   FALSE,
   FOR,

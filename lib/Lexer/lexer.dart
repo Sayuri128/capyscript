@@ -80,6 +80,14 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.NOT_EQUAL, "!=");
+      } else if(currentChar == "&" && peekNextChar() == "&") {
+        _advance();
+        _advance();
+        return Token(TokenType.AND, "&&");
+      } else if(currentChar == "|" && peekNextChar() == "|") {
+        _advance();
+        _advance();
+        return Token(TokenType.OR, "||");
       }
 
       _advance();

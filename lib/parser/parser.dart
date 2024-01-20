@@ -100,12 +100,14 @@ class Parser {
       TokenType.EQUAL_EQUAL,
       TokenType.NOT_EQUAL,
       TokenType.LESS_EQUAL,
-      TokenType.GREATER_EQUAL
+      TokenType.GREATER_EQUAL,
+      TokenType.AND,
+      TokenType.OR,
     ])) {
       final TokenType op = _currentToken!.type;
       eat(op);
       left = ASTBinaryOperatorNode(
-          left: left, right: _parseFactor(functionName: functionName), op: op);
+          left: left, right: _parseTerm(functionName: functionName), op: op);
     }
 
     return left;

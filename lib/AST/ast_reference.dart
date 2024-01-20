@@ -7,7 +7,8 @@ import 'package:capyscript/Interpreter/interpreter_environment.dart';
 
 class ASTReference {
   final Future<dynamic> Function(InterpreterEnvironment environment) getter;
-  final Future<void> Function(InterpreterEnvironment environment, dynamic value) setter;
+  final Future<void> Function(InterpreterEnvironment environment, dynamic value)
+      setter;
 
   ASTReference({
     required this.getter,

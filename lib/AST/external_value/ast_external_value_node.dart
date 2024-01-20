@@ -11,9 +11,9 @@ part 'ast_external_value_node.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTExternalValueNode extends ASTNode {
-
-	factory ASTExternalValueNode.fromJson(Map<String, dynamic> json) => _$ASTExternalValueNodeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTExternalValueNodeToJson(this);
+  factory ASTExternalValueNode.fromJson(Map<String, dynamic> json) =>
+      _$ASTExternalValueNodeFromJson(json);
+  Map<String, dynamic> toJson() => _$ASTExternalValueNodeToJson(this);
 
   final dynamic value;
 

@@ -28,10 +28,10 @@ class HttpGetNode extends ModuleFunctionBody {
     String url = getVariable("url", environment);
     final params = (getVariable("params", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
-    final paths = (getVariable("paths", environment) as Map).map((key, value) =>
-        MapEntry(key.toString(), value));
+    final paths = (getVariable("paths", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value));
     final headers = (getVariable("headers", environment, defaultValue: {})
-    as Map)
+            as Map)
         .map((key, value) => MapEntry(key.toString(), value.toString()))
       ..addAll(getHeaders());
     final throughWeb = getVariable("throughWeb", environment);
@@ -44,7 +44,7 @@ class HttpGetNode extends ModuleFunctionBody {
       _logger.d(
           "httpGet: $url through web browser interceptor controller\nheaders: $headers");
       final response =
-      await controller.loadPage(url: url, method: "GET", headers: headers);
+          await controller.loadPage(url: url, method: "GET", headers: headers);
       return CapyHttpBrowserResponse(
           cookies: response.cookies,
           statusCode: response.statusCode,

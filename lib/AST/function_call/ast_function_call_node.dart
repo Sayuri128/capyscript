@@ -59,7 +59,8 @@ class ASTFunctionCallNode extends ASTNode {
           environment.setVariable(functionDec.parameters[i].paramName,
               await arguments[i].execute(environment));
         } catch (e) {
-          throw Exception("argument ${i + 1} is not defined - ${arguments.toString()} ${paramName}");
+          throw Exception(
+              "argument ${i + 1} is not defined - ${arguments.toString()} ${paramName}");
         }
       }
     }

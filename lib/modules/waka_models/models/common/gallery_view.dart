@@ -3,12 +3,9 @@
  * All right reserved
  */
 
-
-
 import 'package:capyscript/modules/abstract/external_object.dart';
 
 abstract class GalleryView extends ExternalObject {
-
   final String uid;
   final Map<String, dynamic> data;
 
@@ -16,5 +13,4 @@ abstract class GalleryView extends ExternalObject {
     required this.uid,
     required this.data,
   });
-
 }

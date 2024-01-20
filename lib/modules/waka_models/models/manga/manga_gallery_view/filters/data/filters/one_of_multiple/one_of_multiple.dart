@@ -7,8 +7,8 @@ part 'one_of_multiple.g.dart';
 
 @JsonSerializable()
 class FilterDataOneOfMultiple extends FilterData {
-
-	factory FilterDataOneOfMultiple.fromJson(Map<String, dynamic> json) => _$FilterDataOneOfMultipleFromJson(json);
+  factory FilterDataOneOfMultiple.fromJson(Map<String, dynamic> json) =>
+      _$FilterDataOneOfMultipleFromJson(json);
 
   @override
   String toString() {
@@ -19,8 +19,7 @@ class FilterDataOneOfMultiple extends FilterData {
   Map<String, dynamic> toJson() => _$FilterDataOneOfMultipleToJson(this);
   final String selected;
 
-  const FilterDataOneOfMultiple({
-    required this.selected,
-    required GalleryFilter filter
-  }) : super(filter: filter);
+  const FilterDataOneOfMultiple(
+      {required this.selected, required GalleryFilter filter})
+      : super(filter: filter);
 }

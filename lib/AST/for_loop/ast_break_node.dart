@@ -12,9 +12,9 @@ part 'ast_break_node.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTBreakNode extends ASTNode {
-
-	factory ASTBreakNode.fromJson(Map<String, dynamic> json) => _$ASTBreakNodeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTBreakNodeToJson(this);
+  factory ASTBreakNode.fromJson(Map<String, dynamic> json) =>
+      _$ASTBreakNodeFromJson(json);
+  Map<String, dynamic> toJson() => _$ASTBreakNodeToJson(this);
 
   @override
   Future execute(InterpreterEnvironment environment) {

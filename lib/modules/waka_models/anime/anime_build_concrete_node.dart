@@ -19,13 +19,15 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
     final cover = getVariable("cover", environment);
     final title = getVariable("title", environment);
     final description = getVariable("description", environment);
-    final tags = (getVariable("tags", environment) as List).map((e) =>
-        e.toString()).toList();
-    final groups = getVariable("groups", environment);
-    final alternativeTitles = ((getVariable(
-        "alternativeTitles", environment, defaultValue: null) ?? []) as List)
+    final tags = (getVariable("tags", environment) as List)
         .map((e) => e.toString())
         .toList();
+    final groups = getVariable("groups", environment);
+    final alternativeTitles =
+        ((getVariable("alternativeTitles", environment, defaultValue: null) ??
+                []) as List)
+            .map((e) => e.toString())
+            .toList();
     final status = getVariable("status", environment);
     return AnimeConcreteView(
         uid: uid,

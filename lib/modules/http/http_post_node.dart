@@ -23,11 +23,11 @@ class HttpPostNode extends ModuleFunctionBody {
     String url = getVariable("url", environment);
     final params = (getVariable("params", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
-    final paths = (getVariable("paths", environment) as Map).map((key, value) =>
-        MapEntry(key.toString(), value));
+    final paths = (getVariable("paths", environment) as Map)
+        .map((key, value) => MapEntry(key.toString(), value));
     final body = getVariable("body", environment);
     final headers = (getVariable("headers", environment, defaultValue: {})
-    as Map)
+            as Map)
         .map((key, value) => MapEntry(key.toString(), value.toString()))
       ..addAll(getHeaders());
     final throughWeb = getVariable("throughWeb", environment);

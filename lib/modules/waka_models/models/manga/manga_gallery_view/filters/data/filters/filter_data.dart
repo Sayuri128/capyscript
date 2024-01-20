@@ -6,16 +6,14 @@ part 'filter_data.g.dart';
 
 @JsonSerializable()
 class FilterData {
-
-	factory FilterData.fromJson(Map<String, dynamic> json) => _$FilterDataFromJson(json);
-	Map<String, dynamic> toJson() => _$FilterDataToJson(this);
+  factory FilterData.fromJson(Map<String, dynamic> json) =>
+      _$FilterDataFromJson(json);
+  Map<String, dynamic> toJson() => _$FilterDataToJson(this);
 
   @GalleryFilterJsonConverter()
   final GalleryFilter filter;
 
-  const FilterData({
-    required this.filter
-  });
+  const FilterData({required this.filter});
 
   @override
   String toString() {

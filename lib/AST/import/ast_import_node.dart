@@ -10,9 +10,9 @@ part 'ast_import_node.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTImportNode extends ASTNode {
-
-	factory ASTImportNode.fromJson(Map<String, dynamic> json) => _$ASTImportNodeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTImportNodeToJson(this);
+  factory ASTImportNode.fromJson(Map<String, dynamic> json) =>
+      _$ASTImportNodeFromJson(json);
+  Map<String, dynamic> toJson() => _$ASTImportNodeToJson(this);
 
   final String moduleName;
 

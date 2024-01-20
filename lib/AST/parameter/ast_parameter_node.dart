@@ -18,5 +18,4 @@ class ASTParameterNode extends ASTNode {
   final String paramName;
 
   ASTParameterNode(this.paramName);
-
 }

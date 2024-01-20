@@ -3,7 +3,6 @@
  * All right reserved
  */
 
-
 import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:capyscript/modules/waka_models/models/common/element_of_elements_group_of_concrete.dart';
 import 'package:capyscript/modules/waka_models/models/common/elements_group_of_concrete.dart';

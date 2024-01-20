@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
  * All right reserved
  */
 
-
 part 'swircher.g.dart';
 
 @JsonSerializable()

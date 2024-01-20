@@ -3,7 +3,6 @@
  * All right reserved
  */
 
-
 import 'package:args/args.dart';
 import 'package:capyscript/Interpreter/interpreter.dart';
 

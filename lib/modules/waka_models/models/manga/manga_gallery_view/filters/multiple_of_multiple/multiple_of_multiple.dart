@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
  * All right reserved
  */
 
-
 part 'multiple_of_multiple.g.dart';
 
 @JsonSerializable()
@@ -22,10 +21,7 @@ class GalleryFilterMultipleOfMultiple extends GalleryFilter {
       required String paramName,
       required GalleryFilterType type,
       required String param})
-      : super(
-            paramName: paramName,
-            type: type,
-            param: param);
+      : super(paramName: paramName, type: type, param: param);
 
   @override
   String toString() {

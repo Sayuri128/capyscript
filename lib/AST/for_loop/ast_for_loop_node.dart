@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -31,13 +32,12 @@ class ASTForLoopNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    await initialization.execute(memory, functions);
-    for (; await condition.execute(memory, functions);) {
+  Future execute(InterpreterEnvironment environment) async {
+    await initialization.execute(environment);
+    for (; await condition.execute(environment);) {
       try {
-        await body.execute(memory, functions);
-        await increment.execute(memory, functions);
+        await body.execute(environment);
+        await increment.execute(environment);
       } on ASTContinueNode catch (_) {
         continue;
       } on ASTBreakNode catch (_) {

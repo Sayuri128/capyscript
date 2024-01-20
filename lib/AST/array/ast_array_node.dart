@@ -1,4 +1,4 @@
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -20,11 +20,17 @@ class ASTArrayNode extends ASTNode {
 
   const ASTArrayNode({required this.expressions});
 
+  factory ASTArrayNode.fromList(List<dynamic> list) {
+    final List<ASTNode> expressions = [];
+    list.forEach((element) {
+      expressions.add(ASTNode.fromValue(element));
+    });
+    return ASTArrayNode(expressions: expressions);
+  }
+
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    return (await Future.wait(
-            expressions.map((e) => e.execute(memory, functions))))
+  Future execute(InterpreterEnvironment environment) async {
+    return (await Future.wait(expressions.map((e) => e.execute(environment))))
         .toList();
   }
 }

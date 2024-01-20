@@ -20,11 +20,13 @@ enum TokenType {
   EQUALS,
   IMPORT,
   SINGLE_QUOTE,
+  SINGLE_QUTOE_S,
   DOUBLE_QUOTES,
   STRING,
   IF,
   ELSE,
   EQUAL_EQUAL,
+  NOT_EQUAL,
   GREATER,
   LESS,
   LESS_EQUAL,
@@ -32,8 +34,10 @@ enum TokenType {
   TRUE,
   FALSE,
   FOR,
+  RETURN,
   INCREMENT,
   DECREMENT,
   BREAK,
-  CONTINUE
+  CONTINUE,
+  NULL
 }

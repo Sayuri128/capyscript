@@ -8,14 +8,12 @@ part of 'ast_object_get_node.dart';
 
 ASTObjectGetNode _$ASTObjectGetNodeFromJson(Map<String, dynamic> json) =>
     ASTObjectGetNode(
-      targetExpression:
-          ASTNode.fromJson(json['targetExpression'] as Map<String, dynamic>),
-      keyExpression:
-          ASTNode.fromJson(json['keyExpression'] as Map<String, dynamic>),
+      object: ASTNode.fromJson(json['object'] as Map<String, dynamic>),
+      key: ASTNode.fromJson(json['key'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ASTObjectGetNodeToJson(ASTObjectGetNode instance) =>
     <String, dynamic>{
-      'targetExpression': instance.targetExpression.toJson(),
-      'keyExpression': instance.keyExpression.toJson(),
+      'object': instance.object.toJson(),
+      'key': instance.key.toJson(),
     };

@@ -1,4 +1,10 @@
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+/*
+ * Copyright (c) 2023 armatura24
+ * All right reserved
+ */
+
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -27,52 +33,73 @@ class ASTMethodCallNode extends ASTNode {
   });
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final obj = await variable.execute(memory, functions);
+  Future execute(InterpreterEnvironment environment) async {
+    final obj = await variable.execute(environment);
     if (obj is List) {
       switch (methodName) {
         case "push":
           for (final arg in arguments) {
-            obj.add(await arg.execute(memory, functions));
+            obj.add(await arg.execute(environment));
           }
           return null;
         case "pop":
           return obj.removeLast();
         case 'elementAt':
           return obj.elementAt(
-              ((await arguments.first.execute(memory, functions)) as num)
-                  .toInt());
+              ((await arguments.first.execute(environment)) as num).toInt());
         case "removeAt":
           return obj.removeAt(
-              ((await arguments.first.execute(memory, functions)) as num)
-                  .toInt());
-        case "isEmpty":
-          return obj.isEmpty;
-        case "isNotEmpty":
-          return obj.isNotEmpty;
+              ((await arguments.first.execute(environment)) as num).toInt());
       }
     } else if (obj is Map) {
       switch (methodName) {
-        case "values":
-          return obj.values;
-        case "keys":
-          return obj.keys;
-        case "isEmpty":
-          return obj.isEmpty;
-        case "isNotEmpty":
-          return obj.isNotEmpty;
         case "containsKey":
-          return obj
-              .containsKey(await arguments.first.execute(memory, functions));
+          return obj.containsKey(await arguments.first.execute(environment));
         case "clear":
           return obj.clear();
         case "containsValue":
-          return obj
-              .containsValue(await arguments.first.execute(memory, functions));
+          return obj.containsValue(await arguments.first.execute(environment));
         case "remove":
-          return obj.remove(await arguments.first.execute(memory, functions));
+          return obj.remove(await arguments.first.execute(environment));
+        case "addAll":
+          return obj.addAll(await arguments.first.execute(environment));
       }
+    }
+
+    if (obj is String) {
+      switch (methodName) {
+        case "contains":
+          return obj.contains(await arguments.first.execute(environment));
+        case "split":
+          return obj.split(await arguments.first.execute(environment));
+        case "replaceAll":
+          return obj.replaceAll(await arguments.first.execute(environment),
+              await arguments[1].execute(environment));
+        case "replaceFirst":
+          return obj.replaceFirst(await arguments.first.execute(environment),
+              await arguments[1].execute(environment));
+        case "trim":
+          return obj.trim();
+        case "trimLeft":
+          return obj.trimLeft();
+        case "trimRight":
+          return obj.trimRight();
+        case "toLowerCase":
+          return obj.toLowerCase();
+        case "toUpperCase":
+          return obj.toUpperCase();
+        case "substring":
+          return obj.substring(
+              ((await arguments.first.execute(environment)) as num).toInt(),
+              ((await arguments[1].execute(environment)) as num).toInt());
+      }
+    }
+
+    if (obj is ExternalObject) {
+      return obj.callFunction(methodName,
+          ordinalArguments: (await Future.wait(
+                  arguments.map((e) async => await e.execute(environment))))
+              .toList());
     }
   }
 }

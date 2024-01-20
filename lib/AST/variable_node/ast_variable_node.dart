@@ -1,3 +1,5 @@
+import 'package:capyscript/AST/ast_reference.dart';
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -5,7 +7,6 @@ import 'package:json_annotation/json_annotation.dart';
  */
 
 import 'package:capyscript/AST/ast_node.dart';
-import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 
 part 'ast_variable_node.g.dart';
 
@@ -23,8 +24,29 @@ class ASTVariableNode extends ASTNode {
       {required this.variableName, required this.functionName});
 
   @override
-  Future<dynamic> execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    return memory[functionName]?[variableName];
+  Future<dynamic> execute(InterpreterEnvironment environment) async {
+    try {
+      return environment.getVariable(variableName);
+    } catch (e) {
+      return variableName;
+    }
+  }
+
+  @override
+  ASTReference getReference() {
+    return ASTReference(getter: (InterpreterEnvironment environment) async {
+      return this.execute(environment);
+    }, setter: (InterpreterEnvironment environment, dynamic value) async {
+      try {
+        return environment.setVariable(variableName, value);
+      } catch (e) {
+        return;
+      }
+    });
+  }
+
+  @override
+  String toString() {
+    return 'ASTVariableNode{functionName: $functionName, variableName: $variableName}';
   }
 }

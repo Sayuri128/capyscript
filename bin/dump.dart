@@ -3,7 +3,6 @@
  * All right reserved
  */
 
-
 import 'package:args/args.dart';
 import 'package:capyscript/Interpreter/interpreter.dart';
 
@@ -14,6 +13,6 @@ void main(List<String> args) async {
 
   final results = argsParser.parse(args);
 
-  final interpreter = Interpreter(mainPath: results['path']);
+  final interpreter = Interpreter.fromFile(path: results['path']);
   interpreter.dumpAST(results["output"]);
 }

@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -11,18 +12,18 @@ part 'ast_decrement_node.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ASTDecrementNode extends ASTNode {
+  factory ASTDecrementNode.fromJson(Map<String, dynamic> json) =>
+      _$ASTDecrementNodeFromJson(json);
 
-	factory ASTDecrementNode.fromJson(Map<String, dynamic> json) => _$ASTDecrementNodeFromJson(json);
-	Map<String, dynamic> toJson() => _$ASTDecrementNodeToJson(this);
+  Map<String, dynamic> toJson() => _$ASTDecrementNodeToJson(this);
 
   final String variable;
   final String functionName;
 
   @override
-  Future execute(Map<String, Map<String, dynamic>> memory,
-      Map<String, ASTFunctionDeclarationNode> functions) async {
-    final value = memory[functionName]![variable];
-    memory[functionName]![variable]--;
+  Future execute(InterpreterEnvironment environment) async {
+    final value = environment.getVariable(variable) - 1;
+    environment.setVariable(variable, value);
     return value;
   }
 

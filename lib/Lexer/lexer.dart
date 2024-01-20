@@ -27,6 +27,18 @@ class Lexer {
     while (_pos < source.length) {
       final currentChar = source[_pos];
 
+      if (currentChar == '/') {
+        if (peekNextChar() == '/') {
+          // Skip single-line comment
+          _skipSingleLineComment();
+          return getNextToken();
+        } else if (peekNextChar() == '*') {
+          // Skip multi-line comment
+          _skipMultiLineComment();
+          return getNextToken();
+        }
+      }
+
       if (RegExp(r'\s').hasMatch(currentChar)) {
         _advance(); // Skip whitespace
         continue;
@@ -36,7 +48,7 @@ class Lexer {
         return _parseNumber();
       }
 
-      if (source[_pos] == "\'" || source[_pos] == "\"") {
+      if (source[_pos] == "\'" || source[_pos] == "\"" || source[_pos] == "`") {
         return parseString();
       }
 
@@ -64,6 +76,10 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.DECREMENT, "--");
+      } else if (currentChar == "!" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.NOT_EQUAL, "!=");
       }
 
       _advance();
@@ -94,6 +110,8 @@ class Lexer {
           return Token(TokenType.DOUBLE_QUOTES, currentChar);
         case "'":
           return Token(TokenType.SINGLE_QUOTE, currentChar);
+        case "`":
+          return Token(TokenType.SINGLE_QUTOE_S, currentChar);
         case "[":
           return Token(TokenType.LSQUARE_BRACE, currentChar);
         case "]":
@@ -113,6 +131,27 @@ class Lexer {
     }
 
     return Token(TokenType.END, '');
+  }
+
+  void _skipSingleLineComment() {
+    // Skip until the end of line or input
+    String currentChar = source[_pos];
+    while (currentChar != '\n') {
+      _advance();
+      currentChar = source[_pos];
+    }
+  }
+
+  void _skipMultiLineComment() {
+    // Skip until encountering '*/' or end of input
+    String currentChar = source[_pos];
+    while (!(currentChar == '*' && peekNextChar() == '/')) {
+      _advance();
+      currentChar = source[_pos];
+    }
+    // Skip the '*/' characters
+    _advance(); // Skip *
+    _advance(); // Skip /
   }
 
   String getRangeTokens(int range) {
@@ -135,13 +174,13 @@ class Lexer {
     var string = '';
     _advance();
 
-    while (
-        _pos < source.length && source[_pos] != "'" && source[_pos] != "\"") {
+    String openQuote = source[_pos - 1];
+
+    while (_pos < source.length && source[_pos] != openQuote) {
       string += source[_pos++];
     }
 
-    if (_pos >= source.length ||
-        (source[_pos] != "'" && source[_pos] != '\"')) {
+    if (_pos >= source.length || (source[_pos] != openQuote)) {
       throw Exception('Unclosed string literal');
     }
 
@@ -173,6 +212,10 @@ class Lexer {
       return Token(TokenType.BREAK, identifier);
     } else if (identifier == "continue") {
       return Token(TokenType.CONTINUE, identifier);
+    } else if (identifier == "null") {
+      return Token(TokenType.NULL, identifier);
+    } else if (identifier == "return") {
+      return Token(TokenType.RETURN, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

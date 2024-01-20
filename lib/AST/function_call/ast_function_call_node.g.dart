@@ -8,7 +8,7 @@ part of 'ast_function_call_node.dart';
 
 ASTFunctionCallNode _$ASTFunctionCallNodeFromJson(Map<String, dynamic> json) =>
     ASTFunctionCallNode(
-      functionName: json['functionName'] as String,
+      function: ASTNode.fromJson(json['function'] as Map<String, dynamic>),
       arguments: (json['arguments'] as List<dynamic>)
           .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -17,6 +17,6 @@ ASTFunctionCallNode _$ASTFunctionCallNodeFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ASTFunctionCallNodeToJson(
         ASTFunctionCallNode instance) =>
     <String, dynamic>{
-      'functionName': instance.functionName,
+      'function': instance.function.toJson(),
       'arguments': instance.arguments.map((e) => e.toJson()).toList(),
     };

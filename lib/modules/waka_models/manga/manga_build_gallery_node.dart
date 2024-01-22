@@ -15,7 +15,11 @@ class MangaBuildGalleryNode extends ModuleFunctionBody {
     final uid = getVariable('uid', environment);
     final title = getVariable('title', environment);
     final cover = getVariable('cover', environment);
-    final data = getVariable('data', environment);
+    final data = Map.fromEntries(
+      (getVariable('data', environment) as Map).entries.map(
+            (e) => MapEntry(e.key.toString(), e.value),
+          ),
+    );
     return MangaGalleryView(uid: uid, cover: cover, title: title, data: data);
   }
 

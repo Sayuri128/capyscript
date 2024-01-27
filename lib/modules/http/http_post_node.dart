@@ -1,4 +1,6 @@
+import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
@@ -65,11 +67,45 @@ class HttpPostNode extends ModuleFunctionBody {
         functionName: "httpPost",
         parameters: [
           ASTParameterNode("url"),
-          ASTParameterNode("params"),
-          ASTParameterNode("paths"),
-          ASTParameterNode("body"),
-          ASTParameterNode("headers"),
-          ASTParameterNode("throughWeb"),
+          ASTParameterNode(
+            "params",
+            isOptional: true,
+            defaultValue: ASTMapNode(
+              keys: [],
+              values: [],
+            ),
+          ),
+          ASTParameterNode(
+            "paths",
+            isOptional: true,
+            defaultValue: ASTMapNode(
+              keys: [],
+              values: [],
+            ),
+          ),
+          ASTParameterNode(
+            "body",
+            isOptional: true,
+            defaultValue: ASTMapNode(
+              keys: [],
+              values: [],
+            ),
+          ),
+          ASTParameterNode(
+            "headers",
+            isOptional: true,
+            defaultValue: ASTMapNode(
+              keys: [],
+              values: [],
+            ),
+          ),
+          ASTParameterNode(
+            "throughWeb",
+            isOptional: true,
+            defaultValue: ASTBooleanNode(
+              value: false,
+            ),
+          ),
         ],
         body: this);
   }

@@ -15,17 +15,18 @@ class AnimeVideoGroup extends ElementsGroupOfConcrete<AnimeVideo> {
 
   Map<String, dynamic> toJson() => _$AnimeVideoGroupToJson(this);
 
-  const AnimeVideoGroup(
-      {required String title,
-      required List<AnimeVideo> elements,
-      required Map<String, dynamic> data})
-      : super(elements: elements, data: data, title: title);
+  const AnimeVideoGroup({
+    required String title,
+    required List<AnimeVideo> elements,
+  }) : super(elements: elements, title: title);
 
-  AnimeVideoGroup copyWith(
-      {String? title, List<AnimeVideo>? elements, Map<String, dynamic>? data}) {
+  AnimeVideoGroup copyWith({
+    String? title,
+    List<AnimeVideo>? elements,
+  }) {
     return AnimeVideoGroup(
-        title: title ?? this.title,
-        elements: elements ?? this.elements,
-        data: data ?? this.data);
+      title: title ?? this.title,
+      elements: elements ?? this.elements,
+    );
   }
 }

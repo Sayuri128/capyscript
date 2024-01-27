@@ -12,12 +12,10 @@ ChaptersGroup _$ChaptersGroupFromJson(Map<String, dynamic> json) =>
       elements: (json['elements'] as List<dynamic>)
           .map((e) => Chapter.fromJson(e as Map<String, dynamic>))
           .toList(),
-      data: json['data'] as Map<String, dynamic>,
     );
 
 Map<String, dynamic> _$ChaptersGroupToJson(ChaptersGroup instance) =>
     <String, dynamic>{
       'title': instance.title,
       'elements': instance.elements,
-      'data': instance.data,
     };

@@ -34,7 +34,6 @@ class MangaBuildChaptersGroupNode extends ModuleFunctionBody {
         parameters: [
           ASTParameterNode("title"),
           ASTParameterNode("elements"),
-          ASTParameterNode("data"),
         ],
         body: this);
   }

@@ -17,5 +17,12 @@ class ASTParameterNode extends ASTNode {
 
   final String paramName;
 
-  ASTParameterNode(this.paramName);
+  final bool isOptional;
+  final ASTNode? defaultValue;
+
+  ASTParameterNode(
+    this.paramName, {
+    this.defaultValue = null,
+    this.isOptional = false,
+  });
 }

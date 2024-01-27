@@ -9,13 +9,14 @@ abstract class ElementsGroupOfConcrete<
     T extends ElementOfElementsGroupOfConcrete> {
   final String title;
   final List<T> elements;
-  final Map<String, dynamic> data;
 
-  const ElementsGroupOfConcrete(
-      {required this.elements, required this.data, required this.title});
+  const ElementsGroupOfConcrete({
+    required this.elements,
+    required this.title,
+  });
 
   @override
   String toString() {
-    return 'ElementsGroupOfConcrete{title: $title, elements: $elements, data: $data}';
+    return 'ElementsGroupOfConcrete{title: $title, elements: $elements}';
   }
 }

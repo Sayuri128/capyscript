@@ -19,9 +19,10 @@ class AnimeBuildEpisodeGroupNode extends ModuleFunctionBody {
     final videos = (getVariable("videos", environment) as List<dynamic>)
         .map((e) => AnimeVideo.fromJson(jsonDecode(jsonEncode(e))))
         .toList();
-    final data = (getVariable("data", environment) as Map)
-        .map((key, value) => MapEntry(key.toString(), value));
-    return AnimeVideoGroup(title: title, elements: videos, data: data);
+    return AnimeVideoGroup(
+      title: title,
+      elements: videos,
+    );
   }
 
   @override
@@ -31,7 +32,6 @@ class AnimeBuildEpisodeGroupNode extends ModuleFunctionBody {
         parameters: [
           ASTParameterNode("title"),
           ASTParameterNode("videos"),
-          ASTParameterNode("data")
         ],
         body: this);
   }

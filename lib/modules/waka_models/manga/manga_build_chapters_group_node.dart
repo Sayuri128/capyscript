@@ -17,14 +17,11 @@ class MangaBuildChaptersGroupNode extends ModuleFunctionBody {
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final title = getVariable("title", environment);
     final elements = getVariable("elements", environment);
-    final data = (getVariable("data", environment) as Map)
-        .map((key, value) => MapEntry(key.toString(), value));
     return ChaptersGroup(
         title: title,
         elements: (elements as List<dynamic>)
             .map((e) => Chapter.fromJson(jsonDecode(jsonEncode(e))))
-            .toList(),
-        data: data);
+            .toList(),);
   }
 
   @override
@@ -34,7 +31,6 @@ class MangaBuildChaptersGroupNode extends ModuleFunctionBody {
         parameters: [
           ASTParameterNode("title"),
           ASTParameterNode("elements"),
-          ASTParameterNode("data"),
         ],
         body: this);
   }

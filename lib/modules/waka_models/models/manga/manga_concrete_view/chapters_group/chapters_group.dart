@@ -16,21 +16,21 @@ class ChaptersGroup extends ElementsGroupOfConcrete<Chapter> {
 
   Map<String, dynamic> toJson() => _$ChaptersGroupToJson(this);
 
-  const ChaptersGroup(
-      {required String title,
-      required List<Chapter> elements,
-      required Map<String, dynamic> data})
-      : super(elements: elements, data: data, title: title);
+  const ChaptersGroup({
+    required String title,
+    required List<Chapter> elements,
+  }) : super(
+          elements: elements,
+          title: title,
+        );
 
   ChaptersGroup copyWith({
     String? title,
     List<Chapter>? elements,
-    Map<String, dynamic>? data,
   }) {
     return ChaptersGroup(
       title: title ?? this.title,
       elements: elements ?? this.elements,
-      data: data ?? this.data,
     );
   }
 }

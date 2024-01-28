@@ -10,6 +10,7 @@ import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
+import 'package:capyscript/AST/null/ast_null_nodel.dart';
 import 'package:capyscript/AST/object/ast_object_get_node.dart';
 import 'package:capyscript/AST/object/ast_object_set_node.dart';
 import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
@@ -101,13 +102,18 @@ class Parser {
       TokenType.NOT_EQUAL,
       TokenType.LESS_EQUAL,
       TokenType.GREATER_EQUAL,
-      TokenType.AND,
-      TokenType.OR,
     ])) {
       final TokenType op = _currentToken!.type;
       eat(op);
       left = ASTBinaryOperatorNode(
           left: left, right: _parseTerm(functionName: functionName), op: op);
+
+      while(canEat([TokenType.AND, TokenType.OR])) {
+        final TokenType op = _currentToken!.type;
+        eat(op);
+        left = ASTBinaryOperatorNode(
+            left: left, right: _parseTerm(functionName: functionName), op: op);
+      }
     }
 
     return left;
@@ -155,7 +161,7 @@ class Parser {
 
     if (canEat([TokenType.NULL])) {
       eat(TokenType.NULL);
-      return ASTNode();
+      return ASTNullNode();
     }
 
     if (canEat([TokenType.IDENTIFIER])) {

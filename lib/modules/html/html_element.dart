@@ -23,6 +23,14 @@ class HtmlElement extends ExternalObject {
             .getElementsByTagName(ordinalArguments![0])
             .map((e) => HtmlElement(e))
             .toList();
+      case 'querySelectorAll':
+        return element
+            .querySelectorAll(ordinalArguments![0])
+            .map((e) => HtmlElement(e))
+            .toList();
+      case "querySelector":
+        final element = this.element.querySelector(ordinalArguments![0]);
+        return element != null ? HtmlElement(element) : null;
       case "text":
         return element.text;
     }

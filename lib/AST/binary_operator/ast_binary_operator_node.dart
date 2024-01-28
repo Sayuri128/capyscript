@@ -52,7 +52,9 @@ class ASTBinaryOperatorNode extends ASTNode {
       case TokenType.NOT_EQUAL:
         return leftRes != rightRes;
       case TokenType.AND:
-        return _getBoolFromDynamic(leftRes) && _getBoolFromDynamic(rightRes);
+        final left = _getBoolFromDynamic(leftRes);
+        if(!left) return false;
+        return _getBoolFromDynamic(rightRes);
       case TokenType.OR:
         return _getBoolFromDynamic(leftRes) || _getBoolFromDynamic(rightRes);
       default:

@@ -14,9 +14,6 @@ class MangaConcreteView extends ConcreteView<ChaptersGroup> {
 
   Map<String, dynamic> toJson() => _$MangaConcreteViewToJson(this);
 
-  final String cover;
-  final List<String> alternativeTitles;
-  final List<String> tags;
   final MangaStatus status;
 
   @override
@@ -47,15 +44,15 @@ class MangaConcreteView extends ConcreteView<ChaptersGroup> {
   void setField(String name, value) {}
 
   const MangaConcreteView({
-    required String uid,
-    required this.cover,
-    required String title,
-    required this.alternativeTitles,
-    required String description,
-    required this.tags,
+    required super.uid,
+    required super.cover,
+    required super.title,
+    required super.alternativeTitles,
+    required super.description,
+    required super.tags,
     required this.status,
-    required List<ChaptersGroup> groups,
-  }) : super(uid: uid, groups: groups, title: title, description: description);
+    required super.groups,
+  });
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

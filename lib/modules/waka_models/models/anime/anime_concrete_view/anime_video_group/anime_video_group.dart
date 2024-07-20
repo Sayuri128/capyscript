@@ -29,4 +29,33 @@ class AnimeVideoGroup extends ElementsGroupOfConcrete<AnimeVideo> {
       elements: elements ?? this.elements,
     );
   }
+
+  @override
+  callFunction(String name, {List? ordinalArguments}) {
+    if (name == 'copyWith') {
+      return copyWith(
+        title: ordinalArguments![0],
+        elements: ordinalArguments[1],
+      );
+    }
+  }
+
+  @override
+  getField(String name) {
+    if (name == 'title') {
+      return title;
+    }
+    if (name == 'elements') {
+      return elements;
+    }
+  }
+
+  @override
+  void setField(String name, value) {
+    if (name == 'elements') {
+      elements
+        ..clear()
+        ..addAll(value);
+    }
+  }
 }

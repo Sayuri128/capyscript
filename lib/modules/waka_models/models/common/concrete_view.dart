@@ -14,10 +14,16 @@ abstract class ConcreteView<
   final List<C> groups;
   final String title;
   final String description;
+  final String cover;
+  final List<String> alternativeTitles;
+  final List<String> tags;
 
   const ConcreteView(
       {required this.uid,
       required this.groups,
       required this.title,
-      required this.description});
+      required this.description,
+      required this.cover,
+      required this.alternativeTitles,
+      required this.tags});
 }

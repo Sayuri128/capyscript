@@ -1,10 +1,21 @@
 import "io";
+import "http";
+
+import "json";
 
 function main() {
-    arr = [1, 2, 3];
+    value = null;
+    str = "";
 
-    for(i = 0; i < arr.length - 1; i++) {
-        print(arr[i]);
+    if(value == null || str.isEmpty) {
+        print("Hello World");
+    } else {
+        print("else");
     }
 
+    if(str == "" && str != null || null == null) {
+        print("Hello World");
+    } else {
+        print("else");
+    }
 }

@@ -1,5 +1,6 @@
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/logger.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -41,8 +42,8 @@ class IOPrintNode extends ModuleFunctionBody {
     } catch (e) {
       throw Exception("data not found");
     }
-
-    print(data);
+    // print(data);
+    logger.d(data);
 
     return null;
   }

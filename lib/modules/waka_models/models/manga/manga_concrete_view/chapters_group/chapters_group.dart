@@ -33,4 +33,5 @@ class ChaptersGroup extends ElementsGroupOfConcrete<Chapter> {
       elements: elements ?? this.elements,
     );
   }
+
 }

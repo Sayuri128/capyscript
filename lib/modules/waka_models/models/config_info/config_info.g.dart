@@ -12,7 +12,7 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
       logoUrl: json['logoUrl'] as String,
       nsfw: json['nsfw'] as bool,
       language: json['language'] as String,
-      version: json['version'] as int,
+      version: (json['version'] as num).toInt(),
       filters:
           const GalleryFiltersJsonConverter().fromJson(json['filters'] as List),
       type: $enumDecode(_$ConfigInfoTypeEnumMap, json['type']),

@@ -17,9 +17,6 @@ class AnimeConcreteView extends ConcreteView<AnimeVideoGroup> {
 
   Map<String, dynamic> toJson() => _$AnimeConcreteViewToJson(this);
 
-  final String cover;
-  final List<String> alternativeTitles;
-  final List<String> tags;
   final AnimeStatus status;
 
   @override
@@ -50,15 +47,14 @@ class AnimeConcreteView extends ConcreteView<AnimeVideoGroup> {
   void setField(String name, value) {}
 
   const AnimeConcreteView(
-      {required String uid,
-      required this.cover,
-      required String title,
-      required this.alternativeTitles,
-      required String description,
-      required this.tags,
-      required List<AnimeVideoGroup> groups,
-      required this.status})
-      : super(uid: uid, groups: groups, description: description, title: title);
+      {required super.uid,
+      required super.cover,
+      required super.title,
+      required super.alternativeTitles,
+      required super.description,
+      required super.tags,
+      required super.groups,
+      required this.status});
 
   AnimeConcreteView copyWith({
     String? uid,

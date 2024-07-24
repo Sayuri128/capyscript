@@ -37,7 +37,7 @@ class Interpreter {
     return Interpreter(data: input, mainFile: file);
   }
 
-   InterpreterTree? _interpreterTree;
+  InterpreterTree? _interpreterTree;
 
   Future<dynamic> runFunction(String functionName,
       {Map<String, dynamic>? arguments}) async {
@@ -73,12 +73,11 @@ class Interpreter {
   }
 
   InterpreterTree _runParser() {
-    if(_interpreterTree != null) {
+    if (_interpreterTree != null) {
       return _interpreterTree!;
     }
 
     final tree = parser.parse();
-    print("functions number: ${tree.functions.length}");
 
     final modules = _loadModules(imports: tree.modules);
 

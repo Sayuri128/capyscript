@@ -68,8 +68,10 @@ class Parser {
       return cur.value;
     }
 
-    throw Exception(
-        "Unexpected token - ${_currentToken!.type} - expected - ${expectedToken.toString()}");
+    throw Exception("Unexpected token - ${_currentToken!.type} - expected - "
+        "${expectedToken.toString()} \n ${_lexer.getRangeTokens(
+      30,
+    )}");
   }
 
   void eatOr(List<TokenType> expectedTokens) {
@@ -108,7 +110,7 @@ class Parser {
       left = ASTBinaryOperatorNode(
           left: left, right: _parseTerm(functionName: functionName), op: op);
 
-      while(canEat([TokenType.AND, TokenType.OR])) {
+      while (canEat([TokenType.AND, TokenType.OR])) {
         final TokenType op = _currentToken!.type;
         eat(op);
         left = ASTBinaryOperatorNode(
@@ -432,7 +434,7 @@ class Parser {
       return _parseReturn(functionName);
     }
 
-    throw Exception('Invalid statement');
+    throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
   }
 
   ASTReturnNode _parseReturn(String functionName) {

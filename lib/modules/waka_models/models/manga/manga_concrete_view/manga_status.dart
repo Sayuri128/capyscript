@@ -3,4 +3,11 @@
  * All right reserved
  */
 
-enum MangaStatus { RELEASED, ONGOING, PAUSED, ANNOUNCE, CANCELED, UNDEFINED }
+enum MangaStatus {
+  RELEASED,
+  ONGOING,
+  PAUSED,
+  ANNOUNCE,
+  CANCELED,
+  UNDEFINED,
+}

@@ -13,6 +13,7 @@ import 'package:capyscript/modules/waka_models/manga/manga_build_gallery_node.da
 import 'package:capyscript/modules/waka_models/manga/manga_build_pages_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_status_announce_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_status_canceled_node.dart';
+import 'package:capyscript/modules/waka_models/manga/manga_build_status_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_status_ongoing_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_status_paused_node.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_build_status_released_node.dart';
@@ -30,12 +31,17 @@ class MangaModelsModule extends BaseModule {
     functions.add(MangaBuildGalleryNode().toDeclarationNode());
     functions.add(MangaBuildPagesNode().toDeclarationNode());
 
+    functions.add(MangaBuildStatusNode().toDeclarationNode());
+
+    // will be removed
+    // *
     functions.add(MangaBuildStatusAnnounceNode().toDeclarationNode());
     functions.add(MangaBuildStatusCanceledNode().toDeclarationNode());
     functions.add(MangaBuildStatusOngoingNode().toDeclarationNode());
     functions.add(MangaBuildStatusPausedNode().toDeclarationNode());
     functions.add(MangaBuildStatusReleasedNode().toDeclarationNode());
     functions.add(MangaBuildStatusUndefinedNode().toDeclarationNode());
+    // *
 
     body = ASTTree(functions: functions, modules: []);
   }

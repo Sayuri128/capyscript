@@ -11,6 +11,7 @@ import 'package:capyscript/modules/date/date_module.dart';
 import 'package:capyscript/modules/html/html_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_models_module.dart';
+import 'package:capyscript/modules/waka_models/filters/filters_models_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_models_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -69,4 +70,5 @@ final Map<String, BaseModule> modules = {
   HtmlModule.module_name: HtmlModule(),
   AnimeModelsModule.module_name: AnimeModelsModule(),
   MangaModelsModule.module_name: MangaModelsModule(),
+  FiltersModelsModule.module_name: FiltersModelsModule(),
 };

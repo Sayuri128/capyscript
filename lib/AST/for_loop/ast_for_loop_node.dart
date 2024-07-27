@@ -37,11 +37,12 @@ class ASTForLoopNode extends ASTNode {
     for (; await condition.execute(environment);) {
       try {
         await body.execute(environment);
-        await increment.execute(environment);
       } on ASTContinueNode catch (_) {
         continue;
       } on ASTBreakNode catch (_) {
         break;
+      } finally {
+        await increment.execute(environment);
       }
     }
   }

@@ -246,15 +246,11 @@ class Parser {
         variable: target, methodName: methodName, arguments: arguments);
   }
 
-  ASTNode _parseObjectSet(
-      {required ASTNode target, required String functionName}) {
-    final List<ASTNode> keyExpressions = [];
-    while (canEat([TokenType.LSQUARE_BRACE])) {
-      eat(TokenType.LSQUARE_BRACE);
-      keyExpressions.add(_parseExpression(functionName: functionName));
-      eat(TokenType.RSQUARE_BRACE);
-    }
-
+  ASTNode _parseObjectSet({
+    required ASTNode target,
+    required String functionName,
+    required List<ASTNode> keyExpressions,
+  }) {
     eat(TokenType.EQUALS);
 
     final ASTNode value = _parseExpression(functionName: functionName);
@@ -396,7 +392,22 @@ class Parser {
                 targetExpression: factor, fieldName: field);
           }
         } else if (canEat([TokenType.LSQUARE_BRACE])) {
-          factor = _parseObjectSet(target: factor, functionName: functionName);
+          eat(TokenType.LSQUARE_BRACE);
+          final key = _parseExpression(functionName: functionName);
+          eat(TokenType.RSQUARE_BRACE);
+
+          if (canEat([TokenType.EQUALS])) {
+            factor = _parseObjectSet(
+              target: factor,
+              functionName: functionName,
+              keyExpressions: [key],
+            );
+          } else {
+            factor = ASTObjectGetNode(
+              object: factor,
+              key: key,
+            );
+          }
         } else {
           break;
         }

@@ -73,13 +73,13 @@ class ASTPropertyAccessNode extends ASTNode {
         case "isEmpty":
           return obj.isEmpty;
         case "isNotEmpty":
-          return obj.isNotEmpty;
+          return obj.isNotEmpty;  
         default:
           return obj[fieldName];
       }
     }
 
-    throw Exception("${obj.toString()} - ${fieldName} not found");
+    throw Exception("${targetExpression.toJson()} - ${fieldName} not found");
   }
 
   @override

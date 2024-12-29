@@ -15,8 +15,8 @@ class HttpUtils {
 
     for (var element in params.entries) {
       if (element.value is Iterable) {
-        url = '$url${url.endsWith('?') ? '' : '&'}${element.key}[]='
-            '${(await Future.wait((element.value as List).map((e) async => e))).join(',')}';
+        url = '$url${url.endsWith('?') ? '' : '&'}'
+            '${(await Future.wait((element.value as List).map((e) async => "${element.key}[]=${e}"))).join('&')}';
       } else if (element.value is Map) {
         url = '$url${url.endsWith('?') ? '' : '&'}'
             '${(await Future.wait((element.value as Map).entries.map((e) async => '${element.key}[${e.key}]=${e.value}'))).join('&')}';

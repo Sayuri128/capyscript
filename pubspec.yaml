@@ -1,6 +1,6 @@
 name: capyscript
 description: >-
-version: 0.1.4
+version: 0.1.5
 
 environment:
   sdk: ">=3.4.0"

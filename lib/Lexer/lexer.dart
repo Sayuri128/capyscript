@@ -4,6 +4,8 @@ import 'token_type.dart';
 class Lexer {
   final String source;
   int _pos;
+  
+  int get pos => _pos;
 
   Lexer({
     required this.source,

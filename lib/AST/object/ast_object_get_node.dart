@@ -25,6 +25,10 @@ class ASTObjectGetNode extends ASTNode {
   Future execute(InterpreterEnvironment environment) async {
     final target = (await object.execute(environment));
     final keyR = await key.execute(environment);
-    return target[keyR];
+    try {
+      return target[keyR];
+    } catch (e) {
+      throw Exception("target ${object.toJson()} doesn't have key $keyR");
+    }
   }
 }

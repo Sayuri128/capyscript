@@ -1,0 +1,35 @@
+{
+  "name": "capyscript",
+  "displayName": "Capyscript",
+  "description": "Syntax highlighting for the Capyscript scripting language",
+  "version": "0.1.0",
+  "publisher": "armatura24",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sayuri128/capyscript"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "capyscript",
+        "aliases": ["Capyscript", "capyscript"],
+        "extensions": [".capyscript"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "capyscript",
+        "scopeName": "source.capyscript",
+        "path": "./syntaxes/capyscript.tmLanguage.json"
+      }
+    ]
+  }
+}

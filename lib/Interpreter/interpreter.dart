@@ -85,12 +85,22 @@ class Interpreter {
       _importModule(module.body);
     }
     _importModule(tree);
+    _registerClassesAndInterfaces();
     return InterpreterTree(astTree: tree, parsedModules: modules);
   }
 
   void _importModule(ASTTree result) {
     for (final function in result.functions) {
       _environment.functions[function.functionName] = function;
+    }
+  }
+
+  void _registerClassesAndInterfaces() {
+    for (final cls in parser.parsedClasses) {
+      _environment.registerClass(cls);
+    }
+    for (final iface in parser.parsedInterfaces) {
+      _environment.registerInterface(iface);
     }
   }
 

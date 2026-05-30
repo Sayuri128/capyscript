@@ -16,6 +16,13 @@ void main() {
       'true': TokenType.TRUE,
       'false': TokenType.FALSE,
       'null': TokenType.NULL,
+      'class': TokenType.CLASS,
+      'interface': TokenType.INTERFACE,
+      'extends': TokenType.EXTENDS,
+      'implements': TokenType.IMPLEMENTS,
+      'new': TokenType.NEW,
+      'this': TokenType.THIS,
+      'super': TokenType.SUPER,
     };
 
     for (final entry in keywords.entries) {

@@ -4,6 +4,7 @@
  */
 
 import 'package:capyscript/AST/ast_reference.dart';
+import 'package:capyscript/AST/class/ast_instance_node.dart';
 import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -34,6 +35,9 @@ class ASTPropertyAccessNode extends ASTNode {
   @override
   Future execute(InterpreterEnvironment environment) async {
     final obj = await targetExpression.execute(environment);
+    if (obj is ASTInstanceNode) {
+      return obj.getField(fieldName);
+    }
     if (obj is ExternalObject) {
       return await obj.getField(fieldName);
     }
@@ -88,6 +92,10 @@ class ASTPropertyAccessNode extends ASTNode {
       return this.execute(environment);
     }, setter: (InterpreterEnvironment environment, dynamic value) async {
       final obj = await targetExpression.execute(environment);
+      if (obj is ASTInstanceNode) {
+        obj.setField(fieldName, value);
+        return;
+      }
       if (obj is ExternalObject) {
         obj.setField(fieldName, value);
         return;

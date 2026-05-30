@@ -9,9 +9,13 @@ class LspServer {
   final _completionProvider = CompletionProvider();
 
   Future<void> run() async {
+    stderr.writeln('[capyscript-lsp] server started');
     await for (final message in _incomingMessages()) {
+      final method = message['method'];
+      stderr.writeln('[capyscript-lsp] << $method');
       final response = await _dispatch(message);
       if (response != null) {
+        stderr.writeln('[capyscript-lsp] >> response to $method');
         _send(response);
       }
     }
@@ -48,8 +52,8 @@ class LspServer {
 
           try {
             yield jsonDecode(utf8.decode(body)) as Map<String, dynamic>;
-          } catch (_) {
-            // skip malformed message
+          } catch (e) {
+            stderr.writeln('[capyscript-lsp] malformed message: $e');
           }
         } else {
           break;
@@ -133,10 +137,12 @@ class LspServer {
         return null;
 
       case 'textDocument/completion':
-        final uri =
-            (params?['textDocument'] as Map?)?['uri'] as String?;
+        final uri = (params?['textDocument'] as Map?)?['uri'] as String?;
         final content = (uri != null ? _documents[uri] : null) ?? '';
-        final items = _completionProvider.getCompletions(content);
+        final pos = params?['position'] as Map?;
+        final line = (pos?['line'] as num?)?.toInt() ?? 0;
+        final character = (pos?['character'] as num?)?.toInt() ?? 0;
+        final items = _completionProvider.getCompletions(content, line, character);
         return _response(id, {'isIncomplete': false, 'items': items});
 
       case 'shutdown':

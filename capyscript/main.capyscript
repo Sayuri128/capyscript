@@ -6,7 +6,6 @@ import "json";
 function main() {
     value = null;
     str = "";
-
     if(value == null || str.isEmpty) {
         print("Hello World");
     } else {

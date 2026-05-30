@@ -58,6 +58,16 @@ IntelliJ does not support `.vsix` files. Use the TextMate bundle instead.
 
 `.capyscript` files now get syntax highlighting.
 
+#### Troubleshooting: highlighting not working in IntelliJ IDEA
+
+**Step 1 — enable the TextMate Bundles plugin.**
+It ships *disabled* by default in IDEA (but pre-enabled in Android Studio).
+Go to **Preferences → Plugins → Installed**, search for **TextMate Bundles**, enable it, and restart.
+
+**Step 2 — remove the conflicting file type registration.**
+If highlighting still doesn't work, IDEA has registered `.capyscript` as "Unknown" and that takes priority over the bundle.
+Go to **Preferences → Editor → File Types**, select **Unknown** in the left list, find `*.capyscript` in the right panel, and remove it with **−**. Click OK and reopen the file.
+
 ### 2. Enable the LSP
 
 IntelliJ supports LSP via the **LSP4IJ** plugin (free, JetBrains Marketplace).

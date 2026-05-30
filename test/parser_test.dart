@@ -108,7 +108,8 @@ void main() {
     test('parses class fields', () {
       final p = _parse('class Point { x; y; }');
       final cls = p.parsedClasses.first;
-      expect(cls.fields, ['x', 'y']);
+      expect(cls.fields.map((f) => f.name).toList(), ['x', 'y']);
+      expect(cls.fields.every((f) => f.type == null), isTrue);
     });
 
     test('parses class methods', () {
@@ -196,6 +197,53 @@ void main() {
     test('returns ASTInterfaceDeclarationNode instances', () {
       final p = _parse('interface IFoo { }');
       expect(p.parsedInterfaces.first, isA<ASTInterfaceDeclarationNode>());
+    });
+  });
+
+  group('Parser - type annotations', () {
+    test('parses typed function parameters', () {
+      final tree = Parser(source: 'function add(a: int, b: int) { return a + b; }').parse();
+      final params = tree.functions.first.parameters;
+      expect(params[0].paramName, 'a');
+      expect(params[0].paramType, 'int');
+      expect(params[1].paramName, 'b');
+      expect(params[1].paramType, 'int');
+    });
+
+    test('parses function return type annotation', () {
+      final tree = Parser(source: 'function add(a, b): int { return a + b; }').parse();
+      expect(tree.functions.first.returnType, 'int');
+    });
+
+    test('parses generic type annotation', () {
+      final tree = Parser(source: 'function items(x: List<string>): List<int> { return x; }').parse();
+      final param = tree.functions.first.parameters.first;
+      expect(param.paramType, 'List<string>');
+      expect(tree.functions.first.returnType, 'List<int>');
+    });
+
+    test('untyped parameters have null type', () {
+      final tree = Parser(source: 'function foo(x, y) { return x; }').parse();
+      expect(tree.functions.first.parameters.every((p) => p.paramType == null), isTrue);
+    });
+
+    test('parses typed class fields', () {
+      final p = Parser(source: 'class Point { x: int; y: float; label; }')..parse();
+      final fields = p.parsedClasses.first.fields;
+      expect(fields[0].name, 'x');
+      expect(fields[0].type, 'int');
+      expect(fields[1].name, 'y');
+      expect(fields[1].type, 'float');
+      expect(fields[2].name, 'label');
+      expect(fields[2].type, isNull);
+    });
+
+    test('parses optional parameter with default value', () {
+      final tree = Parser(source: 'function greet(name, prefix = "Hi") { return prefix; }').parse();
+      final params = tree.functions.first.parameters;
+      expect(params[1].paramName, 'prefix');
+      expect(params[1].isOptional, isTrue);
+      expect(params[1].defaultValue, isNotNull);
     });
   });
 }

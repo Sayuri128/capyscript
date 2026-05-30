@@ -6,8 +6,14 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#strings" },
+    { "include": "#class-declaration" },
+    { "include": "#interface-declaration" },
     { "include": "#function-declaration" },
+    { "include": "#new-expression" },
+    { "include": "#this-super" },
+    { "include": "#type-annotation" },
     { "include": "#keywords" },
+    { "include": "#type-names" },
     { "include": "#constants" },
     { "include": "#numbers" },
     { "include": "#function-call" },
@@ -46,25 +52,69 @@
         }
       ]
     },
+    "class-declaration": {
+      "comment": "Matches 'class Name' — colors keyword and class name.",
+      "match": "\\b(class)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.class.capyscript" },
+        "2": { "name": "entity.name.type.class.capyscript" }
+      }
+    },
+    "interface-declaration": {
+      "comment": "Matches 'interface Name'.",
+      "match": "\\b(interface)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.class.capyscript" },
+        "2": { "name": "entity.name.type.interface.capyscript" }
+      }
+    },
     "function-declaration": {
-      "comment": "Matches 'function name' — colors both the keyword and the name in one rule so the name wins over the generic function-call rule.",
+      "comment": "Matches 'function name' — colors both the keyword and the name so the name wins over the generic function-call rule.",
       "match": "\\b(function)\\s+([a-zA-Z_]\\w*)\\b",
       "captures": {
         "1": { "name": "keyword.declaration.function.capyscript" },
         "2": { "name": "entity.name.function.capyscript" }
       }
     },
+    "new-expression": {
+      "comment": "Matches 'new ClassName' — keyword + class reference.",
+      "match": "\\b(new)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.operator.new.capyscript" },
+        "2": { "name": "entity.name.type.capyscript" }
+      }
+    },
+    "this-super": {
+      "name": "variable.language.capyscript",
+      "match": "\\b(this|super)\\b"
+    },
+    "type-annotation": {
+      "comment": "Matches ': TypeName' or ': TypeName<...>' in params, return types, field and var declarations.",
+      "match": ":\\s*([a-zA-Z_]\\w*(?:<[^>]+>)?)",
+      "captures": {
+        "1": { "name": "storage.type.capyscript" }
+      }
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.capyscript",
-          "match": "\\b(if|else|for|return|break|continue)\\b"
+          "match": "\\b(if|else|for|return|break|continue|extends|implements)\\b"
         },
         {
           "name": "keyword.control.import.capyscript",
           "match": "\\b(import)\\b"
+        },
+        {
+          "name": "keyword.declaration.capyscript",
+          "match": "\\b(var)\\b"
         }
       ]
+    },
+    "type-names": {
+      "comment": "Built-in type names when used outside a type annotation context (e.g. standalone).",
+      "name": "storage.type.capyscript",
+      "match": "\\b(int|float|string|bool|void|any|dynamic|List|Map)\\b"
     },
     "constants": {
       "name": "constant.language.capyscript",
@@ -75,7 +125,7 @@
       "match": "\\b\\d+(\\.\\d+)?\\b"
     },
     "function-call": {
-      "comment": "Matches any identifier immediately followed by '('. Listed after keywords and function-declaration so those take priority.",
+      "comment": "Matches any identifier immediately followed by '('. Listed after keywords and declarations so those take priority.",
       "match": "\\b([a-zA-Z_]\\w*)\\s*(?=\\()",
       "captures": {
         "1": { "name": "entity.name.function.capyscript" }

@@ -42,7 +42,7 @@ class IOPrintNode extends ModuleFunctionBody {
     } catch (e) {
       throw Exception("data not found");
     }
-    // print(data);
+    print(data);
     logger.d(data);
 
     return null;

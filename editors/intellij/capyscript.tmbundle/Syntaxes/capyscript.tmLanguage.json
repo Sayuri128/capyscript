@@ -6,8 +6,14 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#strings" },
+    { "include": "#class-declaration" },
+    { "include": "#interface-declaration" },
     { "include": "#function-declaration" },
+    { "include": "#new-expression" },
+    { "include": "#this-super" },
+    { "include": "#type-annotation" },
     { "include": "#keywords" },
+    { "include": "#type-names" },
     { "include": "#constants" },
     { "include": "#numbers" },
     { "include": "#function-call" },
@@ -47,6 +53,20 @@
         }
       ]
     },
+    "class-declaration": {
+      "match": "\\b(class)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.class.capyscript" },
+        "2": { "name": "entity.name.type.class.capyscript" }
+      }
+    },
+    "interface-declaration": {
+      "match": "\\b(interface)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.class.capyscript" },
+        "2": { "name": "entity.name.type.interface.capyscript" }
+      }
+    },
     "function-declaration": {
       "match": "\\b(function)\\s+([a-zA-Z_]\\w*)\\b",
       "captures": {
@@ -54,17 +74,42 @@
         "2": { "name": "entity.name.function.capyscript" }
       }
     },
+    "new-expression": {
+      "match": "\\b(new)\\s+([a-zA-Z_]\\w*)\\b",
+      "captures": {
+        "1": { "name": "keyword.operator.new.capyscript" },
+        "2": { "name": "entity.name.type.capyscript" }
+      }
+    },
+    "this-super": {
+      "name": "variable.language.capyscript",
+      "match": "\\b(this|super)\\b"
+    },
+    "type-annotation": {
+      "match": ":\\s*([a-zA-Z_]\\w*(?:<[^>]+>)?)",
+      "captures": {
+        "1": { "name": "storage.type.capyscript" }
+      }
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.capyscript",
-          "match": "\\b(if|else|for|return|break|continue)\\b"
+          "match": "\\b(if|else|for|return|break|continue|extends|implements)\\b"
         },
         {
           "name": "keyword.control.import.capyscript",
           "match": "\\b(import)\\b"
+        },
+        {
+          "name": "keyword.declaration.capyscript",
+          "match": "\\b(var)\\b"
         }
       ]
+    },
+    "type-names": {
+      "name": "storage.type.capyscript",
+      "match": "\\b(int|float|string|bool|void|any|dynamic|List|Map)\\b"
     },
     "constants": {
       "name": "constant.language.capyscript",

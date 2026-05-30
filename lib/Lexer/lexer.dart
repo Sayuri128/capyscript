@@ -238,6 +238,8 @@ class Lexer {
       return Token(TokenType.THIS, identifier);
     } else if (identifier == "super") {
       return Token(TokenType.SUPER, identifier);
+    } else if (identifier == "var") {
+      return Token(TokenType.VAR, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

@@ -2,12 +2,15 @@ import 'package:capyscript/lsp/docs.dart';
 import 'package:capyscript/lsp/module_functions.dart';
 import 'package:capyscript/parser/parser.dart';
 
-// Keywords valid only at the top level (outside any function)
-const _topLevelKeywords = ['import', 'function'];
+const _topLevelKeywords = ['import', 'function', 'class', 'interface'];
 
-// Keywords valid only inside a block
 const _blockKeywords = [
   'if', 'else', 'for', 'return', 'break', 'continue', 'null', 'true', 'false',
+  'new', 'this', 'super', 'var',
+];
+
+const _typeNames = [
+  'int', 'float', 'string', 'bool', 'void', 'any', 'dynamic', 'List', 'Map',
 ];
 
 const _stringMembers = [
@@ -31,6 +34,7 @@ const _kindKeyword = 14;
 const _kindFunction = 3;
 const _kindVariable = 6;
 const _kindField = 5;
+const _kindClass = 7;
 
 class CompletionProvider {
   List<Map<String, dynamic>> getCompletions(String content, int line, int character) {
@@ -38,9 +42,39 @@ class CompletionProvider {
     final currentLine = line < lines.length ? lines[line] : '';
     final textBeforeCursor = currentLine.substring(0, character.clamp(0, currentLine.length));
 
-    // After a dot: offer only member completions
-    if (RegExp(r'[a-zA-Z_]\w*\.$').hasMatch(textBeforeCursor)) {
+    // After a dot: offer class-specific or generic member completions
+    final dotMatch = RegExp(r'([a-zA-Z_]\w*)\.$').firstMatch(textBeforeCursor);
+    if (dotMatch != null) {
+      final varName = dotMatch.group(1)!;
+      final classMap = _variableClassMap(content);
+      if (classMap.containsKey(varName)) {
+        final className = classMap[varName]!;
+        final members = _classMembersFromContent(content)[className] ?? [];
+        if (members.isNotEmpty) {
+          return members.map((m) => _item(m, _kindField)).toList();
+        }
+      }
       return _memberCompletions();
+    }
+
+    // After `new ` or `new Fo`: offer class names
+    if (RegExp(r'\bnew\s+\w*$').hasMatch(textBeforeCursor)) {
+      return _classNamesFromContent(content)
+          .map((c) => _item(c, _kindClass))
+          .toList();
+    }
+
+    // After `: ` (type annotation): offer type names + class names
+    if (RegExp(r':\s*\w*$').hasMatch(textBeforeCursor)) {
+      final seen = <String>{};
+      final items = <Map<String, dynamic>>[];
+      for (final t in _typeNames) {
+        if (seen.add(t)) items.add(_item(t, _kindKeyword));
+      }
+      for (final c in _classNamesFromContent(content)) {
+        if (seen.add(c)) items.add(_item(c, _kindClass));
+      }
+      return items;
     }
 
     final textUpToCursor = [
@@ -72,9 +106,18 @@ class CompletionProvider {
       for (final variable in _variablesFromContent(content)) {
         add(_item(variable, _kindVariable));
       }
+      for (final className in _classNamesFromContent(content)) {
+        add(_item(className, _kindClass));
+      }
+      for (final t in _typeNames) {
+        add(_item(t, _kindKeyword));
+      }
     } else {
       for (final kw in _topLevelKeywords) {
         add(_item(kw, _kindKeyword));
+      }
+      for (final className in _classNamesFromContent(content)) {
+        add(_item(className, _kindClass));
       }
     }
 
@@ -157,6 +200,49 @@ class CompletionProvider {
     vars.removeAll(_blockKeywords);
     vars.removeAll(_topLevelKeywords);
     return vars.toList();
+  }
+
+  List<String> _classNamesFromContent(String content) {
+    try {
+      final p = Parser(source: content);
+      p.parse();
+      return p.parsedClasses.map((c) => c.className).toList();
+    } catch (_) {
+      return RegExp(r'\bclass\s+([a-zA-Z_]\w*)')
+          .allMatches(content)
+          .map((m) => m.group(1)!)
+          .toList();
+    }
+  }
+
+  // Maps variable name → class name for `varName = new ClassName(...)` patterns.
+  Map<String, String> _variableClassMap(String content) {
+    final map = <String, String>{};
+    for (final m in RegExp(r'([a-zA-Z_]\w*)\s*=\s*new\s+([a-zA-Z_]\w*)').allMatches(content)) {
+      map[m.group(1)!] = m.group(2)!;
+    }
+    // Also match `var name = new ClassName(...)` and `var name: Type = new ClassName(...)`
+    for (final m in RegExp(r'\bvar\s+([a-zA-Z_]\w*)(?:\s*:\s*[a-zA-Z_]\w*)?\s*=\s*new\s+([a-zA-Z_]\w*)').allMatches(content)) {
+      map[m.group(1)!] = m.group(2)!;
+    }
+    return map;
+  }
+
+  // Maps class name → list of method and field names.
+  Map<String, List<String>> _classMembersFromContent(String content) {
+    try {
+      final p = Parser(source: content);
+      p.parse();
+      return {
+        for (final c in p.parsedClasses)
+          c.className: [
+            ...c.methods.map((m) => m.functionName),
+            ...c.fields.map((f) => f.name),
+          ]
+      };
+    } catch (_) {
+      return {};
+    }
   }
 
   Map<String, dynamic> _item(String label, int kind) {

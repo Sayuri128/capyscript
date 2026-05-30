@@ -48,5 +48,6 @@ enum TokenType {
   IMPLEMENTS,
   NEW,
   THIS,
-  SUPER
+  SUPER,
+  VAR
 }

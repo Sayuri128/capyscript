@@ -1,5 +1,6 @@
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/Interpreter/type_checker.dart';
 
 class ASTInstanceNode {
   final String className;
@@ -37,13 +38,18 @@ class ASTInstanceNode {
     environment.setVariable('__currentClass__', owningClass);
 
     for (int i = 0; i < method.parameters.length; i++) {
+      final param = method.parameters[i];
       if (i < resolvedArgs.length) {
-        environment.setVariable(method.parameters[i].paramName, resolvedArgs[i]);
-      } else if (method.parameters[i].isOptional && method.parameters[i].defaultValue != null) {
+        environment.setVariable(param.paramName, resolvedArgs[i]);
+      } else if (param.isOptional && param.defaultValue != null) {
         environment.setVariable(
-          method.parameters[i].paramName,
-          await method.parameters[i].defaultValue!.execute(environment),
+          param.paramName,
+          await param.defaultValue!.execute(environment),
         );
+      }
+      if (param.paramType != null) {
+        TypeChecker.check(
+            param.paramType!, environment.getVariable(param.paramName), environment);
       }
     }
 
@@ -52,6 +58,10 @@ class ASTInstanceNode {
       res = await method.execute(environment);
     } on ASTReturnValue catch (r) {
       res = await r.execute(environment);
+    }
+
+    if (method.returnType != null && method.returnType != 'void') {
+      TypeChecker.check(method.returnType!, res, environment);
     }
 
     environment.exitScope();

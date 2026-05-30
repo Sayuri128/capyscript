@@ -106,7 +106,7 @@ class LspServer {
             },
             'completionProvider': {
               'resolveProvider': false,
-              'triggerCharacters': [],
+              'triggerCharacters': ['.'],
             },
           },
           'serverInfo': {'name': 'capyscript-lsp', 'version': '0.1.0'},

@@ -1,4 +1,49 @@
 const Map<String, ({String detail, String doc})> completionDocs = {
+  // Class / OOP keywords
+  'class': (
+    detail: 'class Name { }',
+    doc: 'Declare a class.\n\n**Example:**\n```\nclass Point {\n  x: int;\n  y: int;\n  function constructor(x: int, y: int) {\n    this.x = x;\n    this.y = y;\n  }\n}\n```',
+  ),
+  'interface': (
+    detail: 'interface Name { function method(); }',
+    doc: 'Declare an interface that classes must implement.\n\n**Example:**\n```\ninterface Drawable {\n  function draw();\n}\n```',
+  ),
+  'extends': (
+    detail: 'class Child extends Parent { }',
+    doc: 'Inherit from a parent class. Call `super()` in the constructor to initialize the parent.',
+  ),
+  'implements': (
+    detail: 'class Foo implements IBar { }',
+    doc: 'Declare that a class implements one or more interfaces. A runtime error is thrown if any required method is missing.',
+  ),
+  'new': (
+    detail: 'new ClassName(args)',
+    doc: 'Instantiate a class.\n\n**Example:**\n```\nvar p = new Point(3, 4);\n```',
+  ),
+  'this': (
+    detail: 'this.field',
+    doc: 'Reference the current class instance. Use `this.field` to access or set instance fields inside methods.',
+  ),
+  'super': (
+    detail: 'super(args) / super.method(args)',
+    doc: 'Call the parent class constructor or a parent method.\n\n**Example:**\n```\nfunction constructor(x) {\n  super(x);\n}\n```',
+  ),
+  // `var` keyword
+  'var': (
+    detail: 'var name: Type = value',
+    doc: 'Declare a typed local variable. The type annotation is optional — omitting it allows any value.\n\n**Example:**\n```\nvar x: int = 5;\nvar name: string = "hello";\nvar items: List<string> = [];\n```',
+  ),
+  // Built-in type names
+  'int': (detail: 'int', doc: 'Integer type. Accepts whole numbers only.\n\n**Example:** `var count: int = 0;`'),
+  'float': (detail: 'float', doc: 'Floating-point number type.\n\n**Example:** `var ratio: float = 3.14;`'),
+  'string': (detail: 'string', doc: 'String type.\n\n**Example:** `var name: string = "hello";`'),
+  'bool': (detail: 'bool', doc: 'Boolean type. Values: `true` or `false`.\n\n**Example:** `var flag: bool = true;`'),
+  'void': (detail: 'void', doc: 'Return type for functions that return no meaningful value.'),
+  'any': (detail: 'any', doc: 'Dynamic type — disables type checking. Any value is accepted.'),
+  'dynamic': (detail: 'dynamic', doc: 'Dynamic type — disables type checking. Same as `any`.'),
+  'List': (detail: 'List<T>', doc: 'List (array) type.\n\n**Example:** `var items: List<string> = [];`'),
+  'Map': (detail: 'Map<K, V>', doc: 'Map (dictionary) type.\n\n**Example:** `var data: Map<string, int> = {};`'),
+
   // Keywords
   'import': (
     detail: 'import "module"',

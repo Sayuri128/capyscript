@@ -2,6 +2,7 @@ import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
 import 'package:capyscript/AST/class/ast_class_declaration_node.dart';
+import 'package:capyscript/AST/class/class_field.dart';
 import 'package:capyscript/AST/class/ast_interface_declaration_node.dart';
 import 'package:capyscript/AST/class/ast_new_node.dart';
 import 'package:capyscript/AST/class/ast_super_node.dart';
@@ -33,6 +34,7 @@ import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/ast_node.dart';
 import 'package:capyscript/AST/number/ast_number_node.dart';
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
+import 'package:capyscript/AST/var/ast_var_declaration_node.dart';
 
 class Parser {
   final String source;
@@ -354,24 +356,62 @@ class Parser {
     final parameters = _parseArguments();
     eat(TokenType.RPAREN);
 
+    String? returnType;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      returnType = _parseType();
+    }
+
     final body = _parseBlock(functionName: functionName);
 
     return ASTFunctionDeclarationNode(
-        body: body, functionName: functionName, parameters: parameters);
+        body: body,
+        functionName: functionName,
+        parameters: parameters,
+        returnType: returnType);
   }
 
   List<ASTParameterNode> _parseArguments() {
     final parameters = <ASTParameterNode>[];
     if (_currentToken!.type != TokenType.RPAREN) {
-      parameters.add(ASTParameterNode(_currentToken!.value));
-      eat(TokenType.IDENTIFIER);
+      parameters.add(_parseOneParam());
       while (canEat([TokenType.COMMA])) {
         eat(TokenType.COMMA);
-        parameters.add(ASTParameterNode(_currentToken!.value));
-        eat(TokenType.IDENTIFIER);
+        parameters.add(_parseOneParam());
       }
     }
     return parameters;
+  }
+
+  ASTParameterNode _parseOneParam() {
+    final name = eat(TokenType.IDENTIFIER);
+    String? type;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      type = _parseType();
+    }
+    if (canEat([TokenType.EQUALS])) {
+      eat(TokenType.EQUALS);
+      final defaultExpr = _parseExpression(functionName: name);
+      return ASTParameterNode(name,
+          paramType: type, isOptional: true, defaultValue: defaultExpr);
+    }
+    return ASTParameterNode(name, paramType: type);
+  }
+
+  String _parseType() {
+    final name = eat(TokenType.IDENTIFIER);
+    if (canEat([TokenType.LESS])) {
+      eat(TokenType.LESS);
+      final args = [_parseType()];
+      while (canEat([TokenType.COMMA])) {
+        eat(TokenType.COMMA);
+        args.add(_parseType());
+      }
+      eat(TokenType.GREATER);
+      return '$name<${args.join(', ')}>';
+    }
+    return name;
   }
 
   ASTNode _parseBlock({required String functionName}) {
@@ -422,6 +462,20 @@ class Parser {
 
     if (canEat([TokenType.SUPER])) {
       return _parseSuperExpression(functionName: functionName);
+    }
+
+    if (canEat([TokenType.VAR])) {
+      eat(TokenType.VAR);
+      final varName = eat(TokenType.IDENTIFIER);
+      String? varType;
+      if (canEat([TokenType.COLON])) {
+        eat(TokenType.COLON);
+        varType = _parseType();
+      }
+      eat(TokenType.EQUALS);
+      final expr = _parseExpression(functionName: functionName);
+      return ASTVarDeclarationNode(
+          variableName: varName, declaredType: varType, expression: expr);
     }
 
     if (canEat([TokenType.IDENTIFIER])) {
@@ -592,16 +646,21 @@ class Parser {
 
     eat(TokenType.LBRACE);
 
-    final List<String> fields = [];
+    final List<ClassField> fields = [];
     final List<ASTFunctionDeclarationNode> methods = [];
 
     while (!canEat([TokenType.RBRACE])) {
       if (canEat([TokenType.FUNCTION])) {
         methods.add(_parseFunctionDeclaration());
       } else if (canEat([TokenType.IDENTIFIER])) {
-        // bare field declaration: name;
-        fields.add(eat(TokenType.IDENTIFIER));
+        final fieldName = eat(TokenType.IDENTIFIER);
+        String? fieldType;
+        if (canEat([TokenType.COLON])) {
+          eat(TokenType.COLON);
+          fieldType = _parseType();
+        }
         eat(TokenType.SEMICOLON);
+        fields.add(ClassField(name: fieldName, type: fieldType));
       } else {
         throw Exception(
             "Unexpected token in class body: ${_currentToken!.type}");

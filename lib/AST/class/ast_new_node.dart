@@ -34,7 +34,7 @@ class ASTNewNode extends ASTNode {
       final c = environment.classes[current];
       if (c == null) break;
       for (final field in c.fields) {
-        fields.putIfAbsent(field, () => null);
+        fields.putIfAbsent(field.name, () => null);
       }
       current = c.parentClass;
     }

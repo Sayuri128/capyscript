@@ -20,11 +20,13 @@ class ASTFunctionDeclarationNode extends ASTNode {
   final String functionName;
   final List<ASTParameterNode> parameters;
   final ASTNode body;
+  final String? returnType;
 
   const ASTFunctionDeclarationNode({
     required this.functionName,
     required this.parameters,
     required this.body,
+    this.returnType,
   });
 
   @override

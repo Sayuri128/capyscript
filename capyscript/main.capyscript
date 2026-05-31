@@ -1,4 +1,5 @@
 import "io";
+import "lib/lib";  // relative file import — loads lib/lib.capyscript
 
   class Animal {
     name: string;
@@ -40,7 +41,7 @@ import "io";
     var label: string = "result";
     var sum: int = add(x, 5);
     print(label + ": " + sum);
-    
+
     greet("world");
 
     var dog = new Dog("Rex", 3, "Labrador");
@@ -48,6 +49,9 @@ import "io";
 
     var animal: Animal = new Dog("Buddy", 2, "Poodle");
     print(animal.describe());
+
+    // test() comes from lib/lib.capyscript via relative import
+    print("lib test: " + test(3, 4));
   }
   
   

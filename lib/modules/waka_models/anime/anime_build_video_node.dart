@@ -32,13 +32,14 @@ class AnimeBuildVideoNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildAnimeVideo",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("title"),
-          ASTParameterNode("timestamp"),
-          ASTParameterNode("data"),
-          ASTParameterNode("type"),
-          ASTParameterNode("src"),
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("timestamp", paramType: "any"),
+          ASTParameterNode("data", paramType: "Map"),
+          ASTParameterNode("type", paramType: "any"),
+          ASTParameterNode("src", paramType: "string"),
         ],
+        returnType: "any",
         body: this);
   }
 }

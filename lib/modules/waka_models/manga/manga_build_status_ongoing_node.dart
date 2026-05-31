@@ -17,6 +17,6 @@ class MangaBuildStatusOngoingNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "statusOngoing", parameters: [], body: this);
+        functionName: "statusOngoing", parameters: [], returnType: "any", body: this);
   }
 }

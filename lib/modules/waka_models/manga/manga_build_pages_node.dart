@@ -24,9 +24,10 @@ class MangaBuildPagesNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildPages",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("value"),
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("value", paramType: "List"),
         ],
+        returnType: "any",
         body: this);
   }
 }

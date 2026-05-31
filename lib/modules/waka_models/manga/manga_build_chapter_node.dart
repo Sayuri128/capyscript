@@ -25,11 +25,12 @@ class MangaBuildChapterNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildChapter",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("title"),
-          ASTParameterNode("timestamp"),
-          ASTParameterNode("data"),
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("timestamp", paramType: "any"),
+          ASTParameterNode("data", paramType: "Map"),
         ],
+        returnType: "any",
         body: this);
   }
 }

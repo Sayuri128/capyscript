@@ -26,7 +26,8 @@ class HttpUserHeadersNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "useHeaders",
-        parameters: [ASTParameterNode("headers")],
+        parameters: [ASTParameterNode("headers", paramType: "Map")],
+        returnType: "void",
         body: this);
   }
 }

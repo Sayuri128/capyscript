@@ -26,7 +26,8 @@ class IOModule extends BaseModule {
     final List<ASTFunctionDeclarationNode> functions = [];
     functions.add(ASTFunctionDeclarationNode(
         functionName: "print",
-        parameters: [ASTParameterNode("data")],
+        parameters: [ASTParameterNode("data", paramType: "any")],
+        returnType: "void",
         body: IOPrintNode()));
 
     body = ASTTree(functions: functions, modules: []);

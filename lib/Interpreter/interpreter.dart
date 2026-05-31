@@ -24,6 +24,7 @@ class Interpreter {
   final File? mainFile;
 
   late final InterpreterEnvironment _environment;
+  final Set<String> _loadedFilePaths = {};
 
   Interpreter({required String data, this.mainFile}) {
     _environment = InterpreterEnvironment(functions: {});
@@ -104,30 +105,63 @@ class Interpreter {
     }
   }
 
-  List<BaseModule> _loadModules({required List<ASTImportNode> imports}) {
-    return imports
-        .map((import) {
-          final module = modules[import.moduleName];
-          if (module == null && mainFile != null) {
-            final moduleFilePath =
-                '${path.join(path.dirname(path.normalize(mainFile!.absolute.path)), import.moduleName)}';
+  List<BaseModule> _loadModules(
+      {required List<ASTImportNode> imports, String? baseDir}) {
+    final resolvedBaseDir = baseDir ??
+        (mainFile != null
+            ? path.dirname(path.normalize(mainFile!.absolute.path))
+            : null);
 
-            final file = File(moduleFilePath);
+    final result = <BaseModule>[];
+    for (final import in imports) {
+      final builtinModule = modules[import.moduleName];
+      if (builtinModule != null) {
+        result.add(builtinModule);
+        continue;
+      }
 
-            if (!file.existsSync()) {
-              throw Exception("Module ${import.moduleName} not found");
-            }
+      if (resolvedBaseDir == null) {
+        throw Exception("Module '${import.moduleName}' not found");
+      }
 
-            final moduleParser = Parser(source: file.readAsStringSync());
-            return ImportedModule(
-                body: moduleParser.parse(), moduleName: import.moduleName);
-          }
+      result.addAll(_loadFileModules(import.moduleName, resolvedBaseDir));
+    }
+    return result;
+  }
 
-          return module;
-        })
-        .where((element) => element != null)
-        .cast<BaseModule>()
-        .toList();
+  List<BaseModule> _loadFileModules(String importPath, String baseDir) {
+    var filePath = path.normalize(path.join(baseDir, importPath));
+
+    if (!File(filePath).existsSync()) {
+      final withExt = '$filePath.capyscript';
+      if (!File(withExt).existsSync()) {
+        throw Exception("Module '$importPath' not found");
+      }
+      filePath = withExt;
+    }
+
+    final normalizedPath = File(filePath).absolute.path;
+    if (_loadedFilePaths.contains(normalizedPath)) {
+      return [];
+    }
+    _loadedFilePaths.add(normalizedPath);
+
+    final file = File(filePath);
+    final fileBaseDir = path.dirname(normalizedPath);
+    final moduleParser = Parser(source: file.readAsStringSync());
+    final moduleTree = moduleParser.parse();
+
+    final subModules =
+        _loadModules(imports: moduleTree.modules, baseDir: fileBaseDir);
+
+    for (final cls in moduleParser.parsedClasses) {
+      _environment.registerClass(cls);
+    }
+    for (final iface in moduleParser.parsedInterfaces) {
+      _environment.registerInterface(iface);
+    }
+
+    return [...subModules, ImportedModule(body: moduleTree, moduleName: importPath)];
   }
 
   void dumpAST(String path) {

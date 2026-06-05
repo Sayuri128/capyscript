@@ -41,5 +41,13 @@ enum TokenType {
   DECREMENT,
   BREAK,
   CONTINUE,
-  NULL
+  NULL,
+  CLASS,
+  INTERFACE,
+  EXTENDS,
+  IMPLEMENTS,
+  NEW,
+  THIS,
+  SUPER,
+  VAR
 }

@@ -26,7 +26,8 @@ class IOModule extends BaseModule {
     final List<ASTFunctionDeclarationNode> functions = [];
     functions.add(ASTFunctionDeclarationNode(
         functionName: "print",
-        parameters: [ASTParameterNode("data")],
+        parameters: [ASTParameterNode("data", paramType: "any")],
+        returnType: "void",
         body: IOPrintNode()));
 
     body = ASTTree(functions: functions, modules: []);
@@ -42,7 +43,7 @@ class IOPrintNode extends ModuleFunctionBody {
     } catch (e) {
       throw Exception("data not found");
     }
-    // print(data);
+    print(data);
     logger.d(data);
 
     return null;

@@ -21,7 +21,8 @@ class CreateHtmlParserNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "createHTMLParser",
-        parameters: [ASTParameterNode("value")],
+        parameters: [ASTParameterNode("value", paramType: "string")],
+        returnType: "any",
         body: this);
   }
 }

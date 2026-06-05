@@ -17,6 +17,6 @@ class MangaBuildStatusAnnounceNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "statusAnnounce", parameters: [], body: this);
+        functionName: "statusAnnounce", parameters: [], returnType: "any", body: this);
   }
 }

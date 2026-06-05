@@ -3,6 +3,7 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/class/ast_instance_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -93,6 +94,12 @@ class ASTMethodCallNode extends ASTNode {
               ((await arguments.first.execute(environment)) as num).toInt(),
               ((await arguments[1].execute(environment)) as num).toInt());
       }
+    }
+
+    if (obj is ASTInstanceNode) {
+      final resolvedArgs = await Future.wait(
+          arguments.map((e) async => await e.execute(environment)));
+      return await obj.callMethod(methodName, resolvedArgs, environment);
     }
 
     if (obj is ExternalObject) {

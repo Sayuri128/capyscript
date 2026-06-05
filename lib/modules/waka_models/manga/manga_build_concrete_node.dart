@@ -45,15 +45,16 @@ class MangaBuildConcreteNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildConcrete",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("cover"),
-          ASTParameterNode("title"),
-          ASTParameterNode("description"),
-          ASTParameterNode("tags"),
-          ASTParameterNode("groups"),
-          ASTParameterNode("status"),
-          ASTParameterNode("alternativeTitles")
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("cover", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("description", paramType: "string"),
+          ASTParameterNode("tags", paramType: "List"),
+          ASTParameterNode("groups", paramType: "List"),
+          ASTParameterNode("status", paramType: "any"),
+          ASTParameterNode("alternativeTitles", paramType: "List"),
         ],
+        returnType: "any",
         body: this);
   }
 }

@@ -4,6 +4,8 @@
  */
 
 import 'package:capyscript/AST/ast_reference.dart';
+import 'package:capyscript/AST/class/ast_instance_node.dart';
+import 'package:capyscript/Interpreter/type_checker.dart';
 import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
@@ -34,6 +36,9 @@ class ASTPropertyAccessNode extends ASTNode {
   @override
   Future execute(InterpreterEnvironment environment) async {
     final obj = await targetExpression.execute(environment);
+    if (obj is ASTInstanceNode) {
+      return obj.getField(fieldName);
+    }
     if (obj is ExternalObject) {
       return await obj.getField(fieldName);
     }
@@ -88,11 +93,30 @@ class ASTPropertyAccessNode extends ASTNode {
       return this.execute(environment);
     }, setter: (InterpreterEnvironment environment, dynamic value) async {
       final obj = await targetExpression.execute(environment);
+      if (obj is ASTInstanceNode) {
+        final fieldType = _findFieldType(obj, fieldName, environment);
+        if (fieldType != null) TypeChecker.check(fieldType, value, environment);
+        obj.setField(fieldName, value);
+        return;
+      }
       if (obj is ExternalObject) {
         obj.setField(fieldName, value);
         return;
       }
       throw Exception("${obj.toString()} is undefined");
     });
+  }
+
+  String? _findFieldType(
+      ASTInstanceNode obj, String name, InterpreterEnvironment env) {
+    String? current = obj.className;
+    while (current != null) {
+      final cls = env.classes[current];
+      if (cls == null) break;
+      final field = cls.fields.where((f) => f.name == name).firstOrNull;
+      if (field != null) return field.type;
+      current = cls.parentClass;
+    }
+    return null;
   }
 }

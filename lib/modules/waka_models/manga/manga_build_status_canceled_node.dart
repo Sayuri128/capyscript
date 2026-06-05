@@ -17,6 +17,6 @@ class MangaBuildStatusCanceledNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "statusCanceled", parameters: [], body: this);
+        functionName: "statusCanceled", parameters: [], returnType: "any", body: this);
   }
 }

@@ -28,7 +28,8 @@ class HttpExecuteJsScriptNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "executeJsScript",
-        parameters: [ASTParameterNode("code")],
+        parameters: [ASTParameterNode("code", paramType: "string")],
+        returnType: "any",
         body: this);
   }
 }

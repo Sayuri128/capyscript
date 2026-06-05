@@ -29,9 +29,10 @@ class MangaBuildChaptersGroupNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildChapterGroups",
         parameters: [
-          ASTParameterNode("title"),
-          ASTParameterNode("elements"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("elements", paramType: "List"),
         ],
+        returnType: "any",
         body: this);
   }
 }

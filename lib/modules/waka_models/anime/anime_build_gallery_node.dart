@@ -27,12 +27,13 @@ class AnimeBuildGalleryNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildGallery",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("title"),
-          ASTParameterNode("cover"),
-          ASTParameterNode("data"),
-          ASTParameterNode("status")
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("cover", paramType: "string"),
+          ASTParameterNode("data", paramType: "Map"),
+          ASTParameterNode("status", paramType: "any"),
         ],
+        returnType: "any",
         body: this);
   }
 }

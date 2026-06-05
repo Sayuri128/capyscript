@@ -3,11 +3,20 @@
  * All right reserved
  */
 
+import 'package:capyscript/AST/class/ast_class_declaration_node.dart';
+import 'package:capyscript/AST/class/ast_interface_declaration_node.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/Interpreter/interpreter_scoped_environment.dart';
 
 class InterpreterEnvironment {
   final Map<String, ASTFunctionDeclarationNode> functions;
+  final Map<String, ASTClassDeclarationNode> classes = {};
+  final Map<String, ASTInterfaceDeclarationNode> interfaces = {};
+
+  void registerClass(ASTClassDeclarationNode cls) => classes[cls.className] = cls;
+  void registerInterface(ASTInterfaceDeclarationNode iface) =>
+      interfaces[iface.interfaceName] = iface;
+  ASTClassDeclarationNode lookupClass(String name) => classes[name]!;
 
   InterpreterScopedEnvironment _currentScope;
 

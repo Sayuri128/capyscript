@@ -17,6 +17,6 @@ class AnimeBuildTypeIframeNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "typeIframe", parameters: [], body: this);
+        functionName: "typeIframe", parameters: [], returnType: "any", body: this);
   }
 }

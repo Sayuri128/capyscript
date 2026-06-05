@@ -27,7 +27,8 @@ class HttpRegisterInterceptorControllerNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "registerInterceptorController",
-        parameters: [ASTParameterNode("controller")],
+        parameters: [ASTParameterNode("controller", paramType: "any")],
+        returnType: "any",
         body: this);
   }
 }

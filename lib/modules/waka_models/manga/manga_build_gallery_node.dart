@@ -28,11 +28,12 @@ class MangaBuildGalleryNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildGallery",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("title"),
-          ASTParameterNode("cover"),
-          ASTParameterNode("data"),
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("cover", paramType: "string"),
+          ASTParameterNode("data", paramType: "Map"),
         ],
+        returnType: "any",
         body: this);
   }
 }

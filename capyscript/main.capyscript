@@ -1,21 +1,57 @@
 import "io";
-import "http";
+import "lib/lib";  // relative file import — loads lib/lib.capyscript
 
-import "json";
-
-function main() {
-    value = null;
-    str = "";
-
-    if(value == null || str.isEmpty) {
-        print("Hello World");
-    } else {
-        print("else");
+  class Animal {
+    name: string;
+    age: int;
+  
+    function constructor(n: string, a: int) {
+      this.name = n;
+      this.age = a;
     }
 
-    if(str == "" && str != null || null == null) {
-        print("Hello World");
-    } else {
-        print("else");
+    function describe(): string {
+      return this.name + " is " + this.age + " years old";
     }
-}
+  }
+
+  class Dog extends Animal {
+    breed: string;
+
+    function constructor(n: string, a: int, b: string) {
+      super(n, a);
+      this.breed = b;
+    }
+
+    function describe(): string {
+      return this.name + " (" + this.breed + ") is " + this.age + " years old";
+    }
+  }
+
+  function add(a: int, b: int): int {
+    return a + b;
+  }
+
+  function greet(name: string): void {
+    print("Hello, " + name + "!");
+  }
+  
+  function main() {
+    var x: int = 10;
+    var label: string = "result";
+    var sum: int = add(x, 5);
+    print(label + ": " + sum);
+
+    greet("world");
+
+    var dog = new Dog("Rex", 3, "Labrador");
+    print(dog.describe());
+
+    var animal: Animal = new Dog("Buddy", 2, "Poodle");
+    print(animal.describe());
+
+    // test() comes from lib/lib.capyscript via relative import
+    print("lib test: " + test(3, 4));
+  }
+  
+  

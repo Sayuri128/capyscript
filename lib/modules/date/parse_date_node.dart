@@ -19,7 +19,8 @@ class ParseDateNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "parseDate",
-        parameters: [ASTParameterNode("value")],
+        parameters: [ASTParameterNode("value", paramType: "string")],
+        returnType: "any",
         body: this);
   }
 }

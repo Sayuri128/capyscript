@@ -17,6 +17,6 @@ class MangaBuildStatusPausedNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "statusPaused", parameters: [], body: this);
+        functionName: "statusPaused", parameters: [], returnType: "any", body: this);
   }
 }

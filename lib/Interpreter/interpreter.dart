@@ -24,6 +24,7 @@ class Interpreter {
   final File? mainFile;
 
   late final InterpreterEnvironment _environment;
+  final Set<String> _loadedFilePaths = {};
 
   Interpreter({required String data, this.mainFile}) {
     _environment = InterpreterEnvironment(functions: {});
@@ -37,7 +38,7 @@ class Interpreter {
     return Interpreter(data: input, mainFile: file);
   }
 
-   InterpreterTree? _interpreterTree;
+  InterpreterTree? _interpreterTree;
 
   Future<dynamic> runFunction(String functionName,
       {Map<String, dynamic>? arguments}) async {
@@ -73,12 +74,11 @@ class Interpreter {
   }
 
   InterpreterTree _runParser() {
-    if(_interpreterTree != null) {
+    if (_interpreterTree != null) {
       return _interpreterTree!;
     }
 
     final tree = parser.parse();
-    print("functions number: ${tree.functions.length}");
 
     final modules = _loadModules(imports: tree.modules);
 
@@ -86,6 +86,7 @@ class Interpreter {
       _importModule(module.body);
     }
     _importModule(tree);
+    _registerClassesAndInterfaces();
     return InterpreterTree(astTree: tree, parsedModules: modules);
   }
 
@@ -95,30 +96,72 @@ class Interpreter {
     }
   }
 
-  List<BaseModule> _loadModules({required List<ASTImportNode> imports}) {
-    return imports
-        .map((import) {
-          final module = modules[import.moduleName];
-          if (module == null && mainFile != null) {
-            final moduleFilePath =
-                '${path.join(path.dirname(path.normalize(mainFile!.absolute.path)), import.moduleName)}';
+  void _registerClassesAndInterfaces() {
+    for (final cls in parser.parsedClasses) {
+      _environment.registerClass(cls);
+    }
+    for (final iface in parser.parsedInterfaces) {
+      _environment.registerInterface(iface);
+    }
+  }
 
-            final file = File(moduleFilePath);
+  List<BaseModule> _loadModules(
+      {required List<ASTImportNode> imports, String? baseDir}) {
+    final resolvedBaseDir = baseDir ??
+        (mainFile != null
+            ? path.dirname(path.normalize(mainFile!.absolute.path))
+            : null);
 
-            if (!file.existsSync()) {
-              throw Exception("Module ${import.moduleName} not found");
-            }
+    final result = <BaseModule>[];
+    for (final import in imports) {
+      final builtinModule = modules[import.moduleName];
+      if (builtinModule != null) {
+        result.add(builtinModule);
+        continue;
+      }
 
-            final moduleParser = Parser(source: file.readAsStringSync());
-            return ImportedModule(
-                body: moduleParser.parse(), moduleName: import.moduleName);
-          }
+      if (resolvedBaseDir == null) {
+        throw Exception("Module '${import.moduleName}' not found");
+      }
 
-          return module;
-        })
-        .where((element) => element != null)
-        .cast<BaseModule>()
-        .toList();
+      result.addAll(_loadFileModules(import.moduleName, resolvedBaseDir));
+    }
+    return result;
+  }
+
+  List<BaseModule> _loadFileModules(String importPath, String baseDir) {
+    var filePath = path.normalize(path.join(baseDir, importPath));
+
+    if (!File(filePath).existsSync()) {
+      final withExt = '$filePath.capyscript';
+      if (!File(withExt).existsSync()) {
+        throw Exception("Module '$importPath' not found");
+      }
+      filePath = withExt;
+    }
+
+    final normalizedPath = File(filePath).absolute.path;
+    if (_loadedFilePaths.contains(normalizedPath)) {
+      return [];
+    }
+    _loadedFilePaths.add(normalizedPath);
+
+    final file = File(filePath);
+    final fileBaseDir = path.dirname(normalizedPath);
+    final moduleParser = Parser(source: file.readAsStringSync());
+    final moduleTree = moduleParser.parse();
+
+    final subModules =
+        _loadModules(imports: moduleTree.modules, baseDir: fileBaseDir);
+
+    for (final cls in moduleParser.parsedClasses) {
+      _environment.registerClass(cls);
+    }
+    for (final iface in moduleParser.parsedInterfaces) {
+      _environment.registerInterface(iface);
+    }
+
+    return [...subModules, ImportedModule(body: moduleTree, moduleName: importPath)];
   }
 
   void dumpAST(String path) {

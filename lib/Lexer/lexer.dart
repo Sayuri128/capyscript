@@ -226,6 +226,22 @@ class Lexer {
       return Token(TokenType.NULL, identifier);
     } else if (identifier == "return") {
       return Token(TokenType.RETURN, identifier);
+    } else if (identifier == "class") {
+      return Token(TokenType.CLASS, identifier);
+    } else if (identifier == "interface") {
+      return Token(TokenType.INTERFACE, identifier);
+    } else if (identifier == "extends") {
+      return Token(TokenType.EXTENDS, identifier);
+    } else if (identifier == "implements") {
+      return Token(TokenType.IMPLEMENTS, identifier);
+    } else if (identifier == "new") {
+      return Token(TokenType.NEW, identifier);
+    } else if (identifier == "this") {
+      return Token(TokenType.THIS, identifier);
+    } else if (identifier == "super") {
+      return Token(TokenType.SUPER, identifier);
+    } else if (identifier == "var") {
+      return Token(TokenType.VAR, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

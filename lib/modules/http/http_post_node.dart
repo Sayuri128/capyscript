@@ -66,9 +66,10 @@ class HttpPostNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "httpPost",
         parameters: [
-          ASTParameterNode("url"),
+          ASTParameterNode("url", paramType: "string"),
           ASTParameterNode(
             "params",
+            paramType: "Map",
             isOptional: true,
             defaultValue: ASTMapNode(
               keys: [],
@@ -77,6 +78,7 @@ class HttpPostNode extends ModuleFunctionBody {
           ),
           ASTParameterNode(
             "paths",
+            paramType: "Map",
             isOptional: true,
             defaultValue: ASTMapNode(
               keys: [],
@@ -85,6 +87,7 @@ class HttpPostNode extends ModuleFunctionBody {
           ),
           ASTParameterNode(
             "body",
+            paramType: "any",
             isOptional: true,
             defaultValue: ASTMapNode(
               keys: [],
@@ -93,6 +96,7 @@ class HttpPostNode extends ModuleFunctionBody {
           ),
           ASTParameterNode(
             "headers",
+            paramType: "Map",
             isOptional: true,
             defaultValue: ASTMapNode(
               keys: [],
@@ -101,12 +105,14 @@ class HttpPostNode extends ModuleFunctionBody {
           ),
           ASTParameterNode(
             "throughWeb",
+            paramType: "bool",
             isOptional: true,
             defaultValue: ASTBooleanNode(
               value: false,
             ),
           ),
         ],
+        returnType: "any",
         body: this);
   }
 }

@@ -28,7 +28,8 @@ function test1() {
        print(sum(35, 15));
 
        for(i = 0; i < 10;) {
-            print(i++);
+            print(i);
+            i++;
        }
 
        if(variable > 5) {

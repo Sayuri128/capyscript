@@ -30,9 +30,10 @@ class AnimeBuildEpisodeGroupNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildAnimeVideoGroup",
         parameters: [
-          ASTParameterNode("title"),
-          ASTParameterNode("videos"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("videos", paramType: "List"),
         ],
+        returnType: "any",
         body: this);
   }
 }

@@ -21,7 +21,8 @@ class JsonSerializeNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "jsonEncode",
-        parameters: [ASTParameterNode("value")],
+        parameters: [ASTParameterNode("value", paramType: "any")],
+        returnType: "string",
         body: this);
   }
 }

@@ -1,6 +1,12 @@
 import 'package:capyscript/AST/array/ast_array_node.dart';
 import 'package:capyscript/AST/ast_tree.dart';
 import 'package:capyscript/AST/boolean/ast_boolean_node.dart';
+import 'package:capyscript/AST/class/ast_class_declaration_node.dart';
+import 'package:capyscript/AST/class/class_field.dart';
+import 'package:capyscript/AST/class/ast_interface_declaration_node.dart';
+import 'package:capyscript/AST/class/ast_new_node.dart';
+import 'package:capyscript/AST/class/ast_super_node.dart';
+import 'package:capyscript/AST/class/ast_this_node.dart';
 import 'package:capyscript/AST/decrement/ast_decrement_node.dart';
 import 'package:capyscript/AST/for_loop/ast_break_node.dart';
 import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
@@ -28,6 +34,7 @@ import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/ast_node.dart';
 import 'package:capyscript/AST/number/ast_number_node.dart';
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
+import 'package:capyscript/AST/var/ast_var_declaration_node.dart';
 
 class Parser {
   final String source;
@@ -35,6 +42,9 @@ class Parser {
   late final Lexer _lexer;
   ASTTree? _astTree;
   Token? _currentToken;
+
+  final List<ASTClassDeclarationNode> parsedClasses = [];
+  final List<ASTInterfaceDeclarationNode> parsedInterfaces = [];
 
   Parser({required this.source}) {
     _lexer = Lexer(source: source);
@@ -47,8 +57,17 @@ class Parser {
     final List<ASTFunctionDeclarationNode> functions = [];
     final List<ASTImportNode> imports = [];
 
-    while (canEat([TokenType.FUNCTION, TokenType.IMPORT])) {
-      if (canEat([TokenType.FUNCTION])) {
+    while (canEat([
+      TokenType.FUNCTION,
+      TokenType.IMPORT,
+      TokenType.CLASS,
+      TokenType.INTERFACE,
+    ])) {
+      if (canEat([TokenType.CLASS])) {
+        parsedClasses.add(_parseClassDeclaration());
+      } else if (canEat([TokenType.INTERFACE])) {
+        parsedInterfaces.add(_parseInterfaceDeclaration());
+      } else if (canEat([TokenType.FUNCTION])) {
         functions.add(_parseFunctionDeclaration());
       } else if (canEat([TokenType.IMPORT])) {
         imports.add(_parseImport());
@@ -56,7 +75,6 @@ class Parser {
     }
 
     _astTree = ASTTree(functions: functions, modules: imports);
-    ;
     return _astTree!;
   }
 
@@ -68,8 +86,10 @@ class Parser {
       return cur.value;
     }
 
-    throw Exception(
-        "Unexpected token - ${_currentToken!.type} - expected - ${expectedToken.toString()}");
+    throw Exception("Unexpected token - ${_currentToken!.type} - expected - "
+        "${expectedToken.toString()} \n ${_lexer.getRangeTokens(
+      30,
+    )}");
   }
 
   void eatOr(List<TokenType> expectedTokens) {
@@ -108,7 +128,7 @@ class Parser {
       left = ASTBinaryOperatorNode(
           left: left, right: _parseTerm(functionName: functionName), op: op);
 
-      while(canEat([TokenType.AND, TokenType.OR])) {
+      while (canEat([TokenType.AND, TokenType.OR])) {
         final TokenType op = _currentToken!.type;
         eat(op);
         left = ASTBinaryOperatorNode(
@@ -162,6 +182,22 @@ class Parser {
     if (canEat([TokenType.NULL])) {
       eat(TokenType.NULL);
       return ASTNullNode();
+    }
+
+    if (canEat([TokenType.THIS])) {
+      eat(TokenType.THIS);
+      return ASTThisNode();
+    }
+
+    if (canEat([TokenType.SUPER])) {
+      return _parseSuperExpression(functionName: functionName);
+    }
+
+    if (canEat([TokenType.NEW])) {
+      eat(TokenType.NEW);
+      final className = eat(TokenType.IDENTIFIER);
+      final args = _parseFunctionArguments(functionName: functionName);
+      return ASTNewNode(className: className, arguments: args);
     }
 
     if (canEat([TokenType.IDENTIFIER])) {
@@ -320,24 +356,62 @@ class Parser {
     final parameters = _parseArguments();
     eat(TokenType.RPAREN);
 
+    String? returnType;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      returnType = _parseType();
+    }
+
     final body = _parseBlock(functionName: functionName);
 
     return ASTFunctionDeclarationNode(
-        body: body, functionName: functionName, parameters: parameters);
+        body: body,
+        functionName: functionName,
+        parameters: parameters,
+        returnType: returnType);
   }
 
   List<ASTParameterNode> _parseArguments() {
     final parameters = <ASTParameterNode>[];
     if (_currentToken!.type != TokenType.RPAREN) {
-      parameters.add(ASTParameterNode(_currentToken!.value));
-      eat(TokenType.IDENTIFIER);
+      parameters.add(_parseOneParam());
       while (canEat([TokenType.COMMA])) {
         eat(TokenType.COMMA);
-        parameters.add(ASTParameterNode(_currentToken!.value));
-        eat(TokenType.IDENTIFIER);
+        parameters.add(_parseOneParam());
       }
     }
     return parameters;
+  }
+
+  ASTParameterNode _parseOneParam() {
+    final name = eat(TokenType.IDENTIFIER);
+    String? type;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      type = _parseType();
+    }
+    if (canEat([TokenType.EQUALS])) {
+      eat(TokenType.EQUALS);
+      final defaultExpr = _parseExpression(functionName: name);
+      return ASTParameterNode(name,
+          paramType: type, isOptional: true, defaultValue: defaultExpr);
+    }
+    return ASTParameterNode(name, paramType: type);
+  }
+
+  String _parseType() {
+    final name = eat(TokenType.IDENTIFIER);
+    if (canEat([TokenType.LESS])) {
+      eat(TokenType.LESS);
+      final args = [_parseType()];
+      while (canEat([TokenType.COMMA])) {
+        eat(TokenType.COMMA);
+        args.add(_parseType());
+      }
+      eat(TokenType.GREATER);
+      return '$name<${args.join(', ')}>';
+    }
+    return name;
   }
 
   ASTNode _parseBlock({required String functionName}) {
@@ -362,6 +436,48 @@ class Parser {
   }
 
   ASTNode _parseStatement({required String functionName}) {
+    if (canEat([TokenType.THIS])) {
+      eat(TokenType.THIS);
+      ASTNode factor = const ASTThisNode();
+
+      while (true) {
+        if (canEat([TokenType.DOT])) {
+          eat(TokenType.DOT);
+          final field = eat(TokenType.IDENTIFIER);
+          if (canEat([TokenType.LPAREN])) {
+            factor = _parseMethodCall(functionName, factor, field);
+          } else {
+            factor = ASTPropertyAccessNode(targetExpression: factor, fieldName: field);
+          }
+        } else {
+          break;
+        }
+      }
+
+      if (canEat([TokenType.EQUALS])) {
+        return _parseAssignment(functionName, factor);
+      }
+      return factor;
+    }
+
+    if (canEat([TokenType.SUPER])) {
+      return _parseSuperExpression(functionName: functionName);
+    }
+
+    if (canEat([TokenType.VAR])) {
+      eat(TokenType.VAR);
+      final varName = eat(TokenType.IDENTIFIER);
+      String? varType;
+      if (canEat([TokenType.COLON])) {
+        eat(TokenType.COLON);
+        varType = _parseType();
+      }
+      eat(TokenType.EQUALS);
+      final expr = _parseExpression(functionName: functionName);
+      return ASTVarDeclarationNode(
+          variableName: varName, declaredType: varType, expression: expr);
+    }
+
     if (canEat([TokenType.IDENTIFIER])) {
       final identifier = _currentToken!.value;
       eat(TokenType.IDENTIFIER);
@@ -432,7 +548,7 @@ class Parser {
       return _parseReturn(functionName);
     }
 
-    throw Exception('Invalid statement');
+    throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
   }
 
   ASTReturnNode _parseReturn(String functionName) {
@@ -491,5 +607,97 @@ class Parser {
     final expression = _parseExpression(functionName: functionName);
     return ASTAssignmentNode(
         target: target, expression: expression, functionName: functionName);
+  }
+
+  ASTSuperNode _parseSuperExpression({required String functionName}) {
+    eat(TokenType.SUPER);
+    if (canEat([TokenType.LPAREN])) {
+      final args = _parseFunctionArguments(functionName: functionName);
+      return ASTSuperNode(arguments: args);
+    }
+    if (canEat([TokenType.DOT])) {
+      eat(TokenType.DOT);
+      final methodName = eat(TokenType.IDENTIFIER);
+      final args = _parseFunctionArguments(functionName: functionName);
+      return ASTSuperNode(methodName: methodName, arguments: args);
+    }
+    throw Exception("Expected ( or . after super");
+  }
+
+  ASTClassDeclarationNode _parseClassDeclaration() {
+    eat(TokenType.CLASS);
+    final className = eat(TokenType.IDENTIFIER);
+
+    String? parentClass;
+    if (canEat([TokenType.EXTENDS])) {
+      eat(TokenType.EXTENDS);
+      parentClass = eat(TokenType.IDENTIFIER);
+    }
+
+    final List<String> interfaces = [];
+    if (canEat([TokenType.IMPLEMENTS])) {
+      eat(TokenType.IMPLEMENTS);
+      interfaces.add(eat(TokenType.IDENTIFIER));
+      while (canEat([TokenType.COMMA])) {
+        eat(TokenType.COMMA);
+        interfaces.add(eat(TokenType.IDENTIFIER));
+      }
+    }
+
+    eat(TokenType.LBRACE);
+
+    final List<ClassField> fields = [];
+    final List<ASTFunctionDeclarationNode> methods = [];
+
+    while (!canEat([TokenType.RBRACE])) {
+      if (canEat([TokenType.FUNCTION])) {
+        methods.add(_parseFunctionDeclaration());
+      } else if (canEat([TokenType.IDENTIFIER])) {
+        final fieldName = eat(TokenType.IDENTIFIER);
+        String? fieldType;
+        if (canEat([TokenType.COLON])) {
+          eat(TokenType.COLON);
+          fieldType = _parseType();
+        }
+        eat(TokenType.SEMICOLON);
+        fields.add(ClassField(name: fieldName, type: fieldType));
+      } else {
+        throw Exception(
+            "Unexpected token in class body: ${_currentToken!.type}");
+      }
+    }
+
+    eat(TokenType.RBRACE);
+
+    return ASTClassDeclarationNode(
+      className: className,
+      parentClass: parentClass,
+      interfaces: interfaces,
+      fields: fields,
+      methods: methods,
+    );
+  }
+
+  ASTInterfaceDeclarationNode _parseInterfaceDeclaration() {
+    eat(TokenType.INTERFACE);
+    final interfaceName = eat(TokenType.IDENTIFIER);
+    eat(TokenType.LBRACE);
+
+    final List<String> requiredMethods = [];
+
+    while (!canEat([TokenType.RBRACE])) {
+      eat(TokenType.FUNCTION);
+      requiredMethods.add(eat(TokenType.IDENTIFIER));
+      eat(TokenType.LPAREN);
+      eat(TokenType.RPAREN);
+      eat(TokenType.SEMICOLON);
+    }
+
+    eat(TokenType.RBRACE);
+
+    return ASTInterfaceDeclarationNode(
+      interfaceName: interfaceName,
+      requiredMethods: requiredMethods,
+    );
   }
 }

@@ -30,6 +30,9 @@ class ASTBinaryOperatorNode extends ASTNode {
 
     switch (op) {
       case TokenType.PLUS:
+        if (leftRes is String || rightRes is String) {
+          return leftRes.toString() + rightRes.toString();
+        }
         return leftRes + rightRes;
       case TokenType.MINUS:
         return leftRes - rightRes;

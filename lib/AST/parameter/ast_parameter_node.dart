@@ -16,13 +16,14 @@ class ASTParameterNode extends ASTNode {
   Map<String, dynamic> toJson() => _$ASTParameterNodeToJson(this);
 
   final String paramName;
-
   final bool isOptional;
   final ASTNode? defaultValue;
+  final String? paramType;
 
   ASTParameterNode(
     this.paramName, {
     this.defaultValue = null,
     this.isOptional = false,
+    this.paramType,
   });
 }

@@ -19,7 +19,8 @@ class ParseStringNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "parseString",
-        parameters: [ASTParameterNode("value")],
+        parameters: [ASTParameterNode("value", paramType: "any")],
+        returnType: "string",
         body: this);
   }
 }

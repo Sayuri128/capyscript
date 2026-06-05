@@ -7,6 +7,7 @@ import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/Interpreter/type_checker.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 
@@ -69,6 +70,10 @@ class ASTFunctionCallNode extends ASTNode {
               "argument ${i + 1} is not defined - ${arguments.toString()} ${paramName} \n in function ${functionDec.functionName}");
         }
       }
+      if (param.paramType != null) {
+        TypeChecker.check(
+            param.paramType!, environment.getVariable(paramName), environment);
+      }
     }
 
     late final dynamic res;
@@ -77,6 +82,10 @@ class ASTFunctionCallNode extends ASTNode {
       res = await functionDec.execute(environment);
     } on ASTReturnValue catch (r) {
       res = await r.execute(environment);
+    }
+
+    if (functionDec.returnType != null && functionDec.returnType != 'void') {
+      TypeChecker.check(functionDec.returnType!, res, environment);
     }
 
     environment.exitScope();

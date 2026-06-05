@@ -21,6 +21,9 @@ class HttpGetHeadersNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "getHeaders", parameters: [], body: this);
+        functionName: "getHeaders",
+        parameters: [],
+        returnType: "Map",
+        body: this);
   }
 }

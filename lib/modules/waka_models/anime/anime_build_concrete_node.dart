@@ -47,15 +47,16 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
     return ASTFunctionDeclarationNode(
         functionName: "buildConcrete",
         parameters: [
-          ASTParameterNode("uid"),
-          ASTParameterNode("cover"),
-          ASTParameterNode("title"),
-          ASTParameterNode("description"),
-          ASTParameterNode("tags"),
-          ASTParameterNode("groups"),
-          ASTParameterNode("alternativeTitles"),
-          ASTParameterNode("status"),
+          ASTParameterNode("uid", paramType: "string"),
+          ASTParameterNode("cover", paramType: "string"),
+          ASTParameterNode("title", paramType: "string"),
+          ASTParameterNode("description", paramType: "string"),
+          ASTParameterNode("tags", paramType: "List"),
+          ASTParameterNode("groups", paramType: "List"),
+          ASTParameterNode("alternativeTitles", paramType: "List"),
+          ASTParameterNode("status", paramType: "any"),
         ],
+        returnType: "any",
         body: this);
   }
 }

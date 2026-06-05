@@ -17,6 +17,6 @@ class MangaBuildStatusUndefinedNode extends ModuleFunctionBody {
   @override
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
-        functionName: "statusUndefined", parameters: [], body: this);
+        functionName: "statusUndefined", parameters: [], returnType: "any", body: this);
   }
 }

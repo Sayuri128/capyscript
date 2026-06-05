@@ -19,7 +19,8 @@ class ParseDoubleNode extends ModuleFunctionBody {
   ASTFunctionDeclarationNode toDeclarationNode() {
     return ASTFunctionDeclarationNode(
         functionName: "parseDouble",
-        parameters: [ASTParameterNode("value")],
+        parameters: [ASTParameterNode("value", paramType: "any")],
+        returnType: "float",
         body: this);
   }
 }

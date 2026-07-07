@@ -122,6 +122,20 @@ void main() {
         isTrue,
       );
     });
+
+    test('&& does not evaluate right side when left is false', () async {
+      expect(
+        await run('function main() { return 1 == 0 && missing(); }'),
+        isFalse,
+      );
+    });
+
+    test('|| does not evaluate right side when left is true', () async {
+      expect(
+        await run('function main() { return 1 == 1 || missing(); }'),
+        isTrue,
+      );
+    });
   });
 
   group('Increment / Decrement', () {

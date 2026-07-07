@@ -36,49 +36,73 @@ class ASTMethodCallNode extends ASTNode {
   @override
   Future execute(InterpreterEnvironment environment) async {
     final obj = await variable.execute(environment);
+    final args = await Future.wait(
+        arguments.map((e) async => await e.execute(environment)));
+
     if (obj is List) {
       switch (methodName) {
         case "push":
-          for (final arg in arguments) {
-            obj.add(await arg.execute(environment));
-          }
+        case "add":
+          obj.addAll(args);
           return null;
         case "pop":
           return obj.removeLast();
         case 'elementAt':
-          return obj.elementAt(
-              ((await arguments.first.execute(environment)) as num).toInt());
+          return obj.elementAt((args.first as num).toInt());
         case "removeAt":
-          return obj.removeAt(
-              ((await arguments.first.execute(environment)) as num).toInt());
+          return obj.removeAt((args.first as num).toInt());
+        case "remove":
+          return obj.remove(args.first);
+        case "insert":
+          obj.insert((args.first as num).toInt(), args[1]);
+          return null;
+        case "indexOf":
+          return obj.indexOf(args.first);
+        case "contains":
+          return obj.contains(args.first);
+        case "join":
+          return obj.join(args.isEmpty ? "" : args.first.toString());
+        case "sublist":
+          return obj.sublist((args.first as num).toInt(),
+              args.length > 1 ? (args[1] as num).toInt() : null);
+        case "reversed":
+          return obj.reversed.toList();
+        case "sort":
+          obj.sort();
+          return obj;
+        case "clear":
+          obj.clear();
+          return null;
       }
     } else if (obj is Map) {
       switch (methodName) {
         case "containsKey":
-          return obj.containsKey(await arguments.first.execute(environment));
+          return obj.containsKey(args.first);
         case "clear":
           return obj.clear();
         case "containsValue":
-          return obj.containsValue(await arguments.first.execute(environment));
+          return obj.containsValue(args.first);
         case "remove":
-          return obj.remove(await arguments.first.execute(environment));
+          return obj.remove(args.first);
         case "addAll":
-          return obj.addAll(await arguments.first.execute(environment));
+          return obj.addAll(args.first);
       }
-    }
-
-    if (obj is String) {
+    } else if (obj is String) {
       switch (methodName) {
         case "contains":
-          return obj.contains(await arguments.first.execute(environment));
+          return obj.contains(args.first);
         case "split":
-          return obj.split(await arguments.first.execute(environment));
+          return obj.split(args.first);
         case "replaceAll":
-          return obj.replaceAll(await arguments.first.execute(environment),
-              await arguments[1].execute(environment));
+          return obj.replaceAll(args.first, args[1]);
         case "replaceFirst":
-          return obj.replaceFirst(await arguments.first.execute(environment),
-              await arguments[1].execute(environment));
+          return obj.replaceFirst(args.first, args[1]);
+        case "startsWith":
+          return obj.startsWith(args.first);
+        case "endsWith":
+          return obj.endsWith(args.first);
+        case "indexOf":
+          return obj.indexOf(args.first);
         case "trim":
           return obj.trim();
         case "trimLeft":
@@ -89,24 +113,27 @@ class ASTMethodCallNode extends ASTNode {
           return obj.toLowerCase();
         case "toUpperCase":
           return obj.toUpperCase();
+        case "padLeft":
+          return obj.padLeft((args.first as num).toInt(),
+              args.length > 1 ? args[1].toString() : ' ');
+        case "padRight":
+          return obj.padRight((args.first as num).toInt(),
+              args.length > 1 ? args[1].toString() : ' ');
         case "substring":
-          return obj.substring(
-              ((await arguments.first.execute(environment)) as num).toInt(),
-              ((await arguments[1].execute(environment)) as num).toInt());
+          return obj.substring((args.first as num).toInt(),
+              args.length > 1 ? (args[1] as num).toInt() : null);
       }
     }
 
     if (obj is ASTInstanceNode) {
-      final resolvedArgs = await Future.wait(
-          arguments.map((e) async => await e.execute(environment)));
-      return await obj.callMethod(methodName, resolvedArgs, environment);
+      return await obj.callMethod(methodName, args, environment);
     }
 
     if (obj is ExternalObject) {
-      return obj.callFunction(methodName,
-          ordinalArguments: (await Future.wait(
-                  arguments.map((e) async => await e.execute(environment))))
-              .toList());
+      return obj.callFunction(methodName, ordinalArguments: args);
     }
+
+    throw Exception(
+        "method '$methodName' is not supported on ${obj == null ? 'null' : obj.runtimeType}");
   }
 }

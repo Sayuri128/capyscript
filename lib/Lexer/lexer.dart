@@ -16,6 +16,9 @@ class Lexer {
   }
 
   String peekNextChar() {
+    if (_pos + 1 >= source.length) {
+      return '';
+    }
     return source[_pos + 1];
   }
 
@@ -142,24 +145,18 @@ class Lexer {
   }
 
   void _skipSingleLineComment() {
-    // Skip until the end of line or input
-    String currentChar = source[_pos];
-    while (currentChar != '\n') {
+    while (_pos < source.length && source[_pos] != '\n') {
       _advance();
-      currentChar = source[_pos];
     }
   }
 
   void _skipMultiLineComment() {
-    // Skip until encountering '*/' or end of input
-    String currentChar = source[_pos];
-    while (!(currentChar == '*' && peekNextChar() == '/')) {
+    while (_pos < source.length &&
+        !(source[_pos] == '*' && peekNextChar() == '/')) {
       _advance();
-      currentChar = source[_pos];
     }
-    // Skip the '*/' characters
-    _advance(); // Skip *
-    _advance(); // Skip /
+    _advance();
+    _advance();
   }
 
   String getRangeTokens(int range) {

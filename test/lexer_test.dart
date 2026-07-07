@@ -174,6 +174,16 @@ void main() {
       final token = Lexer(source: '/*\nline1\nline2\n*/true').getNextToken();
       expect(token.type, TokenType.TRUE);
     });
+
+    test('single-line comment at end of file without newline', () {
+      expect(Lexer(source: '// only a comment').getNextToken().type,
+          TokenType.END);
+    });
+
+    test('unterminated multi-line comment does not crash', () {
+      expect(Lexer(source: '/* unterminated').getNextToken().type,
+          TokenType.END);
+    });
   });
 
   group('Lexer - whitespace and end', () {

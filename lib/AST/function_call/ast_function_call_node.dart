@@ -39,56 +39,59 @@ class ASTFunctionCallNode extends ASTNode {
 
     environment.enterScope();
 
-    for (int i = 0; i < functionDec.parameters.length; i++) {
-      final arg = arguments[0];
-      final param = functionDec.parameters[i];
-      final paramName = param.paramName;
-      bool foundInMap = false;
-      if (arg is ASTMapNode) {
-        for (int j = 0; j < arg.keys.length; j++) {
-          final key = await arg.keys[j];
-          final keyValue = await key.execute(environment);
-          if (keyValue == paramName) {
-            environment.setVariable(
-                paramName, await arg.values[j].execute(environment));
-            foundInMap = true;
-            break;
-          }
-        }
-      }
-      if (!foundInMap) {
-        try {
-          environment.setVariable(functionDec.parameters[i].paramName,
-              await arguments[i].execute(environment));
-        } catch (e) {
-          if(param.isOptional && param.defaultValue != null) {
-            environment.setVariable(functionDec.parameters[i].paramName,
-                await param.defaultValue!.execute(environment));
-            continue;
-          }
-          throw Exception(
-              "argument ${i + 1} is not defined - ${arguments.toString()} ${paramName} \n in function ${functionDec.functionName}");
-        }
-      }
-      if (param.paramType != null) {
-        TypeChecker.check(
-            param.paramType!, environment.getVariable(paramName), environment);
-      }
-    }
-
-    late final dynamic res;
-
     try {
-      res = await functionDec.execute(environment);
-    } on ASTReturnValue catch (r) {
-      res = await r.execute(environment);
-    }
+      for (int i = 0; i < functionDec.parameters.length; i++) {
+        final arg = arguments[0];
+        final param = functionDec.parameters[i];
+        final paramName = param.paramName;
+        bool foundInMap = false;
+        if (arg is ASTMapNode) {
+          for (int j = 0; j < arg.keys.length; j++) {
+            final key = await arg.keys[j];
+            final keyValue = await key.execute(environment);
+            if (keyValue == paramName) {
+              environment.setVariable(
+                  paramName, await arg.values[j].execute(environment));
+              foundInMap = true;
+              break;
+            }
+          }
+        }
+        if (!foundInMap) {
+          try {
+            environment.setVariable(functionDec.parameters[i].paramName,
+                await arguments[i].execute(environment));
+          } catch (e) {
+            if (param.isOptional && param.defaultValue != null) {
+              environment.setVariable(functionDec.parameters[i].paramName,
+                  await param.defaultValue!.execute(environment));
+              continue;
+            }
+            throw Exception(
+                "argument ${i + 1} is not defined - ${arguments.toString()} ${paramName} \n in function ${functionDec.functionName}");
+          }
+        }
+        if (param.paramType != null) {
+          TypeChecker.check(
+              param.paramType!, environment.getVariable(paramName), environment);
+        }
+      }
 
-    if (functionDec.returnType != null && functionDec.returnType != 'void') {
-      TypeChecker.check(functionDec.returnType!, res, environment);
-    }
+      late final dynamic res;
 
-    environment.exitScope();
-    return res;
+      try {
+        res = await functionDec.execute(environment);
+      } on ASTReturnValue catch (r) {
+        res = await r.execute(environment);
+      }
+
+      if (functionDec.returnType != null && functionDec.returnType != 'void') {
+        TypeChecker.check(functionDec.returnType!, res, environment);
+      }
+
+      return res;
+    } finally {
+      environment.exitScope();
+    }
   }
 }

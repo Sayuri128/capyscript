@@ -105,39 +105,65 @@ class Parser {
   }
 
   ASTNode _parseExpression({required String functionName}) {
-    return _parseTerm(functionName: functionName);
+    return _parseOr(functionName: functionName);
   }
 
-  ASTNode _parseTerm({required String functionName}) {
-    ASTNode left = _parseFactor(functionName: functionName);
-
-    while (canEat([
-      TokenType.PLUS,
-      TokenType.MINUS,
-      TokenType.MULTIPLY,
-      TokenType.DIVIDE,
-      TokenType.LESS,
-      TokenType.GREATER,
-      TokenType.EQUAL_EQUAL,
-      TokenType.NOT_EQUAL,
-      TokenType.LESS_EQUAL,
-      TokenType.GREATER_EQUAL,
-    ])) {
+  ASTNode _parseBinaryLevel({
+    required String functionName,
+    required List<TokenType> operators,
+    required ASTNode Function({required String functionName}) next,
+  }) {
+    ASTNode left = next(functionName: functionName);
+    while (canEat(operators)) {
       final TokenType op = _currentToken!.type;
       eat(op);
       left = ASTBinaryOperatorNode(
-          left: left, right: _parseTerm(functionName: functionName), op: op);
-
-      while (canEat([TokenType.AND, TokenType.OR])) {
-        final TokenType op = _currentToken!.type;
-        eat(op);
-        left = ASTBinaryOperatorNode(
-            left: left, right: _parseTerm(functionName: functionName), op: op);
-      }
+          left: left, right: next(functionName: functionName), op: op);
     }
-
     return left;
   }
+
+  ASTNode _parseOr({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.OR],
+        next: _parseAnd,
+      );
+
+  ASTNode _parseAnd({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.AND],
+        next: _parseEquality,
+      );
+
+  ASTNode _parseEquality({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.EQUAL_EQUAL, TokenType.NOT_EQUAL],
+        next: _parseComparison,
+      );
+
+  ASTNode _parseComparison({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [
+          TokenType.LESS,
+          TokenType.GREATER,
+          TokenType.LESS_EQUAL,
+          TokenType.GREATER_EQUAL,
+        ],
+        next: _parseAdditive,
+      );
+
+  ASTNode _parseAdditive({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.PLUS, TokenType.MINUS],
+        next: _parseMultiplicative,
+      );
+
+  ASTNode _parseMultiplicative({required String functionName}) =>
+      _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.MULTIPLY, TokenType.DIVIDE],
+        next: _parseFactor,
+      );
 
   ASTNode _parsePrimary({required String functionName}) {
     if (canEat([TokenType.NUMBER])) {

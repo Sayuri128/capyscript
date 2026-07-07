@@ -5,6 +5,7 @@
 
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
+import 'package:capyscript/AST/lambda/ast_closure.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
@@ -32,12 +33,27 @@ class ASTFunctionCallNode extends ASTNode {
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final dynamic functionKey;
+    ASTClosure? closure;
     if (function is ASTVariableNode) {
-      functionKey = (function as ASTVariableNode).variableName;
+      final name = (function as ASTVariableNode).variableName;
+      functionKey = name;
+      if (!environment.functions.containsKey(name)) {
+        closure = _tryResolveClosure(environment, name);
+      }
     } else if (function is ASTStringNode) {
       functionKey = (function as ASTStringNode).value;
     } else {
-      functionKey = await function.execute(environment);
+      final value = await function.execute(environment);
+      if (value is ASTClosure) {
+        closure = value;
+      }
+      functionKey = value;
+    }
+
+    if (closure != null) {
+      final args = await Future.wait(
+          arguments.map((a) async => await a.execute(environment)));
+      return await closure.call(environment, args);
     }
 
     final ASTFunctionDeclarationNode? resolved = environment.functions[functionKey];
@@ -103,6 +119,16 @@ class ASTFunctionCallNode extends ASTNode {
       return res;
     } finally {
       environment.exitScope();
+    }
+  }
+
+  ASTClosure? _tryResolveClosure(
+      InterpreterEnvironment environment, String name) {
+    try {
+      final value = environment.getVariable(name);
+      return value is ASTClosure ? value : null;
+    } catch (e) {
+      return null;
     }
   }
 }

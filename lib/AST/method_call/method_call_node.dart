@@ -4,6 +4,7 @@
  */
 
 import 'package:capyscript/AST/class/ast_instance_node.dart';
+import 'package:capyscript/AST/lambda/ast_closure.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/external_object.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -73,6 +74,56 @@ class ASTMethodCallNode extends ASTNode {
         case "clear":
           obj.clear();
           return null;
+        case "map":
+          final fn = _asClosure(args.first, methodName);
+          final out = [];
+          for (final e in obj) {
+            out.add(await fn.call(environment, [e]));
+          }
+          return out;
+        case "filter":
+        case "where":
+          final fn = _asClosure(args.first, methodName);
+          final out = [];
+          for (final e in obj) {
+            if (_truthy(await fn.call(environment, [e]))) out.add(e);
+          }
+          return out;
+        case "forEach":
+          final fn = _asClosure(args.first, methodName);
+          for (final e in obj) {
+            await fn.call(environment, [e]);
+          }
+          return null;
+        case "any":
+          final fn = _asClosure(args.first, methodName);
+          for (final e in obj) {
+            if (_truthy(await fn.call(environment, [e]))) return true;
+          }
+          return false;
+        case "every":
+          final fn = _asClosure(args.first, methodName);
+          for (final e in obj) {
+            if (!_truthy(await fn.call(environment, [e]))) return false;
+          }
+          return true;
+        case "reduce":
+          final fn = _asClosure(args.first, methodName);
+          if (obj.isEmpty) {
+            throw Exception("reduce on empty list");
+          }
+          dynamic acc = obj.first;
+          for (int i = 1; i < obj.length; i++) {
+            acc = await fn.call(environment, [acc, obj[i]]);
+          }
+          return acc;
+        case "fold":
+          final fn = _asClosure(args[1], methodName);
+          dynamic acc = args.first;
+          for (final e in obj) {
+            acc = await fn.call(environment, [acc, e]);
+          }
+          return acc;
       }
     } else if (obj is Map) {
       switch (methodName) {
@@ -135,5 +186,15 @@ class ASTMethodCallNode extends ASTNode {
 
     throw Exception(
         "method '$methodName' is not supported on ${obj == null ? 'null' : obj.runtimeType}");
+  }
+
+  ASTClosure _asClosure(dynamic value, String methodName) {
+    if (value is ASTClosure) return value;
+    throw Exception("$methodName expects a function argument");
+  }
+
+  bool _truthy(dynamic value) {
+    if (value is bool) return value;
+    return value != 0 && value != null;
   }
 }

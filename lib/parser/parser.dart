@@ -14,6 +14,7 @@ import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
+import 'package:capyscript/AST/lambda/ast_lambda_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/null/ast_null_nodel.dart';
@@ -166,6 +167,10 @@ class Parser {
       );
 
   ASTNode _parsePrimary({required String functionName}) {
+    if (canEat([TokenType.FUNCTION])) {
+      return _parseLambda(functionName: functionName);
+    }
+
     if (canEat([TokenType.NUMBER])) {
       final num value = num.parse(_currentToken!.value);
       eat(TokenType.NUMBER);
@@ -237,6 +242,8 @@ class Parser {
   }
 
   ASTNode _parseFactor({required String functionName}) {
+    ASTNode factor;
+
     // array
     if (canEat([TokenType.LSQUARE_BRACE])) {
       eat(TokenType.LSQUARE_BRACE);
@@ -248,11 +255,9 @@ class Parser {
         }
       }
       eat(TokenType.RSQUARE_BRACE);
-      return ASTArrayNode(expressions: values);
-    }
-
-    // map
-    if (canEat([TokenType.LBRACE])) {
+      factor = ASTArrayNode(expressions: values);
+    } else if (canEat([TokenType.LBRACE])) {
+      // map
       eat(TokenType.LBRACE);
       final Map<ASTNode, ASTNode> mapEntities = {};
       if (!canEat([TokenType.RBRACE])) {
@@ -268,11 +273,11 @@ class Parser {
         }
       }
       eat(TokenType.RBRACE);
-      return ASTMapNode(
+      factor = ASTMapNode(
           keys: mapEntities.keys.toList(), values: mapEntities.values.toList());
+    } else {
+      factor = _parsePrimary(functionName: functionName);
     }
-
-    ASTNode factor = _parsePrimary(functionName: functionName);
 
     while (true) {
       if (canEat([TokenType.DOT])) {
@@ -370,6 +375,24 @@ class Parser {
       return ASTImportNode(moduleName: moduleName);
     }
     throw Exception("Cannot parse import module");
+  }
+
+  ASTLambdaNode _parseLambda({required String functionName}) {
+    eat(TokenType.FUNCTION);
+    eat(TokenType.LPAREN);
+    final parameters = _parseArguments();
+    eat(TokenType.RPAREN);
+
+    String? returnType;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      returnType = _parseType();
+    }
+
+    final body = _parseBlock(functionName: functionName);
+
+    return ASTLambdaNode(
+        parameters: parameters, body: body, returnType: returnType);
   }
 
   ASTFunctionDeclarationNode _parseFunctionDeclaration() {

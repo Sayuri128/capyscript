@@ -25,6 +25,18 @@ class ASTBinaryOperatorNode extends ASTNode {
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
     final leftRes = await left.execute(environment);
+
+    switch (op) {
+      case TokenType.AND:
+        if (!_getBoolFromDynamic(leftRes)) return false;
+        return _getBoolFromDynamic(await right.execute(environment));
+      case TokenType.OR:
+        if (_getBoolFromDynamic(leftRes)) return true;
+        return _getBoolFromDynamic(await right.execute(environment));
+      default:
+        break;
+    }
+
     final rightRes = await right.execute(environment);
     // print(leftRes.toString() + " ${op} " + rightRes.toString());
 
@@ -54,12 +66,6 @@ class ASTBinaryOperatorNode extends ASTNode {
         return leftRes[rightRes];
       case TokenType.NOT_EQUAL:
         return leftRes != rightRes;
-      case TokenType.AND:
-        final left = _getBoolFromDynamic(leftRes);
-        if(!left) return false;
-        return _getBoolFromDynamic(rightRes);
-      case TokenType.OR:
-        return _getBoolFromDynamic(leftRes) || _getBoolFromDynamic(rightRes);
       default:
         return leftRes + rightRes;
     }

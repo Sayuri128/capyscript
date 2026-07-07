@@ -161,7 +161,7 @@ class Parser {
   ASTNode _parseMultiplicative({required String functionName}) =>
       _parseBinaryLevel(
         functionName: functionName,
-        operators: [TokenType.MULTIPLY, TokenType.DIVIDE],
+        operators: [TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO],
         next: _parseFactor,
       );
 

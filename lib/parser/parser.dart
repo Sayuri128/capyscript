@@ -23,6 +23,7 @@ import 'package:capyscript/AST/object/ast_object_set_node.dart';
 import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/AST/throw/ast_throw_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Lexer/lexer.dart';
 import 'package:capyscript/Lexer/token.dart';
@@ -595,6 +596,13 @@ class Parser {
     if (canEat([TokenType.RETURN])) {
       eat(TokenType.RETURN);
       return _parseReturn(functionName);
+    }
+
+    if (canEat([TokenType.THROW])) {
+      eat(TokenType.THROW);
+      final expression = _parseExpression(functionName: functionName);
+      eat(TokenType.SEMICOLON);
+      return ASTThrowNode(expression: expression);
     }
 
     throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');

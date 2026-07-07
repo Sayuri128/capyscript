@@ -239,6 +239,14 @@ class Lexer {
       return Token(TokenType.SUPER, identifier);
     } else if (identifier == "var") {
       return Token(TokenType.VAR, identifier);
+    } else if (identifier == "try") {
+      return Token(TokenType.TRY, identifier);
+    } else if (identifier == "catch") {
+      return Token(TokenType.CATCH, identifier);
+    } else if (identifier == "finally") {
+      return Token(TokenType.FINALLY, identifier);
+    } else if (identifier == "throw") {
+      return Token(TokenType.THROW, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

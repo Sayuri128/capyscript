@@ -30,6 +30,18 @@ void main() {
       expect(await run('function main() { return 2 + 3 * 4; }'), equals(14));
     });
 
+    test('operator precedence: * before + (multiply on left)', () async {
+      expect(await run('function main() { return 2 * 3 + 1; }'), equals(7));
+    });
+
+    test('subtraction is left-associative', () async {
+      expect(await run('function main() { return 10 - 3 - 2; }'), equals(5));
+    });
+
+    test('division is left-associative', () async {
+      expect(await run('function main() { return 20 / 4 / 5; }'), equals(1));
+    });
+
     test('parentheses override precedence', () async {
       expect(await run('function main() { return (2 + 3) * 4; }'), equals(20));
     });
@@ -94,8 +106,18 @@ void main() {
   });
 
   group('Logical', () {
-    // Note: the parser only handles && and || after a comparison expression.
-    // Standalone boolean literals cannot be combined with && / || directly.
+    test('and - bare booleans', () async {
+      expect(await run('function main() { var a = true; var b = false; '
+          'if (a && b) { return "both"; } return "not both"; }'),
+          equals('not both'));
+    });
+
+    test('or - bare booleans', () async {
+      expect(await run('function main() { var a = true; var b = false; '
+          'if (a || b) { return "either"; } return "neither"; }'),
+          equals('either'));
+    });
+
     test('and - both true', () async {
       expect(await run('function main() { return 1 == 1 && 2 == 2; }'), isTrue);
     });

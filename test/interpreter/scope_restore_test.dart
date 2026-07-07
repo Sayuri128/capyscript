@@ -13,8 +13,8 @@ void main() {
       await expectLater(interp.runFunction('boom'), throwsA(anything));
 
       // The scope stack must have been unwound, so `leaked` from boom's
-      // frame must not be visible to a subsequent call.
-      expect(await interp.runFunction('check'), isNot(999));
+      // frame must not be visible to a subsequent call (undefined reads throw).
+      await expectLater(interp.runFunction('check'), throwsA(anything));
     });
 
     test('interpreter still usable after a thrown error', () async {

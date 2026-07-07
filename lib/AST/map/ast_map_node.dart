@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
  */
 
 import 'package:capyscript/AST/ast_node.dart';
+import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 
 part 'ast_map_node.g.dart';
 
@@ -39,8 +40,11 @@ class ASTMapNode extends ASTNode {
   Future execute(InterpreterEnvironment environment) async {
     final Map<dynamic, dynamic> map = {};
     for (int i = 0; i < keys.length; i++) {
-      map[await keys[i].execute(environment)] =
-          await values[i].execute(environment);
+      final keyNode = keys[i];
+      final key = keyNode is ASTVariableNode
+          ? await keyNode.executeOrName(environment)
+          : await keyNode.execute(environment);
+      map[key] = await values[i].execute(environment);
     }
     return map;
   }

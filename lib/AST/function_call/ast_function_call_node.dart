@@ -6,6 +6,8 @@
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
+import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/type_checker.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -29,13 +31,20 @@ class ASTFunctionCallNode extends ASTNode {
 
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
-    late final ASTFunctionDeclarationNode functionDec;
-
-    try {
-      functionDec = environment.functions[await function.execute(environment)]!;
-    } catch (e) {
-      throw Exception("function ${function.toString()} not found");
+    final dynamic functionKey;
+    if (function is ASTVariableNode) {
+      functionKey = (function as ASTVariableNode).variableName;
+    } else if (function is ASTStringNode) {
+      functionKey = (function as ASTStringNode).value;
+    } else {
+      functionKey = await function.execute(environment);
     }
+
+    final ASTFunctionDeclarationNode? resolved = environment.functions[functionKey];
+    if (resolved == null) {
+      throw Exception("function $functionKey not found");
+    }
+    final ASTFunctionDeclarationNode functionDec = resolved;
 
     environment.enterScope();
 
@@ -47,8 +56,10 @@ class ASTFunctionCallNode extends ASTNode {
         bool foundInMap = false;
         if (arg is ASTMapNode) {
           for (int j = 0; j < arg.keys.length; j++) {
-            final key = await arg.keys[j];
-            final keyValue = await key.execute(environment);
+            final key = arg.keys[j];
+            final keyValue = key is ASTVariableNode
+                ? await key.executeOrName(environment)
+                : await key.execute(environment);
             if (keyValue == paramName) {
               environment.setVariable(
                   paramName, await arg.values[j].execute(environment));

@@ -24,6 +24,7 @@ import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/throw/ast_throw_node.dart';
+import 'package:capyscript/AST/try_catch/ast_try_catch_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Lexer/lexer.dart';
 import 'package:capyscript/Lexer/token.dart';
@@ -605,7 +606,39 @@ class Parser {
       return ASTThrowNode(expression: expression);
     }
 
+    if (canEat([TokenType.TRY])) {
+      return _parseTryStatement(functionName: functionName);
+    }
+
     throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
+  }
+
+  ASTTryCatchNode _parseTryStatement({required String functionName}) {
+    eat(TokenType.TRY);
+    final tryBlock = _parseBlock(functionName: functionName);
+
+    String? catchVariable;
+    ASTNode? catchBlock;
+    if (canEat([TokenType.CATCH])) {
+      eat(TokenType.CATCH);
+      eat(TokenType.LPAREN);
+      catchVariable = eat(TokenType.IDENTIFIER);
+      eat(TokenType.RPAREN);
+      catchBlock = _parseBlock(functionName: functionName);
+    }
+
+    ASTNode? finallyBlock;
+    if (canEat([TokenType.FINALLY])) {
+      eat(TokenType.FINALLY);
+      finallyBlock = _parseBlock(functionName: functionName);
+    }
+
+    return ASTTryCatchNode(
+      tryBlock: tryBlock,
+      catchVariable: catchVariable,
+      catchBlock: catchBlock,
+      finallyBlock: finallyBlock,
+    );
   }
 
   ASTReturnNode _parseReturn(String functionName) {

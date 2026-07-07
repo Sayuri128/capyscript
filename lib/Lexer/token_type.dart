@@ -50,5 +50,9 @@ enum TokenType {
   NEW,
   THIS,
   SUPER,
-  VAR
+  VAR,
+  TRY,
+  CATCH,
+  FINALLY,
+  THROW
 }

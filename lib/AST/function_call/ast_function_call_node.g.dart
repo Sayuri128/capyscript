@@ -15,8 +15,8 @@ ASTFunctionCallNode _$ASTFunctionCallNodeFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ASTFunctionCallNodeToJson(
-        ASTFunctionCallNode instance) =>
-    <String, dynamic>{
-      'function': instance.function.toJson(),
-      'arguments': instance.arguments.map((e) => e.toJson()).toList(),
-    };
+  ASTFunctionCallNode instance,
+) => <String, dynamic>{
+  'function': instance.function.toJson(),
+  'arguments': instance.arguments.map((e) => e.toJson()).toList(),
+};

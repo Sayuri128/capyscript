@@ -7,11 +7,7 @@ part of 'ast_import_node.dart';
 // **************************************************************************
 
 ASTImportNode _$ASTImportNodeFromJson(Map<String, dynamic> json) =>
-    ASTImportNode(
-      moduleName: json['moduleName'] as String,
-    );
+    ASTImportNode(moduleName: json['moduleName'] as String);
 
 Map<String, dynamic> _$ASTImportNodeToJson(ASTImportNode instance) =>
-    <String, dynamic>{
-      'moduleName': instance.moduleName,
-    };
+    <String, dynamic>{'moduleName': instance.moduleName};

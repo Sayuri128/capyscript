@@ -9,8 +9,9 @@ part of 'switcher.dart';
 FilterDataSwitcher _$FilterDataSwitcherFromJson(Map<String, dynamic> json) =>
     FilterDataSwitcher(
       on: json['on'] as bool,
-      filter: const GalleryFilterJsonConverter()
-          .fromJson(json['filter'] as Map<String, dynamic>),
+      filter: const GalleryFilterJsonConverter().fromJson(
+        json['filter'] as Map<String, dynamic>,
+      ),
     );
 
 Map<String, dynamic> _$FilterDataSwitcherToJson(FilterDataSwitcher instance) =>

@@ -8,8 +8,9 @@ part of 'ast_for_loop_node.dart';
 
 ASTForLoopNode _$ASTForLoopNodeFromJson(Map<String, dynamic> json) =>
     ASTForLoopNode(
-      initialization:
-          ASTNode.fromJson(json['initialization'] as Map<String, dynamic>),
+      initialization: ASTNode.fromJson(
+        json['initialization'] as Map<String, dynamic>,
+      ),
       condition: ASTNode.fromJson(json['condition'] as Map<String, dynamic>),
       increment: ASTNode.fromJson(json['increment'] as Map<String, dynamic>),
       body: ASTNode.fromJson(json['body'] as Map<String, dynamic>),

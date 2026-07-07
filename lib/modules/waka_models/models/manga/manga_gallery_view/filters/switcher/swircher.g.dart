@@ -7,24 +7,24 @@ part of 'swircher.dart';
 // **************************************************************************
 
 GalleryFilterSwitcher _$GalleryFilterSwitcherFromJson(
-        Map<String, dynamic> json) =>
-    GalleryFilterSwitcher(
-      onValue: json['onValue'] as String,
-      offValue: json['offValue'] as String,
-      type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
-      paramName: json['paramName'] as String,
-      param: json['param'] as String,
-    );
+  Map<String, dynamic> json,
+) => GalleryFilterSwitcher(
+  onValue: json['onValue'] as String,
+  offValue: json['offValue'] as String,
+  type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
+  paramName: json['paramName'] as String,
+  param: json['param'] as String,
+);
 
 Map<String, dynamic> _$GalleryFilterSwitcherToJson(
-        GalleryFilterSwitcher instance) =>
-    <String, dynamic>{
-      'paramName': instance.paramName,
-      'param': instance.param,
-      'type': _$GalleryFilterTypeEnumMap[instance.type]!,
-      'onValue': instance.onValue,
-      'offValue': instance.offValue,
-    };
+  GalleryFilterSwitcher instance,
+) => <String, dynamic>{
+  'paramName': instance.paramName,
+  'param': instance.param,
+  'type': _$GalleryFilterTypeEnumMap[instance.type]!,
+  'onValue': instance.onValue,
+  'offValue': instance.offValue,
+};
 
 const _$GalleryFilterTypeEnumMap = {
   GalleryFilterType.MULTIPLE_OF_ANY: 'MULTIPLE_OF_ANY',

@@ -12,6 +12,4 @@ ASTReturnNode _$ASTReturnNodeFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ASTReturnNodeToJson(ASTReturnNode instance) =>
-    <String, dynamic>{
-      'expression': instance.expression.toJson(),
-    };
+    <String, dynamic>{'expression': instance.expression.toJson()};

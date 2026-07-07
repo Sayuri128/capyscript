@@ -7,11 +7,7 @@ part of 'ast_string_node.dart';
 // **************************************************************************
 
 ASTStringNode _$ASTStringNodeFromJson(Map<String, dynamic> json) =>
-    ASTStringNode(
-      value: json['value'] as String,
-    );
+    ASTStringNode(value: json['value'] as String);
 
 Map<String, dynamic> _$ASTStringNodeToJson(ASTStringNode instance) =>
-    <String, dynamic>{
-      'value': instance.value,
-    };
+    <String, dynamic>{'value': instance.value};

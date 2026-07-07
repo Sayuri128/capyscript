@@ -7,15 +7,15 @@ part of 'ast_if_node.dart';
 // **************************************************************************
 
 ASTIfNode _$ASTIfNodeFromJson(Map<String, dynamic> json) => ASTIfNode(
-      condition: ASTNode.fromJson(json['condition'] as Map<String, dynamic>),
-      trueBranch: ASTNode.fromJson(json['trueBranch'] as Map<String, dynamic>),
-      elseBranch: json['elseBranch'] == null
-          ? null
-          : ASTNode.fromJson(json['elseBranch'] as Map<String, dynamic>),
-    );
+  condition: ASTNode.fromJson(json['condition'] as Map<String, dynamic>),
+  trueBranch: ASTNode.fromJson(json['trueBranch'] as Map<String, dynamic>),
+  elseBranch: json['elseBranch'] == null
+      ? null
+      : ASTNode.fromJson(json['elseBranch'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$ASTIfNodeToJson(ASTIfNode instance) => <String, dynamic>{
-      'condition': instance.condition.toJson(),
-      'trueBranch': instance.trueBranch.toJson(),
-      'elseBranch': instance.elseBranch?.toJson(),
-    };
+  'condition': instance.condition.toJson(),
+  'trueBranch': instance.trueBranch.toJson(),
+  'elseBranch': instance.elseBranch?.toJson(),
+};

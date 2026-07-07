@@ -7,24 +7,24 @@ part of 'multiple_of_multiple.dart';
 // **************************************************************************
 
 GalleryFilterMultipleOfMultiple _$GalleryFilterMultipleOfMultipleFromJson(
-        Map<String, dynamic> json) =>
-    GalleryFilterMultipleOfMultiple(
-      values: (json['values'] as List<dynamic>)
-          .map((e) => (e as List<dynamic>).map((e) => e as String).toList())
-          .toList(),
-      paramName: json['paramName'] as String,
-      type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
-      param: json['param'] as String,
-    );
+  Map<String, dynamic> json,
+) => GalleryFilterMultipleOfMultiple(
+  values: (json['values'] as List<dynamic>)
+      .map((e) => (e as List<dynamic>).map((e) => e as String).toList())
+      .toList(),
+  paramName: json['paramName'] as String,
+  type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
+  param: json['param'] as String,
+);
 
 Map<String, dynamic> _$GalleryFilterMultipleOfMultipleToJson(
-        GalleryFilterMultipleOfMultiple instance) =>
-    <String, dynamic>{
-      'paramName': instance.paramName,
-      'param': instance.param,
-      'type': _$GalleryFilterTypeEnumMap[instance.type]!,
-      'values': instance.values,
-    };
+  GalleryFilterMultipleOfMultiple instance,
+) => <String, dynamic>{
+  'paramName': instance.paramName,
+  'param': instance.param,
+  'type': _$GalleryFilterTypeEnumMap[instance.type]!,
+  'values': instance.values,
+};
 
 const _$GalleryFilterTypeEnumMap = {
   GalleryFilterType.MULTIPLE_OF_ANY: 'MULTIPLE_OF_ANY',

@@ -7,13 +7,9 @@ part of 'ast_external_value_node.dart';
 // **************************************************************************
 
 ASTExternalValueNode _$ASTExternalValueNodeFromJson(
-        Map<String, dynamic> json) =>
-    ASTExternalValueNode(
-      value: json['value'],
-    );
+  Map<String, dynamic> json,
+) => ASTExternalValueNode(value: json['value']);
 
 Map<String, dynamic> _$ASTExternalValueNodeToJson(
-        ASTExternalValueNode instance) =>
-    <String, dynamic>{
-      'value': instance.value,
-    };
+  ASTExternalValueNode instance,
+) => <String, dynamic>{'value': instance.value};

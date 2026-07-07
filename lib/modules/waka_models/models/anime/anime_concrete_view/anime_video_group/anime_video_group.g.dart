@@ -15,7 +15,4 @@ AnimeVideoGroup _$AnimeVideoGroupFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AnimeVideoGroupToJson(AnimeVideoGroup instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'elements': instance.elements,
-    };
+    <String, dynamic>{'title': instance.title, 'elements': instance.elements};

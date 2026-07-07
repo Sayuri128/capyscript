@@ -8,13 +8,15 @@ part of 'ast_object_set_node.dart';
 
 ASTObjectSetNode _$ASTObjectSetNodeFromJson(Map<String, dynamic> json) =>
     ASTObjectSetNode(
-      targetExpression:
-          ASTNode.fromJson(json['targetExpression'] as Map<String, dynamic>),
+      targetExpression: ASTNode.fromJson(
+        json['targetExpression'] as Map<String, dynamic>,
+      ),
       keyExpressions: (json['keyExpressions'] as List<dynamic>)
           .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
           .toList(),
-      valueExpression:
-          ASTNode.fromJson(json['valueExpression'] as Map<String, dynamic>),
+      valueExpression: ASTNode.fromJson(
+        json['valueExpression'] as Map<String, dynamic>,
+      ),
     );
 
 Map<String, dynamic> _$ASTObjectSetNodeToJson(ASTObjectSetNode instance) =>

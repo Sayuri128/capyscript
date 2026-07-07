@@ -6,6 +6,7 @@ enum TokenType {
   MINUS,
   MULTIPLY,
   DIVIDE,
+  MODULO,
   LPAREN,
   RPAREN,
   SEMICOLON,

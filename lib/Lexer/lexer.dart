@@ -103,6 +103,8 @@ class Lexer {
           return Token(TokenType.MULTIPLY, currentChar);
         case '/':
           return Token(TokenType.DIVIDE, currentChar);
+        case '%':
+          return Token(TokenType.MODULO, currentChar);
         case '(':
           return Token(TokenType.LPAREN, currentChar);
         case ')':

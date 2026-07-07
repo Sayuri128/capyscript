@@ -42,6 +42,14 @@ void main() {
       expect(await run('function main() { return 20 / 4 / 5; }'), equals(1));
     });
 
+    test('modulo', () async {
+      expect(await run('function main() { return 10 % 3; }'), equals(1));
+    });
+
+    test('modulo has same precedence as multiply', () async {
+      expect(await run('function main() { return 10 % 3 * 2; }'), equals(2));
+    });
+
     test('parentheses override precedence', () async {
       expect(await run('function main() { return (2 + 3) * 4; }'), equals(20));
     });

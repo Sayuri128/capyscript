@@ -1,0 +1,14 @@
+import "io";
+
+function foo(fun) {
+    fun();
+}
+
+function bar() {
+    print("Hello World!");
+}
+
+function main() {
+    foo(bar); 
+
+}

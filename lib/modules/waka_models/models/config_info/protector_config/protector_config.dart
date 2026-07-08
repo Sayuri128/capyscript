@@ -17,10 +17,12 @@ class ProtectorConfig {
   final String pingUrl;
   final bool needToLogin;
   final bool inAppBrowserInterceptor;
+  final String? sessionGroup;
 
   const ProtectorConfig({
     required this.pingUrl,
     required this.needToLogin,
     required this.inAppBrowserInterceptor,
+    this.sessionGroup,
   });
 }

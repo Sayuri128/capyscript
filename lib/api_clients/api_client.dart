@@ -4,7 +4,6 @@
  */
 
 import 'package:capyscript/Interpreter/interpreter.dart';
-import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_module.dart';
 
@@ -30,7 +29,8 @@ abstract class ApiClient {
   }
 
   Map<String, String> getProtectorHeaders() {
-    return (modules[HttpModule.module_name] as HttpModule).getHeaders();
+    final module = interpreter.builtinModule(HttpModule.module_name);
+    return module is HttpModule ? module.getHeaders() : <String, String>{};
   }
 
   Future<Map<String, String>> getImageHeaders(

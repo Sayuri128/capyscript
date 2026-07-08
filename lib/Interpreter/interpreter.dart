@@ -40,6 +40,20 @@ class Interpreter {
 
   InterpreterTree? _interpreterTree;
 
+  final Map<String, BaseModule> _builtinModules = {};
+
+  BaseModule? builtinModule(String moduleName) {
+    final existing = _builtinModules[moduleName];
+    if (existing != null) {
+      return existing;
+    }
+    final factory = moduleFactories[moduleName];
+    if (factory == null) {
+      return null;
+    }
+    return _builtinModules[moduleName] = factory();
+  }
+
   Future<dynamic> runFunction(String functionName,
       {Map<String, dynamic>? arguments}) async {
     InterpreterTree interpreterResult = _runParser();
@@ -114,9 +128,9 @@ class Interpreter {
 
     final result = <BaseModule>[];
     for (final import in imports) {
-      final builtinModule = modules[import.moduleName];
-      if (builtinModule != null) {
-        result.add(builtinModule);
+      final builtin = builtinModule(import.moduleName);
+      if (builtin != null) {
+        result.add(builtin);
         continue;
       }
 

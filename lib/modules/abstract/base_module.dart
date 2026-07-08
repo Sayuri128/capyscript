@@ -60,13 +60,15 @@ class ModuleFunctionBody extends ASTNode {
   }
 }
 
-final Map<String, BaseModule> modules = {
-  HttpModule.module_name: HttpModule(),
-  IOModule.module_name: IOModule(),
-  JsonModule.module_name: JsonModule(),
-  ConverterModule.module_name: ConverterModule(),
-  DateModule.module_name: DateModule(),
-  HtmlModule.module_name: HtmlModule(),
-  AnimeModelsModule.module_name: AnimeModelsModule(),
-  MangaModelsModule.module_name: MangaModelsModule(),
+typedef ModuleFactory = BaseModule Function();
+
+final Map<String, ModuleFactory> moduleFactories = {
+  HttpModule.module_name: HttpModule.new,
+  IOModule.module_name: IOModule.new,
+  JsonModule.module_name: JsonModule.new,
+  ConverterModule.module_name: ConverterModule.new,
+  DateModule.module_name: DateModule.new,
+  HtmlModule.module_name: HtmlModule.new,
+  AnimeModelsModule.module_name: AnimeModelsModule.new,
+  MangaModelsModule.module_name: MangaModelsModule.new,
 };

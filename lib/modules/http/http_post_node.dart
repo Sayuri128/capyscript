@@ -28,10 +28,10 @@ class HttpPostNode extends ModuleFunctionBody {
     final paths = (getVariable("paths", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
     final body = getVariable("body", environment);
-    final headers = (getVariable("headers", environment, defaultValue: {})
+    final scriptHeaders = (getVariable("headers", environment, defaultValue: {})
             as Map)
-        .map((key, value) => MapEntry(key.toString(), value.toString()))
-      ..addAll(getHeaders());
+        .map((key, value) => MapEntry(key.toString(), value.toString()));
+    final headers = <String, String>{...getHeaders(), ...scriptHeaders};
     final throughWeb = getVariable("throughWeb", environment);
 
     url = await HttpUtils.buildUri(url, params: params, paths: paths);

@@ -44,7 +44,13 @@ class ASTMethodCallNode extends ASTNode {
       switch (methodName) {
         case "push":
         case "add":
-          obj.addAll(args);
+          // args is always List<dynamic>, but obj may be a typed list handed
+          // out by ExternalObject.getField (e.g. List<Chapter>), whose addAll
+          // rejects an Iterable<dynamic> outright. Add element-wise so the
+          // type check applies per element instead of to the iterable.
+          for (final arg in args) {
+            obj.add(arg);
+          }
           return null;
         case "pop":
           return obj.removeLast();
@@ -136,7 +142,8 @@ class ASTMethodCallNode extends ASTNode {
         case "remove":
           return obj.remove(args.first);
         case "addAll":
-          return obj.addAll(args.first);
+          (args.first as Map).forEach((key, value) => obj[key] = value);
+          return null;
       }
     } else if (obj is String) {
       switch (methodName) {

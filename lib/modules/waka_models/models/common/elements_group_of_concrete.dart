@@ -39,7 +39,7 @@ abstract class ElementsGroupOfConcrete<
     if (name == 'elements') {
       elements
         ..clear()
-        ..addAll(value);
+        ..addAll((value as Iterable<dynamic>).cast<T>());
     }
   }
 }

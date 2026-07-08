@@ -34,28 +34,9 @@ class AnimeVideoGroup extends ElementsGroupOfConcrete<AnimeVideo> {
   callFunction(String name, {List? ordinalArguments}) {
     if (name == 'copyWith') {
       return copyWith(
-        title: ordinalArguments![0],
-        elements: ordinalArguments[1],
+        title: ordinalArguments![0] as String?,
+        elements: (ordinalArguments[1] as Iterable<dynamic>?)?.cast<AnimeVideo>().toList(),
       );
-    }
-  }
-
-  @override
-  getField(String name) {
-    if (name == 'title') {
-      return title;
-    }
-    if (name == 'elements') {
-      return elements;
-    }
-  }
-
-  @override
-  void setField(String name, value) {
-    if (name == 'elements') {
-      elements
-        ..clear()
-        ..addAll(value);
     }
   }
 }

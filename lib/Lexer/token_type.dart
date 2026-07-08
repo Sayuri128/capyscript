@@ -6,6 +6,7 @@ enum TokenType {
   MINUS,
   MULTIPLY,
   DIVIDE,
+  MODULO,
   LPAREN,
   RPAREN,
   SEMICOLON,
@@ -49,5 +50,9 @@ enum TokenType {
   NEW,
   THIS,
   SUPER,
-  VAR
+  VAR,
+  TRY,
+  CATCH,
+  FINALLY,
+  THROW
 }

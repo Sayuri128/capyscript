@@ -25,6 +25,10 @@ class ASTVariableNode extends ASTNode {
 
   @override
   Future<dynamic> execute(InterpreterEnvironment environment) async {
+    return environment.getVariable(variableName);
+  }
+
+  Future<dynamic> executeOrName(InterpreterEnvironment environment) async {
     try {
       return environment.getVariable(variableName);
     } catch (e) {

@@ -7,13 +7,13 @@ part of 'ast_map_node.dart';
 // **************************************************************************
 
 ASTMapNode _$ASTMapNodeFromJson(Map<String, dynamic> json) => ASTMapNode(
-      keys: (json['keys'] as List<dynamic>)
-          .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      values: (json['values'] as List<dynamic>)
-          .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  keys: (json['keys'] as List<dynamic>)
+      .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  values: (json['values'] as List<dynamic>)
+      .map((e) => ASTNode.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$ASTMapNodeToJson(ASTMapNode instance) =>
     <String, dynamic>{

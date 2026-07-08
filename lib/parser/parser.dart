@@ -14,6 +14,7 @@ import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
+import 'package:capyscript/AST/lambda/ast_lambda_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/method_call/method_call_node.dart';
 import 'package:capyscript/AST/null/ast_null_nodel.dart';
@@ -22,6 +23,8 @@ import 'package:capyscript/AST/object/ast_object_set_node.dart';
 import 'package:capyscript/AST/proprty_access/ast_property_access_node.dart';
 import 'package:capyscript/AST/return/ast_return_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/AST/throw/ast_throw_node.dart';
+import 'package:capyscript/AST/try_catch/ast_try_catch_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
 import 'package:capyscript/Lexer/lexer.dart';
 import 'package:capyscript/Lexer/token.dart';
@@ -105,41 +108,71 @@ class Parser {
   }
 
   ASTNode _parseExpression({required String functionName}) {
-    return _parseTerm(functionName: functionName);
+    return _parseOr(functionName: functionName);
   }
 
-  ASTNode _parseTerm({required String functionName}) {
-    ASTNode left = _parseFactor(functionName: functionName);
-
-    while (canEat([
-      TokenType.PLUS,
-      TokenType.MINUS,
-      TokenType.MULTIPLY,
-      TokenType.DIVIDE,
-      TokenType.LESS,
-      TokenType.GREATER,
-      TokenType.EQUAL_EQUAL,
-      TokenType.NOT_EQUAL,
-      TokenType.LESS_EQUAL,
-      TokenType.GREATER_EQUAL,
-    ])) {
+  ASTNode _parseBinaryLevel({
+    required String functionName,
+    required List<TokenType> operators,
+    required ASTNode Function({required String functionName}) next,
+  }) {
+    ASTNode left = next(functionName: functionName);
+    while (canEat(operators)) {
       final TokenType op = _currentToken!.type;
       eat(op);
       left = ASTBinaryOperatorNode(
-          left: left, right: _parseTerm(functionName: functionName), op: op);
-
-      while (canEat([TokenType.AND, TokenType.OR])) {
-        final TokenType op = _currentToken!.type;
-        eat(op);
-        left = ASTBinaryOperatorNode(
-            left: left, right: _parseTerm(functionName: functionName), op: op);
-      }
+          left: left, right: next(functionName: functionName), op: op);
     }
-
     return left;
   }
 
+  ASTNode _parseOr({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.OR],
+        next: _parseAnd,
+      );
+
+  ASTNode _parseAnd({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.AND],
+        next: _parseEquality,
+      );
+
+  ASTNode _parseEquality({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.EQUAL_EQUAL, TokenType.NOT_EQUAL],
+        next: _parseComparison,
+      );
+
+  ASTNode _parseComparison({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [
+          TokenType.LESS,
+          TokenType.GREATER,
+          TokenType.LESS_EQUAL,
+          TokenType.GREATER_EQUAL,
+        ],
+        next: _parseAdditive,
+      );
+
+  ASTNode _parseAdditive({required String functionName}) => _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.PLUS, TokenType.MINUS],
+        next: _parseMultiplicative,
+      );
+
+  ASTNode _parseMultiplicative({required String functionName}) =>
+      _parseBinaryLevel(
+        functionName: functionName,
+        operators: [TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO],
+        next: _parseFactor,
+      );
+
   ASTNode _parsePrimary({required String functionName}) {
+    if (canEat([TokenType.FUNCTION])) {
+      return _parseLambda(functionName: functionName);
+    }
+
     if (canEat([TokenType.NUMBER])) {
       final num value = num.parse(_currentToken!.value);
       eat(TokenType.NUMBER);
@@ -211,6 +244,8 @@ class Parser {
   }
 
   ASTNode _parseFactor({required String functionName}) {
+    ASTNode factor;
+
     // array
     if (canEat([TokenType.LSQUARE_BRACE])) {
       eat(TokenType.LSQUARE_BRACE);
@@ -222,11 +257,9 @@ class Parser {
         }
       }
       eat(TokenType.RSQUARE_BRACE);
-      return ASTArrayNode(expressions: values);
-    }
-
-    // map
-    if (canEat([TokenType.LBRACE])) {
+      factor = ASTArrayNode(expressions: values);
+    } else if (canEat([TokenType.LBRACE])) {
+      // map
       eat(TokenType.LBRACE);
       final Map<ASTNode, ASTNode> mapEntities = {};
       if (!canEat([TokenType.RBRACE])) {
@@ -242,11 +275,11 @@ class Parser {
         }
       }
       eat(TokenType.RBRACE);
-      return ASTMapNode(
+      factor = ASTMapNode(
           keys: mapEntities.keys.toList(), values: mapEntities.values.toList());
+    } else {
+      factor = _parsePrimary(functionName: functionName);
     }
-
-    ASTNode factor = _parsePrimary(functionName: functionName);
 
     while (true) {
       if (canEat([TokenType.DOT])) {
@@ -340,6 +373,24 @@ class Parser {
       return ASTImportNode(moduleName: moduleName);
     }
     throw Exception("Cannot parse import module");
+  }
+
+  ASTLambdaNode _parseLambda({required String functionName}) {
+    eat(TokenType.FUNCTION);
+    eat(TokenType.LPAREN);
+    final parameters = _parseArguments();
+    eat(TokenType.RPAREN);
+
+    String? returnType;
+    if (canEat([TokenType.COLON])) {
+      eat(TokenType.COLON);
+      returnType = _parseType();
+    }
+
+    final body = _parseBlock(functionName: functionName);
+
+    return ASTLambdaNode(
+        parameters: parameters, body: body, returnType: returnType);
   }
 
   ASTFunctionDeclarationNode _parseFunctionDeclaration() {
@@ -559,7 +610,46 @@ class Parser {
       return _parseReturn(functionName);
     }
 
+    if (canEat([TokenType.THROW])) {
+      eat(TokenType.THROW);
+      final expression = _parseExpression(functionName: functionName);
+      eat(TokenType.SEMICOLON);
+      return ASTThrowNode(expression: expression);
+    }
+
+    if (canEat([TokenType.TRY])) {
+      return _parseTryStatement(functionName: functionName);
+    }
+
     throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
+  }
+
+  ASTTryCatchNode _parseTryStatement({required String functionName}) {
+    eat(TokenType.TRY);
+    final tryBlock = _parseBlock(functionName: functionName);
+
+    String? catchVariable;
+    ASTNode? catchBlock;
+    if (canEat([TokenType.CATCH])) {
+      eat(TokenType.CATCH);
+      eat(TokenType.LPAREN);
+      catchVariable = eat(TokenType.IDENTIFIER);
+      eat(TokenType.RPAREN);
+      catchBlock = _parseBlock(functionName: functionName);
+    }
+
+    ASTNode? finallyBlock;
+    if (canEat([TokenType.FINALLY])) {
+      eat(TokenType.FINALLY);
+      finallyBlock = _parseBlock(functionName: functionName);
+    }
+
+    return ASTTryCatchNode(
+      tryBlock: tryBlock,
+      catchVariable: catchVariable,
+      catchBlock: catchBlock,
+      finallyBlock: finallyBlock,
+    );
   }
 
   ASTReturnNode _parseReturn(String functionName) {

@@ -20,9 +20,19 @@ class InterpreterEnvironment {
 
   InterpreterScopedEnvironment _currentScope;
 
+  InterpreterScopedEnvironment get currentScope => _currentScope;
+
   void enterScope() {
     _currentScope =
         InterpreterScopedEnvironment(parentScope: _currentScope, variables: {});
+  }
+
+  void enterScopeWith(InterpreterScopedEnvironment parent) {
+    _currentScope = InterpreterScopedEnvironment(parentScope: parent, variables: {});
+  }
+
+  void restoreScope(InterpreterScopedEnvironment scope) {
+    _currentScope = scope;
   }
 
   void exitScope() {

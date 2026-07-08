@@ -18,6 +18,9 @@ class Lexer {
   }
 
   String peekNextChar() {
+    if (_pos + 1 >= source.length) {
+      return '';
+    }
     return source[_pos + 1];
   }
 
@@ -102,6 +105,8 @@ class Lexer {
           return Token(TokenType.MULTIPLY, currentChar);
         case '/':
           return Token(TokenType.DIVIDE, currentChar);
+        case '%':
+          return Token(TokenType.MODULO, currentChar);
         case '(':
           return Token(TokenType.LPAREN, currentChar);
         case ')':
@@ -144,24 +149,18 @@ class Lexer {
   }
 
   void _skipSingleLineComment() {
-    // Skip until the end of line or input
-    String currentChar = source[_pos];
-    while (currentChar != '\n') {
+    while (_pos < source.length && source[_pos] != '\n') {
       _advance();
-      currentChar = source[_pos];
     }
   }
 
   void _skipMultiLineComment() {
-    // Skip until encountering '*/' or end of input
-    String currentChar = source[_pos];
-    while (!(currentChar == '*' && peekNextChar() == '/')) {
+    while (_pos < source.length &&
+        !(source[_pos] == '*' && peekNextChar() == '/')) {
       _advance();
-      currentChar = source[_pos];
     }
-    // Skip the '*/' characters
-    _advance(); // Skip *
-    _advance(); // Skip /
+    _advance();
+    _advance();
   }
 
   String getRangeTokens(int range) {
@@ -242,6 +241,14 @@ class Lexer {
       return Token(TokenType.SUPER, identifier);
     } else if (identifier == "var") {
       return Token(TokenType.VAR, identifier);
+    } else if (identifier == "try") {
+      return Token(TokenType.TRY, identifier);
+    } else if (identifier == "catch") {
+      return Token(TokenType.CATCH, identifier);
+    } else if (identifier == "finally") {
+      return Token(TokenType.FINALLY, identifier);
+    } else if (identifier == "throw") {
+      return Token(TokenType.THROW, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

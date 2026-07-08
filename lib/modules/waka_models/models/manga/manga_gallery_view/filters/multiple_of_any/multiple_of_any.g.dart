@@ -7,20 +7,20 @@ part of 'multiple_of_any.dart';
 // **************************************************************************
 
 GalleryFilterMultipleOfAny _$GalleryFilterMultipleOfAnyFromJson(
-        Map<String, dynamic> json) =>
-    GalleryFilterMultipleOfAny(
-      paramName: json['paramName'] as String,
-      type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
-      param: json['param'] as String,
-    );
+  Map<String, dynamic> json,
+) => GalleryFilterMultipleOfAny(
+  paramName: json['paramName'] as String,
+  type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
+  param: json['param'] as String,
+);
 
 Map<String, dynamic> _$GalleryFilterMultipleOfAnyToJson(
-        GalleryFilterMultipleOfAny instance) =>
-    <String, dynamic>{
-      'paramName': instance.paramName,
-      'param': instance.param,
-      'type': _$GalleryFilterTypeEnumMap[instance.type]!,
-    };
+  GalleryFilterMultipleOfAny instance,
+) => <String, dynamic>{
+  'paramName': instance.paramName,
+  'param': instance.param,
+  'type': _$GalleryFilterTypeEnumMap[instance.type]!,
+};
 
 const _$GalleryFilterTypeEnumMap = {
   GalleryFilterType.MULTIPLE_OF_ANY: 'MULTIPLE_OF_ANY',

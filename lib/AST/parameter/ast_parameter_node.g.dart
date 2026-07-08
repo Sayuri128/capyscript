@@ -13,6 +13,7 @@ ASTParameterNode _$ASTParameterNodeFromJson(Map<String, dynamic> json) =>
           ? null
           : ASTNode.fromJson(json['defaultValue'] as Map<String, dynamic>),
       isOptional: json['isOptional'] as bool? ?? false,
+      paramType: json['paramType'] as String?,
     );
 
 Map<String, dynamic> _$ASTParameterNodeToJson(ASTParameterNode instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$ASTParameterNodeToJson(ASTParameterNode instance) =>
       'paramName': instance.paramName,
       'isOptional': instance.isOptional,
       'defaultValue': instance.defaultValue?.toJson(),
+      'paramType': instance.paramType,
     };

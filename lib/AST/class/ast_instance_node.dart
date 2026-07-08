@@ -34,38 +34,41 @@ class ASTInstanceNode {
     final owningClass = _findOwningClass(startClass, methodName, environment)!;
 
     environment.enterScope();
-    environment.setVariable('this', this);
-    environment.setVariable('__currentClass__', owningClass);
-
-    for (int i = 0; i < method.parameters.length; i++) {
-      final param = method.parameters[i];
-      if (i < resolvedArgs.length) {
-        environment.setVariable(param.paramName, resolvedArgs[i]);
-      } else if (param.isOptional && param.defaultValue != null) {
-        environment.setVariable(
-          param.paramName,
-          await param.defaultValue!.execute(environment),
-        );
-      }
-      if (param.paramType != null) {
-        TypeChecker.check(
-            param.paramType!, environment.getVariable(param.paramName), environment);
-      }
-    }
-
-    dynamic res;
     try {
-      res = await method.execute(environment);
-    } on ASTReturnValue catch (r) {
-      res = await r.execute(environment);
-    }
+      environment.setVariable('this', this);
+      environment.setVariable('__currentClass__', owningClass);
 
-    if (method.returnType != null && method.returnType != 'void') {
-      TypeChecker.check(method.returnType!, res, environment);
-    }
+      for (int i = 0; i < method.parameters.length; i++) {
+        final param = method.parameters[i];
+        if (i < resolvedArgs.length) {
+          environment.setVariable(param.paramName, resolvedArgs[i]);
+        } else if (param.isOptional && param.defaultValue != null) {
+          environment.setVariable(
+            param.paramName,
+            await param.defaultValue!.execute(environment),
+          );
+        }
+        if (param.paramType != null) {
+          TypeChecker.check(
+              param.paramType!, environment.getVariable(param.paramName), environment);
+        }
+      }
 
-    environment.exitScope();
-    return res;
+      dynamic res;
+      try {
+        res = await method.execute(environment);
+      } on ASTReturnValue catch (r) {
+        res = await r.execute(environment);
+      }
+
+      if (method.returnType != null && method.returnType != 'void') {
+        TypeChecker.check(method.returnType!, res, environment);
+      }
+
+      return res;
+    } finally {
+      environment.exitScope();
+    }
   }
 
   dynamic _findMethod(

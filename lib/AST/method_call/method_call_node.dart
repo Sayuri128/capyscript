@@ -44,10 +44,6 @@ class ASTMethodCallNode extends ASTNode {
       switch (methodName) {
         case "push":
         case "add":
-          // args is always List<dynamic>, but obj may be a typed list handed
-          // out by ExternalObject.getField (e.g. List<Chapter>), whose addAll
-          // rejects an Iterable<dynamic> outright. Add element-wise so the
-          // type check applies per element instead of to the iterable.
           for (final arg in args) {
             obj.add(arg);
           }

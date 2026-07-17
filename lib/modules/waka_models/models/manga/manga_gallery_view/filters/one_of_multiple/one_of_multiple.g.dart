@@ -10,6 +10,7 @@ GalleryFilterOneOfMultiple _$GalleryFilterOneOfMultipleFromJson(
   Map<String, dynamic> json,
 ) => GalleryFilterOneOfMultiple(
   values: (json['values'] as List<dynamic>).map((e) => e as String).toList(),
+  labels: (json['labels'] as List<dynamic>?)?.map((e) => e as String).toList(),
   paramName: json['paramName'] as String,
   type: $enumDecode(_$GalleryFilterTypeEnumMap, json['type']),
   param: json['param'] as String,
@@ -22,6 +23,7 @@ Map<String, dynamic> _$GalleryFilterOneOfMultipleToJson(
   'param': instance.param,
   'type': _$GalleryFilterTypeEnumMap[instance.type]!,
   'values': instance.values,
+  'labels': instance.labels,
 };
 
 const _$GalleryFilterTypeEnumMap = {

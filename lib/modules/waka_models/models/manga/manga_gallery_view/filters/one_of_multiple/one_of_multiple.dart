@@ -14,9 +14,11 @@ class GalleryFilterOneOfMultiple extends GalleryFilter {
 
   Map<String, dynamic> toJson() => _$GalleryFilterOneOfMultipleToJson(this);
   final List<String> values;
+  final List<String>? labels;
 
   const GalleryFilterOneOfMultiple(
       {required this.values,
+      this.labels,
       required String paramName,
       required GalleryFilterType type,
       required String param})
@@ -24,6 +26,6 @@ class GalleryFilterOneOfMultiple extends GalleryFilter {
 
   @override
   String toString() {
-    return 'GalleryFilterOneOfMultiple{values: $values}';
+    return 'GalleryFilterOneOfMultiple{values: $values, labels: $labels}';
   }
 }

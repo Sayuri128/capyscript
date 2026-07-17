@@ -15,9 +15,11 @@ class GalleryFilterMultipleOfMultiple extends GalleryFilter {
   Map<String, dynamic> toJson() =>
       _$GalleryFilterMultipleOfMultipleToJson(this);
   List<List<String>> values;
+  List<List<String>>? labels;
 
   GalleryFilterMultipleOfMultiple(
       {required this.values,
+      this.labels,
       required String paramName,
       required GalleryFilterType type,
       required String param})
@@ -25,6 +27,6 @@ class GalleryFilterMultipleOfMultiple extends GalleryFilter {
 
   @override
   String toString() {
-    return 'GalleryFilterMultipleOfMultiple{values: $values}';
+    return 'GalleryFilterMultipleOfMultiple{values: $values, labels: $labels}';
   }
 }

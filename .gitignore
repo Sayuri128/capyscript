@@ -28,3 +28,4 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 /UKDInterpreter.iml
+/bin/.local-chrome/

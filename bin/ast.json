@@ -1,0 +1,739 @@
+{
+ "astTree": {
+  "functions": [
+   {
+    "functionName": "main",
+    "parameters": [],
+    "body": {
+     "statements": [
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "map"
+       },
+       "functionName": "main",
+       "expression": {
+        "keys": [
+         {
+          "value": "key"
+         }
+        ],
+        "values": [
+         {
+          "keys": [
+           {
+            "value": "key"
+           }
+          ],
+          "values": [
+           {
+            "value": "test"
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "key"
+       },
+       "functionName": "main",
+       "expression": {
+        "value": "key"
+       }
+      },
+      {
+       "function": {
+        "functionName": "main",
+        "variableName": "print"
+       },
+       "arguments": [
+        {
+         "variable": {
+          "object": {
+           "object": {
+            "functionName": "main",
+            "variableName": "map"
+           },
+           "key": {
+            "functionName": "main",
+            "variableName": "key"
+           }
+          },
+          "key": {
+           "functionName": "main",
+           "variableName": "key"
+          }
+         },
+         "methodName": "replaceAll",
+         "arguments": [
+          {
+           "value": "t"
+          },
+          {
+           "value": "T"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "uid"
+       },
+       "functionName": "main",
+       "expression": {
+        "value": "test"
+       }
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "chapterNumber"
+       },
+       "functionName": "main",
+       "expression": {
+        "value": "1"
+       }
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "chapterVolume"
+       },
+       "functionName": "main",
+       "expression": {
+        "value": "1"
+       }
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "chapter"
+       },
+       "functionName": "main",
+       "expression": {
+        "keys": [
+         {
+          "value": "name"
+         },
+         {
+          "value": "number"
+         },
+         {
+          "value": "volume"
+         },
+         {
+          "value": "chapter_created_at"
+         }
+        ],
+        "values": [
+         {
+          "value": "test"
+         },
+         {
+          "value": "1"
+         },
+         {
+          "value": "1"
+         },
+         {
+          "value": "2021-01-01"
+         }
+        ]
+       }
+      },
+      {
+       "target": {
+        "functionName": "main",
+        "variableName": "map"
+       },
+       "functionName": "main",
+       "expression": {
+        "keys": [
+         {
+          "value": "uid"
+         },
+         {
+          "value": "title"
+         },
+         {
+          "value": "timestamp"
+         },
+         {
+          "value": "data"
+         }
+        ],
+        "values": [
+         {
+          "left": {
+           "functionName": "main",
+           "variableName": "uid"
+          },
+          "right": {
+           "left": {
+            "value": "_"
+           },
+           "right": {
+            "left": {
+             "functionName": "main",
+             "variableName": "chapterNumber"
+            },
+            "right": {
+             "left": {
+              "value": "_"
+             },
+             "right": {
+              "functionName": "main",
+              "variableName": "chapterVolume"
+             },
+             "op": "TokenType.PLUS"
+            },
+            "op": "TokenType.PLUS"
+           },
+           "op": "TokenType.PLUS"
+          },
+          "op": "TokenType.PLUS"
+         },
+         {
+          "left": {
+           "value": "Том "
+          },
+          "right": {
+           "left": {
+            "function": {
+             "functionName": "main",
+             "variableName": "parseString"
+            },
+            "arguments": [
+             {
+              "functionName": "main",
+              "variableName": "chapterVolume"
+             }
+            ]
+           },
+           "right": {
+            "left": {
+             "value": " Глава "
+            },
+            "right": {
+             "left": {
+              "functionName": "main",
+              "variableName": "chapterNumber"
+             },
+             "right": {
+              "left": {
+               "value": " "
+              },
+              "right": {
+               "functionName": "main",
+               "variableName": "chapterName"
+              },
+              "op": "TokenType.PLUS"
+             },
+             "op": "TokenType.PLUS"
+            },
+            "op": "TokenType.PLUS"
+           },
+           "op": "TokenType.PLUS"
+          },
+          "op": "TokenType.PLUS"
+         },
+         {
+          "targetExpression": {
+           "functionName": "main",
+           "variableName": "chapter"
+          },
+          "fieldName": "chapter_created_at"
+         },
+         {
+          "functionName": "main",
+          "variableName": "chapter"
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "modules": [
+   {
+    "moduleName": "http"
+   },
+   {
+    "moduleName": "io"
+   },
+   {
+    "moduleName": "json"
+   },
+   {
+    "moduleName": "date"
+   },
+   {
+    "moduleName": "html"
+   },
+   {
+    "moduleName": "manga_models"
+   },
+   {
+    "moduleName": "converter"
+   }
+  ]
+ },
+ "parsedModules": [
+  {
+   "body": {
+    "functions": [
+     {
+      "functionName": "httpGet",
+      "parameters": [
+       {
+        "paramName": "url",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "params",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "paths",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "headers",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "throughWeb",
+        "isOptional": true,
+        "defaultValue": {}
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "httpPost",
+      "parameters": [
+       {
+        "paramName": "url",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "params",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "paths",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "body",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "headers",
+        "isOptional": true,
+        "defaultValue": {
+         "keys": [],
+         "values": []
+        }
+       },
+       {
+        "paramName": "throughWeb",
+        "isOptional": true,
+        "defaultValue": {}
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "registerInterceptorController",
+      "parameters": [
+       {
+        "paramName": "controller",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "executeJsScript",
+      "parameters": [
+       {
+        "paramName": "code",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "useHeaders",
+      "parameters": [
+       {
+        "paramName": "headers",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "getHeaders",
+      "parameters": [],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "body": {
+    "functions": [
+     {
+      "functionName": "print",
+      "parameters": [
+       {
+        "paramName": "data",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "moduleName": "json",
+   "body": {
+    "functions": [
+     {
+      "functionName": "jsonEncode",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "jsonDecode",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "moduleName": "date",
+   "body": {
+    "functions": [
+     {
+      "functionName": "createDateFormatter",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "parseDate",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "moduleName": "html",
+   "body": {
+    "functions": [
+     {
+      "functionName": "createHTMLParser",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "moduleName": "manga_models",
+   "body": {
+    "functions": [
+     {
+      "functionName": "buildChapter",
+      "parameters": [
+       {
+        "paramName": "uid",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "title",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "timestamp",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "data",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "buildChapterGroups",
+      "parameters": [
+       {
+        "paramName": "title",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "elements",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "buildConcrete",
+      "parameters": [
+       {
+        "paramName": "uid",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "cover",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "title",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "description",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "tags",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "groups",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "status",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "alternativeTitles",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "buildGallery",
+      "parameters": [
+       {
+        "paramName": "uid",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "title",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "cover",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "data",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "buildPages",
+      "parameters": [
+       {
+        "paramName": "uid",
+        "isOptional": false,
+        "defaultValue": null
+       },
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "buildStatus",
+      "parameters": [
+       {
+        "paramName": "type",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "statusAnnounce",
+      "parameters": [],
+      "body": {}
+     },
+     {
+      "functionName": "statusCanceled",
+      "parameters": [],
+      "body": {}
+     },
+     {
+      "functionName": "statusOngoing",
+      "parameters": [],
+      "body": {}
+     },
+     {
+      "functionName": "statusPaused",
+      "parameters": [],
+      "body": {}
+     },
+     {
+      "functionName": "statusReleased",
+      "parameters": [],
+      "body": {}
+     },
+     {
+      "functionName": "statusUndefined",
+      "parameters": [],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  },
+  {
+   "moduleName": "converter",
+   "body": {
+    "functions": [
+     {
+      "functionName": "parseDouble",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "parseString",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     },
+     {
+      "functionName": "parseInt",
+      "parameters": [
+       {
+        "paramName": "value",
+        "isOptional": false,
+        "defaultValue": null
+       }
+      ],
+      "body": {}
+     }
+    ],
+    "modules": []
+   }
+  }
+ ]
+}

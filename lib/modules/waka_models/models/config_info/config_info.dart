@@ -3,6 +3,7 @@ import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/f
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/multiple_of_multiple/multiple_of_multiple.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/one_of_any/one_of_any.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/one_of_multiple/one_of_multiple.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/range/range.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/switcher/swircher.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -144,6 +145,8 @@ class GalleryFilterJsonConverter
         return GalleryFilterOneOfMultiple.fromJson(json);
       case GalleryFilterType.SWITCHER:
         return GalleryFilterSwitcher.fromJson(json);
+      case GalleryFilterType.RANGE:
+        return GalleryFilterRange.fromJson(json);
     }
   }
 
@@ -158,6 +161,8 @@ class GalleryFilterJsonConverter
     } else if (object is GalleryFilterOneOfMultiple) {
       return object.toJson();
     } else if (object is GalleryFilterSwitcher) {
+      return object.toJson();
+    } else if (object is GalleryFilterRange) {
       return object.toJson();
     }
     return {};
@@ -192,4 +197,5 @@ const GalleryFilterModes = {
   GalleryFilterType.ONE_OF_ANY: 'ONE_OF_ANY',
   GalleryFilterType.ONE_OF_MULTIPLE: 'ONE_OF_MULTIPLE',
   GalleryFilterType.SWITCHER: 'SWITCHER',
+  GalleryFilterType.RANGE: 'RANGE',
 };

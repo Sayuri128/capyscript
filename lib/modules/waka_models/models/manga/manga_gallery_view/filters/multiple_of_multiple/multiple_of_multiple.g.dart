@@ -36,4 +36,5 @@ const _$GalleryFilterTypeEnumMap = {
   GalleryFilterType.ONE_OF_ANY: 'ONE_OF_ANY',
   GalleryFilterType.ONE_OF_MULTIPLE: 'ONE_OF_MULTIPLE',
   GalleryFilterType.SWITCHER: 'SWITCHER',
+  GalleryFilterType.RANGE: 'RANGE',
 };

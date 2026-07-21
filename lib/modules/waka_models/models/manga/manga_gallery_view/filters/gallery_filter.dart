@@ -24,5 +24,6 @@ enum GalleryFilterType {
   MULTIPLE_OF_MULTIPLE,
   ONE_OF_ANY,
   ONE_OF_MULTIPLE,
-  SWITCHER
+  SWITCHER,
+  RANGE
 }

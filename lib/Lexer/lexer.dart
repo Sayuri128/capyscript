@@ -74,6 +74,22 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.GREATER_EQUAL, '>=');
+      } else if (currentChar == "+" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.PLUS_EQUALS, "+=");
+      } else if (currentChar == "-" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.MINUS_EQUALS, "-=");
+      } else if (currentChar == "*" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.MULTIPLY_EQUALS, "*=");
+      } else if (currentChar == "/" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.DIVIDE_EQUALS, "/=");
       } else if (currentChar == "+" && peekNextChar() == "+") {
         _advance();
         _advance();
@@ -140,6 +156,8 @@ class Lexer {
           return Token(TokenType.LESS, currentChar);
         case ">":
           return Token(TokenType.GREATER, currentChar);
+        case "!":
+          return Token(TokenType.NOT, currentChar);
         default:
           throw Exception(
               'Invalid token at ${locationOf(--_pos)} \n ${getRangeTokens(20)}');
@@ -199,8 +217,18 @@ class Lexer {
     _advance();
 
     String openQuote = source[_pos - 1];
+    final escapes = openQuote != "`";
 
     while (_pos < source.length && source[_pos] != openQuote) {
+      if (escapes && source[_pos] == "\\" && _pos + 1 < source.length) {
+        final next = source[_pos + 1];
+        final escaped = _escapes[next];
+        if (escaped != null) {
+          string += escaped;
+          _pos += 2;
+          continue;
+        }
+      }
       string += source[_pos++];
     }
 
@@ -211,6 +239,15 @@ class Lexer {
     _advance();
     return Token(TokenType.STRING, string);
   }
+
+  static const Map<String, String> _escapes = {
+    "n": "\n",
+    "t": "\t",
+    "r": "\r",
+    "\\": "\\",
+    "\"": "\"",
+    "'": "'",
+  };
 
   Token parseIdentifier() {
     var identifier = '';
@@ -264,6 +301,10 @@ class Lexer {
       return Token(TokenType.FINALLY, identifier);
     } else if (identifier == "throw") {
       return Token(TokenType.THROW, identifier);
+    } else if (identifier == "while") {
+      return Token(TokenType.WHILE, identifier);
+    } else if (identifier == "in") {
+      return Token(TokenType.IN, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

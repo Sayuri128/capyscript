@@ -10,7 +10,9 @@ import 'package:capyscript/AST/class/ast_this_node.dart';
 import 'package:capyscript/AST/decrement/ast_decrement_node.dart';
 import 'package:capyscript/AST/for_loop/ast_break_node.dart';
 import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
+import 'package:capyscript/AST/for_loop/ast_for_in_node.dart';
 import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
+import 'package:capyscript/AST/not/ast_not_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
@@ -209,6 +211,11 @@ class Parser {
       return _parseFactor(functionName: functionName);
     }
 
+    if (canEat([TokenType.NOT])) {
+      eat(TokenType.NOT);
+      return ASTNotNode(expression: _parseFactor(functionName: functionName));
+    }
+
     if (canEat([TokenType.MINUS])) {
       eat(TokenType.MINUS);
       return ASTBinaryOperatorNode(
@@ -337,9 +344,24 @@ class Parser {
       eat(TokenType.RSQUARE_BRACE);
     }
 
-    eat(TokenType.EQUALS);
+    ASTNode read() => keyExpressions.fold(
+        target, (object, key) => ASTObjectGetNode(object: object, key: key));
 
-    final ASTNode value = _parseExpression(functionName: functionName);
+    final ASTNode value;
+    if (canEat([TokenType.EQUALS])) {
+      eat(TokenType.EQUALS);
+      value = _parseExpression(functionName: functionName);
+    } else if (canEat(_compoundAssignments.keys.toList())) {
+      final operator = _currentToken!.type;
+      eat(operator);
+      value = ASTBinaryOperatorNode(
+          left: read(),
+          right: _parseExpression(functionName: functionName),
+          op: _compoundAssignments[operator]!);
+    } else {
+      return read();
+    }
+
     return ASTObjectSetNode(
         targetExpression: target,
         keyExpressions: keyExpressions,
@@ -521,6 +543,9 @@ class Parser {
       if (canEat([TokenType.EQUALS])) {
         return _parseAssignment(functionName, factor);
       }
+      if (canEat(_compoundAssignments.keys.toList())) {
+        return _parseCompoundAssignment(functionName, factor);
+      }
       return factor;
     }
 
@@ -585,6 +610,9 @@ class Parser {
         // Assuming TokenType.EQUALS represents '=' for assignment
         return _parseAssignment(functionName, factor);
       }
+      if (canEat(_compoundAssignments.keys.toList())) {
+        return _parseCompoundAssignment(functionName, factor);
+      }
 
       return factor;
     }
@@ -595,6 +623,19 @@ class Parser {
 
     if (canEat([TokenType.FOR])) {
       return _parseForLoopNode(functionName: functionName);
+    }
+
+    if (canEat([TokenType.WHILE])) {
+      eat(TokenType.WHILE);
+      eat(TokenType.LPAREN);
+      final condition = _parseExpression(functionName: functionName);
+      eat(TokenType.RPAREN);
+      final body = _parseBlock(functionName: functionName);
+      return ASTForLoopNode(
+          initialization: ASTNode(),
+          condition: condition,
+          increment: ASTNode(),
+          body: body);
     }
 
     if (canEat([TokenType.BREAK])) {
@@ -660,7 +701,7 @@ class Parser {
     return ASTReturnNode(expression: expression);
   }
 
-  ASTForLoopNode _parseForLoopNode({required String functionName}) {
+  ASTNode _parseForLoopNode({required String functionName}) {
     eat(TokenType.FOR);
     eat(TokenType.LPAREN);
 
@@ -670,13 +711,23 @@ class Parser {
     } else {
       initialization = ASTNode();
     }
+
+    if (initialization is ASTVariableNode && canEat([TokenType.IN])) {
+      eat(TokenType.IN);
+      final iterable = _parseExpression(functionName: functionName);
+      eat(TokenType.RPAREN);
+      return ASTForInNode(
+          variableName: initialization.variableName,
+          iterable: iterable,
+          body: _parseBlock(functionName: functionName));
+    }
     eat(TokenType.SEMICOLON);
 
     late final ASTNode condition;
     if (!canEat([TokenType.SEMICOLON])) {
       condition = _parseExpression(functionName: functionName);
     } else {
-      condition = ASTNode();
+      condition = const ASTBooleanNode(value: true);
     }
     eat(TokenType.SEMICOLON);
 
@@ -703,6 +754,25 @@ class Parser {
         arguments: _parseFunctionArguments(functionName: functionName));
     eat(TokenType.SEMICOLON);
     return func;
+  }
+
+  static const Map<TokenType, TokenType> _compoundAssignments = {
+    TokenType.PLUS_EQUALS: TokenType.PLUS,
+    TokenType.MINUS_EQUALS: TokenType.MINUS,
+    TokenType.MULTIPLY_EQUALS: TokenType.MULTIPLY,
+    TokenType.DIVIDE_EQUALS: TokenType.DIVIDE,
+  };
+
+  ASTAssignmentNode _parseCompoundAssignment(
+      String functionName, ASTNode target) {
+    final operator = _currentToken!.type;
+    eat(operator);
+    final expression = _parseExpression(functionName: functionName);
+    return ASTAssignmentNode(
+        target: target,
+        expression: ASTBinaryOperatorNode(
+            left: target, right: expression, op: _compoundAssignments[operator]!),
+        functionName: functionName);
   }
 
   ASTAssignmentNode _parseAssignment(String functionName, ASTNode target) {

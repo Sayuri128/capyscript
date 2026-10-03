@@ -64,7 +64,7 @@ class ConfigInfo extends ExternalObject {
   @override
   getField(String name) {
     if (name == 'name') {
-      return name;
+      return this.name;
     } else if (name == 'logoUrl') {
       return logoUrl;
     } else if (name == 'nsfw') {
@@ -176,10 +176,12 @@ class GalleryFiltersJsonConverter
   @override
   List<GalleryFilter> fromJson(List<dynamic> json) {
     final GalleryFilterJsonConverter converter = GalleryFilterJsonConverter();
+    final knownTypes = GalleryFilterModes.values.toSet();
 
-    return json.map((e) {
-      return converter.fromJson(e);
-    }).toList();
+    return json
+        .where((e) => e is Map && knownTypes.contains(e["type"]))
+        .map((e) => converter.fromJson(e))
+        .toList();
   }
 
   @override

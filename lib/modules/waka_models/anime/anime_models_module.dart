@@ -11,6 +11,7 @@ import 'package:capyscript/modules/waka_models/anime/anime_build_episode_group_n
 import 'package:capyscript/modules/waka_models/anime/anime_build_gallery_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_announce_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_canceled_node.dart';
+import 'package:capyscript/modules/waka_models/anime/anime_build_status_ongoing_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_paused_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_release_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_undefined_node.dart';
@@ -30,6 +31,7 @@ class AnimeModelsModule extends BaseModule {
 
     functions.add(AnimeBuildStatusAnnounceNode().toDeclarationNode());
     functions.add(AnimeBuildStatusCanceledNode().toDeclarationNode());
+    functions.add(AnimeBuildStatusOngoingNode().toDeclarationNode());
     functions.add(AnimeBuildStatusPausedNode().toDeclarationNode());
     functions.add(AnimeBuildStatusReleaseNode().toDeclarationNode());
     functions.add(AnimeBuildStatusUndefinedNode().toDeclarationNode());

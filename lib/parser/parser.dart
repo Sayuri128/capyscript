@@ -45,14 +45,22 @@ class Parser {
   late final Lexer _lexer;
   ASTTree? _astTree;
   Token? _currentToken;
+  int _currentTokenStart = 0;
 
   final List<ASTClassDeclarationNode> parsedClasses = [];
   final List<ASTInterfaceDeclarationNode> parsedInterfaces = [];
 
   Parser({required this.source}) {
     _lexer = Lexer(source: source);
-    _currentToken = _lexer.getNextToken();
+    _nextToken();
   }
+
+  void _nextToken() {
+    _currentToken = _lexer.getNextToken();
+    _currentTokenStart = _lexer.tokenStart;
+  }
+
+  String get _location => _lexer.locationOf(_currentTokenStart);
 
   ASTTree parse() {
     if (_astTree != null) return _astTree!;
@@ -77,6 +85,11 @@ class Parser {
       }
     }
 
+    if (_currentToken!.type != TokenType.END) {
+      throw Exception("Unexpected token ${_currentToken!.type} at $_location - "
+          "expected function, import, class or interface \n ${_lexer.getRangeTokens(30)}");
+    }
+
     _astTree = ASTTree(functions: functions, modules: imports);
     return _astTree!;
   }
@@ -84,12 +97,12 @@ class Parser {
   String eat(TokenType expectedToken) {
     final cur = _currentToken!;
     if (_currentToken!.type == expectedToken) {
-      _currentToken = _lexer.getNextToken();
+      _nextToken();
       // print("eat ${_currentToken.toString()}");
       return cur.value;
     }
 
-    throw Exception("Unexpected token - ${_currentToken!.type} - expected - "
+    throw Exception("Unexpected token - ${_currentToken!.type} at $_location - expected - "
         "${expectedToken.toString()} \n ${_lexer.getRangeTokens(
       30,
     )}");
@@ -97,10 +110,10 @@ class Parser {
 
   void eatOr(List<TokenType> expectedTokens) {
     if (expectedTokens.any((element) => element == _currentToken!.type)) {
-      _currentToken = _lexer.getNextToken();
+      _nextToken();
       return;
     }
-    throw Exception("Unexpected Token! ${_currentToken!.type}");
+    throw Exception("Unexpected token ${_currentToken!.type} at $_location");
   }
 
   bool canEat(List<TokenType> tokens) {
@@ -240,7 +253,7 @@ class Parser {
           variableName: identifier, functionName: functionName);
     }
 
-    throw Exception("Unexpected token ${_currentToken.toString()}");
+    throw Exception("Unexpected token ${_currentToken.toString()} at $_location");
   }
 
   ASTNode _parseFactor({required String functionName}) {
@@ -610,7 +623,7 @@ class Parser {
       return _parseTryStatement(functionName: functionName);
     }
 
-    throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
+    throw Exception('Invalid statement at $_location \n ${_lexer.getRangeTokens(30)}');
   }
 
   ASTTryCatchNode _parseTryStatement({required String functionName}) {
@@ -711,7 +724,7 @@ class Parser {
       final args = _parseFunctionArguments(functionName: functionName);
       return ASTSuperNode(methodName: methodName, arguments: args);
     }
-    throw Exception("Expected ( or . after super");
+    throw Exception("Expected ( or . after super at $_location");
   }
 
   ASTClassDeclarationNode _parseClassDeclaration() {
@@ -753,7 +766,7 @@ class Parser {
         fields.add(ClassField(name: fieldName, type: fieldType));
       } else {
         throw Exception(
-            "Unexpected token in class body: ${_currentToken!.type}");
+            "Unexpected token in class body: ${_currentToken!.type} at $_location");
       }
     }
 

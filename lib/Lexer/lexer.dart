@@ -4,6 +4,7 @@ import 'token_type.dart';
 class Lexer {
   final String source;
   int _pos;
+  int tokenStart = 0;
 
   Lexer({
     required this.source,
@@ -46,6 +47,8 @@ class Lexer {
         _advance(); // Skip whitespace
         continue;
       }
+
+      tokenStart = _pos;
 
       if (RegExp(r'\d').hasMatch(currentChar)) {
         return _parseNumber();
@@ -139,11 +142,25 @@ class Lexer {
           return Token(TokenType.GREATER, currentChar);
         default:
           throw Exception(
-              'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
+              'Invalid token at ${locationOf(--_pos)} \n ${getRangeTokens(20)}');
       }
     }
 
+    tokenStart = _pos;
     return Token(TokenType.END, '');
+  }
+
+  String locationOf(int offset) {
+    final end = offset.clamp(0, source.length);
+    var line = 1;
+    var lineStart = 0;
+    for (var i = 0; i < end; i++) {
+      if (source.codeUnitAt(i) == 10) {
+        line++;
+        lineStart = i + 1;
+      }
+    }
+    return 'line $line:${end - lineStart + 1}';
   }
 
   void _skipSingleLineComment() {
@@ -188,7 +205,7 @@ class Lexer {
     }
 
     if (_pos >= source.length || (source[_pos] != openQuote)) {
-      throw Exception('Unclosed string literal');
+      throw Exception('Unclosed string literal at ${locationOf(tokenStart)}');
     }
 
     _advance();

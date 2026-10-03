@@ -136,6 +136,42 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'parseString(value)',
     doc: 'Convert a value to its string representation.',
   ),
+  'base64Encode': (
+    detail: 'base64Encode(value)',
+    doc: 'Encode a string as UTF-8 base64.',
+  ),
+  'base64Decode': (
+    detail: 'base64Decode(value)',
+    doc: 'Decode UTF-8 base64 (padding optional) into a string.',
+  ),
+  'urlEncode': (
+    detail: 'urlEncode(value)',
+    doc: 'Percent-encode a value for use in a URL component.',
+  ),
+  'urlDecode': (
+    detail: 'urlDecode(value)',
+    doc: 'Decode a percent-encoded URL component.',
+  ),
+  'regexTest': (
+    detail: 'regexTest(pattern, input, flags = "")',
+    doc: 'Whether the pattern matches anywhere in input. Flags: i (ignore case), m (multiline), s (dot matches newline).',
+  ),
+  'regexMatch': (
+    detail: 'regexMatch(pattern, input, flags = "")',
+    doc: 'First match as [whole, group1, ...], or null.',
+  ),
+  'regexMatchAll': (
+    detail: 'regexMatchAll(pattern, input, flags = "")',
+    doc: 'Every match as a list of [whole, group1, ...].',
+  ),
+  'regexSplit': (
+    detail: 'regexSplit(pattern, input, flags = "")',
+    doc: 'Split input on the pattern.',
+  ),
+  'regexReplace': (
+    detail: 'regexReplace(pattern, input, replacement, flags = "")',
+    doc: 'Replace every match; \$1 inserts a group, \$\$ a literal dollar.',
+  ),
 
   // date module
   'createDateFormatter': (

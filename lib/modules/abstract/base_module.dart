@@ -12,6 +12,7 @@ import 'package:capyscript/modules/html/html_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_models_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_models_module.dart';
+import 'package:capyscript/modules/regex/regex_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -71,4 +72,5 @@ final Map<String, ModuleFactory> moduleFactories = {
   HtmlModule.module_name: HtmlModule.new,
   AnimeModelsModule.module_name: AnimeModelsModule.new,
   MangaModelsModule.module_name: MangaModelsModule.new,
+  RegexModule.module_name: RegexModule.new,
 };

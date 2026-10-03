@@ -9,7 +9,22 @@ const Map<String, List<String>> moduleFunctions = {
   ],
   'io': ['print'],
   'json': ['jsonEncode', 'jsonDecode'],
-  'converter': ['parseInt', 'parseDouble', 'parseString'],
+  'converter': [
+    'parseInt',
+    'parseDouble',
+    'parseString',
+    'base64Encode',
+    'base64Decode',
+    'urlEncode',
+    'urlDecode',
+  ],
+  'regex': [
+    'regexTest',
+    'regexMatch',
+    'regexMatchAll',
+    'regexSplit',
+    'regexReplace',
+  ],
   'date': ['createDateFormatter', 'parseDate'],
   'html': ['createHTMLParser'],
   'manga_models': [

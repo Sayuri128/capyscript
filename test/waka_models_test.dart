@@ -1,5 +1,7 @@
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_status.dart';
+import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/config_info.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/switcher/swircher.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_view_type.dart';
@@ -112,6 +114,76 @@ void main() {
       ''');
 
       expect(result, AnimeStatus.ONGOING);
+    });
+  });
+
+  group('buildConcrete metadata', () {
+    test('manga accepts and normalizes authors, artists, year, rating and url', () async {
+      final view = await run('''
+        import "manga_models";
+        function main() {
+          return buildConcrete({
+            "uid": "u", "cover": "c", "title": "t", "description": "d",
+            "tags": [], "groups": [], "status": statusOngoing(), "alternativeTitles": [],
+            "authors": ["A", " ", "A", "B"], "artists": ["C"],
+            "year": "2019", "rating": "8,7", "url": "https://example.com/t"
+          });
+        }
+      ''') as MangaConcreteView;
+
+      expect(view.authors, ['A', 'B']);
+      expect(view.artists, ['C']);
+      expect(view.year, 2019);
+      expect(view.rating, 8.7);
+      expect(view.url, 'https://example.com/t');
+      expect(MangaConcreteView.fromJson(view.toJson()).authors, ['A', 'B']);
+    });
+
+    test('scripts that pass no metadata still work', () async {
+      final view = await run('''
+        import "manga_models";
+        function main() {
+          return buildConcrete({
+            "uid": "u", "cover": "c", "title": "t", "description": "d",
+            "tags": [], "groups": [], "status": statusOngoing(), "alternativeTitles": []
+          });
+        }
+      ''') as MangaConcreteView;
+
+      expect(view.authors, isEmpty);
+      expect(view.year, isNull);
+      expect(view.rating, isNull);
+      expect(view.url, isNull);
+    });
+
+    test('older cached json without metadata still decodes', () {
+      final json = {
+        'uid': 'u', 'cover': 'c', 'title': 't', 'alternativeTitles': <String>[],
+        'description': 'd', 'tags': <String>[], 'status': 'ONGOING', 'groups': <dynamic>[],
+      };
+
+      final view = MangaConcreteView.fromJson(json);
+
+      expect(view.authors, isEmpty);
+      expect(view.artists, isEmpty);
+      expect(view.rating, isNull);
+    });
+
+    test('rating is clamped and invalid values are dropped', () async {
+      final view = await run('''
+        import "anime_models";
+        function main() {
+          return buildConcrete({
+            "uid": "u", "cover": "c", "title": "t", "description": "d",
+            "tags": [], "groups": [], "alternativeTitles": [], "status": statusOngoing(),
+            "rating": 42, "year": "unknown", "url": "not a url"
+          });
+        }
+      ''') as AnimeConcreteView;
+
+      expect(view.rating, 10);
+      expect(view.year, isNull);
+      expect(view.url, isNull);
     });
   });
 }

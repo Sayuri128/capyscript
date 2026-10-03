@@ -12,6 +12,7 @@ import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/chapters_group/chapters_group.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_status.dart';
+import 'package:capyscript/modules/waka_models/concrete_metadata.dart';
 
 class MangaBuildConcreteNode extends ModuleFunctionBody {
   @override
@@ -25,7 +26,13 @@ class MangaBuildConcreteNode extends ModuleFunctionBody {
     final status =
         getVariable('status', environment, defaultValue: MangaStatus.UNDEFINED);
     final alternativeTitles = getVariable('alternativeTitles', environment);
+    final metadata = ConcreteMetadata.read(this, environment);
     return MangaConcreteView(
+        authors: metadata.authors,
+        artists: metadata.artists,
+        year: metadata.year,
+        rating: metadata.rating,
+        url: metadata.url,
         uid: uid,
         cover: cover,
         title: title,
@@ -53,6 +60,7 @@ class MangaBuildConcreteNode extends ModuleFunctionBody {
           ASTParameterNode("groups", paramType: "List"),
           ASTParameterNode("status", paramType: "any"),
           ASTParameterNode("alternativeTitles", paramType: "List"),
+          ...ConcreteMetadata.parameters(),
         ],
         returnType: "any",
         body: this);

@@ -196,7 +196,7 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   ),
   'buildConcrete': (
     detail: 'buildConcrete(params)',
-    doc: 'Build a concrete manga entry model.',
+    doc: 'Build a concrete entry: uid, cover, title, description, tags, groups, status, alternativeTitles; optional authors, artists, year, rating (0-10), url.',
   ),
   'buildChapter': (
     detail: 'buildChapter(params)',

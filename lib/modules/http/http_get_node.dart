@@ -55,7 +55,9 @@ class HttpGetNode extends ModuleFunctionBody {
           headers: response.headers);
     } else {
       _logger.d("httpGet: $url\nheaders: $headers");
-      final response = await http.get(uri, headers: headers);
+      final response = await http
+          .get(uri, headers: headers)
+          .timeout(HttpUtils.requestTimeout);
 
       return CapyHttpResponse(
           statusCode: response.statusCode,

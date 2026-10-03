@@ -4,6 +4,10 @@
  */
 
 class HttpUtils {
+  static const Duration requestTimeout = Duration(seconds: 60);
+
+  static String _encode(dynamic value) => Uri.encodeComponent(value.toString());
+
   static Future<String> buildUri(String input,
       {required Map<String, dynamic> params,
       required Map<String, dynamic> paths}) async {
@@ -20,13 +24,13 @@ class HttpUtils {
           continue;
         }
         url = '$url${url.endsWith('?') ? '' : '&'}'
-            '${values.map((e) => '${element.key}[]=$e').join('&')}';
+            '${values.map((e) => '${element.key}[]=${_encode(e)}').join('&')}';
       } else if (element.value is Map) {
         url = '$url${url.endsWith('?') ? '' : '&'}'
-            '${(await Future.wait((element.value as Map).entries.map((e) async => '${element.key}[${e.key}]=${e.value}'))).join('&')}';
+            '${(element.value as Map).entries.map((e) => '${element.key}[${e.key}]=${_encode(e.value)}').join('&')}';
       } else {
         url =
-            '$url${url.endsWith('?') ? '' : '&'}${element.key}=${element.value}';
+            '$url${url.endsWith('?') ? '' : '&'}${element.key}=${_encode(element.value)}';
       }
     }
 

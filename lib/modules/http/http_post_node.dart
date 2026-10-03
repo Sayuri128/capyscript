@@ -51,7 +51,9 @@ class HttpPostNode extends ModuleFunctionBody {
           headers: response.headers);
     } else {
       _logger.d("httpPost: $url\nheaders: $headers");
-      final response = await http.post(uri, headers: headers, body: body);
+      final response = await http
+          .post(uri, headers: headers, body: body)
+          .timeout(HttpUtils.requestTimeout);
 
       return CapyHttpResponse(
           statusCode: response.statusCode,

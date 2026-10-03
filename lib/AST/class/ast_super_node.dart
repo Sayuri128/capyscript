@@ -22,7 +22,7 @@ class ASTSuperNode extends ASTNode {
     }
 
     final resolvedArgs =
-        await Future.wait(arguments.map((a) => a.execute(environment)));
+        [for (final a in arguments) await a.execute(environment)];
 
     final targetMethod = methodName ?? 'constructor';
     return await instance.callMethodOnClass(

@@ -1,3 +1,4 @@
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:test/test.dart';
 import 'helpers.dart';
 
@@ -62,7 +63,8 @@ void main() {
             return group.elements.length;
           }
         '''),
-        throwsA(isA<TypeError>()),
+        throwsA(isA<CapyScriptRuntimeError>()
+            .having((e) => e.cause, 'cause', isA<TypeError>())),
       );
     });
   });

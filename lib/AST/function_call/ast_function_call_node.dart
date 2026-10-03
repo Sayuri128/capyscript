@@ -9,6 +9,7 @@ import 'package:capyscript/AST/lambda/ast_closure.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
 import 'package:capyscript/AST/variable_node/ast_variable_node.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/type_checker.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -51,8 +52,10 @@ class ASTFunctionCallNode extends ASTNode {
     }
 
     if (closure != null) {
-      final args = await Future.wait(
-          arguments.map((a) async => await a.execute(environment)));
+      final args = [];
+      for (final argument in arguments) {
+        args.add(await argument.execute(environment));
+      }
       return await closure.call(environment, args);
     }
 
@@ -62,64 +65,71 @@ class ASTFunctionCallNode extends ASTNode {
     }
     final ASTFunctionDeclarationNode functionDec = resolved;
 
-    environment.enterScope();
+    final boundArguments = await _resolveArguments(functionDec, environment);
+    final callEnvironment = environment.functionEnvironment();
 
     try {
       for (int i = 0; i < functionDec.parameters.length; i++) {
-        final arg = arguments[0];
         final param = functionDec.parameters[i];
         final paramName = param.paramName;
-        bool foundInMap = false;
-        if (arg is ASTMapNode) {
-          for (int j = 0; j < arg.keys.length; j++) {
-            final key = arg.keys[j];
-            final keyValue = key is ASTVariableNode
-                ? await key.executeOrName(environment)
-                : await key.execute(environment);
-            if (keyValue == paramName) {
-              environment.setVariable(
-                  paramName, await arg.values[j].execute(environment));
-              foundInMap = true;
-              break;
-            }
-          }
-        }
-        if (!foundInMap) {
-          try {
-            environment.setVariable(functionDec.parameters[i].paramName,
-                await arguments[i].execute(environment));
-          } catch (e) {
-            if (param.isOptional && param.defaultValue != null) {
-              environment.setVariable(functionDec.parameters[i].paramName,
-                  await param.defaultValue!.execute(environment));
-              continue;
-            }
-            throw Exception(
-                "argument ${i + 1} is not defined - ${arguments.toString()} ${paramName} \n in function ${functionDec.functionName}");
-          }
+        if (boundArguments.containsKey(paramName)) {
+          callEnvironment.defineVariable(paramName, boundArguments[paramName]);
+        } else if (param.isOptional && param.defaultValue != null) {
+          callEnvironment.defineVariable(
+              paramName, await param.defaultValue!.execute(callEnvironment));
+        } else {
+          throw Exception(
+              "argument ${i + 1} ($paramName) is not defined in function ${functionDec.functionName}");
         }
         if (param.paramType != null) {
-          TypeChecker.check(
-              param.paramType!, environment.getVariable(paramName), environment);
+          TypeChecker.check(param.paramType!,
+              callEnvironment.getVariable(paramName), callEnvironment);
         }
       }
 
       late final dynamic res;
 
       try {
-        res = await functionDec.execute(environment);
+        res = await functionDec.execute(callEnvironment);
       } on ASTReturnValue catch (r) {
-        res = await r.execute(environment);
+        res = await r.execute(callEnvironment);
       }
 
       if (functionDec.returnType != null && functionDec.returnType != 'void') {
-        TypeChecker.check(functionDec.returnType!, res, environment);
+        TypeChecker.check(functionDec.returnType!, res, callEnvironment);
       }
 
       return res;
-    } finally {
-      environment.exitScope();
+    } catch (e, st) {
+      CapyScriptRuntimeError.rethrowWithFrame(e, st, functionDec.functionName);
     }
+  }
+
+  Future<Map<String, dynamic>> _resolveArguments(
+      ASTFunctionDeclarationNode functionDec,
+      InterpreterEnvironment environment) async {
+    final first = arguments.isEmpty ? null : arguments.first;
+    final namedKeys = <dynamic>[];
+    if (first is ASTMapNode) {
+      for (final key in first.keys) {
+        namedKeys.add(key is ASTVariableNode
+            ? await key.executeOrName(environment)
+            : await key.execute(environment));
+      }
+    }
+
+    final bound = <String, dynamic>{};
+    for (int i = 0; i < functionDec.parameters.length; i++) {
+      final paramName = functionDec.parameters[i].paramName;
+      final namedIndex = namedKeys.indexOf(paramName);
+      if (namedIndex != -1) {
+        bound[paramName] =
+            await (first as ASTMapNode).values[namedIndex].execute(environment);
+      } else if (i < arguments.length) {
+        bound[paramName] = await arguments[i].execute(environment);
+      }
+    }
+    return bound;
   }
 
   ASTClosure? _tryResolveClosure(

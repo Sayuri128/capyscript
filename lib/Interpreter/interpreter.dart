@@ -101,7 +101,7 @@ class Interpreter {
     }
     _importModule(tree);
     _registerClassesAndInterfaces();
-    return InterpreterTree(astTree: tree, parsedModules: modules);
+    return _interpreterTree = InterpreterTree(astTree: tree, parsedModules: modules);
   }
 
   void _importModule(ASTTree result) {

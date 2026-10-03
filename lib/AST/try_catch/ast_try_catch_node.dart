@@ -2,6 +2,7 @@ import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/for_loop/ast_break_node.dart';
 import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
 import 'package:capyscript/AST/throw/capyscript_error.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
@@ -40,7 +41,7 @@ class ASTTryCatchNode extends ASTNode {
     } catch (error) {
       if (catchBlock != null) {
         if (catchVariable != null) {
-          environment.setVariable(catchVariable!, _toScriptError(error));
+          environment.defineVariable(catchVariable!, _toScriptError(error));
         }
         await catchBlock!.execute(environment);
       }
@@ -53,6 +54,9 @@ class ASTTryCatchNode extends ASTNode {
   }
 
   dynamic _toScriptError(Object error) {
+    if (error is CapyScriptRuntimeError) {
+      return _toScriptError(error.cause);
+    }
     if (error is CapyScriptError) {
       return error.value;
     }

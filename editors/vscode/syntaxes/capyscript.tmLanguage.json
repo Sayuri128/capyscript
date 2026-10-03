@@ -99,7 +99,7 @@
       "patterns": [
         {
           "name": "keyword.control.capyscript",
-          "match": "\\b(if|else|for|return|break|continue|extends|implements)\\b"
+          "match": "\\b(if|else|for|while|in|return|break|continue|try|catch|finally|throw|extends|implements)\\b"
         },
         {
           "name": "keyword.control.import.capyscript",
@@ -133,7 +133,7 @@
     },
     "operators": {
       "name": "keyword.operator.capyscript",
-      "match": "(\\+\\+|--|==|!=|<=|>=|&&|\\|\\||[+\\-*/<>=])"
+      "match": "(\\+\\+|--|\\+=|-=|\\*=|/=|==|!=|<=|>=|&&|\\|\\||[+\\-*/<>=!])"
     }
   }
 }

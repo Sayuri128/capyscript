@@ -35,6 +35,7 @@ class ASTForLoopNode extends ASTNode {
   Future execute(InterpreterEnvironment environment) async {
     await initialization.execute(environment);
     for (; await condition.execute(environment);) {
+      environment.budget.countLoopIteration();
       try {
         await body.execute(environment);
       } on ASTContinueNode catch (_) {

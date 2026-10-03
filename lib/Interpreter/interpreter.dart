@@ -11,6 +11,7 @@ import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/Interpreter/execution_budget.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
@@ -22,11 +23,13 @@ class Interpreter {
   late final Parser parser;
 
   final File? mainFile;
+  final ExecutionBudget budget;
 
   late final InterpreterEnvironment _environment;
   final Set<String> _loadedFilePaths = {};
 
-  Interpreter({required String data, this.mainFile}) {
+  Interpreter({required String data, this.mainFile, ExecutionBudget? budget})
+      : budget = budget ?? ExecutionBudget() {
     _environment = InterpreterEnvironment(functions: {});
     this.parser = Parser(source: data);
   }
@@ -69,7 +72,7 @@ class Interpreter {
         function: ASTStringNode(value: functionName),
         arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
 
-    return await functionCall.execute(_environment);
+    return await functionCall.execute(_environment.withBudget(budget.fresh()));
   }
 
   Future<dynamic> interpret() async {
@@ -84,7 +87,7 @@ class Interpreter {
 
     final mainCall = ASTFunctionCallNode(
         function: ASTStringNode(value: 'main'), arguments: []);
-    return await mainCall.execute(_environment);
+    return await mainCall.execute(_environment.withBudget(budget.fresh()));
   }
 
   InterpreterTree _runParser() {

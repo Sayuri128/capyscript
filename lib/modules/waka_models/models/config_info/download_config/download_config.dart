@@ -11,9 +11,13 @@ class DownloadConfig {
 
   final int pageDelayMs;
   final int chapterDelayMs;
+  final int? segmentConcurrency;
+  final int episodeDelayMs;
 
   const DownloadConfig({
     this.pageDelayMs = 0,
     this.chapterDelayMs = 0,
+    this.segmentConcurrency,
+    this.episodeDelayMs = 0,
   });
 }

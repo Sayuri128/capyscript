@@ -11,6 +11,9 @@ import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
+import 'package:capyscript/api_clients/host/extension_host.dart';
+import 'package:capyscript/api_clients/source_error.dart';
 import 'package:capyscript/Interpreter/execution_budget.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
@@ -24,21 +27,27 @@ class Interpreter {
 
   final File? mainFile;
   final ExecutionBudget budget;
+  final ExtensionHost host;
 
   late final InterpreterEnvironment _environment;
   final Set<String> _loadedFilePaths = {};
 
-  Interpreter({required String data, this.mainFile, ExecutionBudget? budget})
+  Interpreter(
+      {required String data,
+      this.mainFile,
+      ExecutionBudget? budget,
+      this.host = ExtensionHost.none})
       : budget = budget ?? ExecutionBudget() {
     _environment = InterpreterEnvironment(functions: {});
     this.parser = Parser(source: data);
   }
 
-  factory Interpreter.fromFile({required String path}) {
+  factory Interpreter.fromFile(
+      {required String path, ExtensionHost host = ExtensionHost.none}) {
     final file = File(path);
     final String input = file.readAsStringSync();
 
-    return Interpreter(data: input, mainFile: file);
+    return Interpreter(data: input, mainFile: file, host: host);
   }
 
   InterpreterTree? _interpreterTree;
@@ -54,7 +63,7 @@ class Interpreter {
     if (factory == null) {
       return null;
     }
-    return _builtinModules[moduleName] = factory();
+    return _builtinModules[moduleName] = factory(host);
   }
 
   Future<dynamic> runFunction(String functionName,
@@ -67,7 +76,16 @@ class Interpreter {
         function: ASTStringNode(value: functionName),
         arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
 
-    return await functionCall.execute(_environment.withBudget(budget.fresh()));
+    try {
+      return await functionCall
+          .execute(_environment.withBudget(budget.fresh()));
+    } on CapyScriptRuntimeError catch (error, stackTrace) {
+      final cause = error.cause;
+      if (cause is SourceError) {
+        Error.throwWithStackTrace(cause, stackTrace);
+      }
+      rethrow;
+    }
   }
 
   bool hasFunction(String functionName) {

@@ -1,4 +1,5 @@
 import 'package:capyscript/modules/abstract/external_object.dart';
+import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_skip_marker.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video_subtitle.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -16,6 +17,11 @@ class AnimeVideoSource extends ExternalObject {
   final String? format;
   final Map<String, String> headers;
   final List<AnimeVideoSubtitle> subtitles;
+  @AnimeSkipMarkersJsonConverter()
+  final List<AnimeSkipMarker> skip;
+  final String? audioLabel;
+  @JsonKey(defaultValue: false)
+  final bool preferForDownload;
 
   const AnimeVideoSource({
     required this.url,
@@ -23,6 +29,9 @@ class AnimeVideoSource extends ExternalObject {
     this.format,
     this.headers = const <String, String>{},
     this.subtitles = const <AnimeVideoSubtitle>[],
+    this.skip = const <AnimeSkipMarker>[],
+    this.audioLabel,
+    this.preferForDownload = false,
   });
 
   @override
@@ -40,6 +49,12 @@ class AnimeVideoSource extends ExternalObject {
       return headers;
     } else if (name == 'subtitles') {
       return subtitles;
+    } else if (name == 'skip') {
+      return skip;
+    } else if (name == 'audioLabel') {
+      return audioLabel;
+    } else if (name == 'preferForDownload') {
+      return preferForDownload;
     }
     return null;
   }
@@ -53,6 +68,9 @@ class AnimeVideoSource extends ExternalObject {
     String? format,
     Map<String, String>? headers,
     List<AnimeVideoSubtitle>? subtitles,
+    List<AnimeSkipMarker>? skip,
+    String? audioLabel,
+    bool? preferForDownload,
   }) {
     return AnimeVideoSource(
       url: url ?? this.url,
@@ -60,11 +78,14 @@ class AnimeVideoSource extends ExternalObject {
       format: format ?? this.format,
       headers: headers ?? this.headers,
       subtitles: subtitles ?? this.subtitles,
+      skip: skip ?? this.skip,
+      audioLabel: audioLabel ?? this.audioLabel,
+      preferForDownload: preferForDownload ?? this.preferForDownload,
     );
   }
 
   @override
   String toString() {
-    return 'AnimeVideoSource{url: $url, quality: $quality, format: $format, headers: $headers, subtitles: $subtitles}';
+    return 'AnimeVideoSource{url: $url, quality: $quality, format: $format, headers: $headers, subtitles: $subtitles, skip: $skip, audioLabel: $audioLabel, preferForDownload: $preferForDownload}';
   }
 }

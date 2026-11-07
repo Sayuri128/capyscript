@@ -27,6 +27,10 @@ class AnimeBuildVideoSourceNode extends ModuleFunctionBody {
       format: AnimeVideoSourceReader.readFormat(read("format")),
       headers: AnimeVideoSourceReader.readHeaders(read("headers")),
       subtitles: AnimeVideoSourceReader.readSubtitles(read("subtitles")),
+      skip: AnimeVideoSourceReader.readSkipMarkers(read("skip")),
+      audioLabel: AnimeVideoSourceReader.readText(read("audioLabel")),
+      preferForDownload:
+          AnimeVideoSourceReader.readFlag(read("preferForDownload")),
     );
   }
 
@@ -48,6 +52,14 @@ class AnimeBuildVideoSourceNode extends ModuleFunctionBody {
               paramType: "any",
               isOptional: true,
               defaultValue: const ASTArrayNode(expressions: [])),
+          ASTParameterNode("skip",
+              paramType: "any",
+              isOptional: true,
+              defaultValue: const ASTArrayNode(expressions: [])),
+          ASTParameterNode("audioLabel",
+              paramType: "any", isOptional: true, defaultValue: const ASTNullNode()),
+          ASTParameterNode("preferForDownload",
+              paramType: "any", isOptional: true, defaultValue: const ASTNullNode()),
         ],
         returnType: "any",
         body: this);

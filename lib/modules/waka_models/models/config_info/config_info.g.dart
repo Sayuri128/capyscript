@@ -27,6 +27,19 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
     const DownloadConfigJsonConverter().fromJson,
   ),
   searchAvailable: json['searchAvailable'] as bool,
+  apiVersion: (json['apiVersion'] as num?)?.toInt() ?? 1,
+  minAppVersion: json['minAppVersion'] as String?,
+  preferences: json['preferences'] == null
+      ? const <ExtensionPreference>[]
+      : const ExtensionPreferencesJsonConverter().fromJson(
+          json['preferences'] as List?,
+        ),
+  requestPolicy: json['requestPolicy'] == null
+      ? null
+      : RequestPolicy.fromJson(json['requestPolicy'] as Map<String, dynamic>),
+  feeds: json['feeds'] == null
+      ? const <GalleryFeed>[]
+      : const GalleryFeedsJsonConverter().fromJson(json['feeds'] as List?),
 );
 
 Map<String, dynamic> _$ConfigInfoToJson(
@@ -50,6 +63,13 @@ Map<String, dynamic> _$ConfigInfoToJson(
     const DownloadConfigJsonConverter().toJson,
   ),
   'searchAvailable': instance.searchAvailable,
+  'apiVersion': instance.apiVersion,
+  'minAppVersion': instance.minAppVersion,
+  'preferences': const ExtensionPreferencesJsonConverter().toJson(
+    instance.preferences,
+  ),
+  'requestPolicy': instance.requestPolicy?.toJson(),
+  'feeds': const GalleryFeedsJsonConverter().toJson(instance.feeds),
 };
 
 const _$ConfigInfoTypeEnumMap = {

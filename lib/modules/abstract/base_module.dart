@@ -4,6 +4,7 @@
  */
 
 import 'package:capyscript/AST/ast_tree.dart';
+import 'package:capyscript/api_clients/host/extension_host.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/converter/converter_module.dart';
@@ -61,16 +62,16 @@ class ModuleFunctionBody extends ASTNode {
   }
 }
 
-typedef ModuleFactory = BaseModule Function();
+typedef ModuleFactory = BaseModule Function(ExtensionHost host);
 
 final Map<String, ModuleFactory> moduleFactories = {
-  HttpModule.module_name: HttpModule.new,
-  IOModule.module_name: IOModule.new,
-  JsonModule.module_name: JsonModule.new,
-  ConverterModule.module_name: ConverterModule.new,
-  DateModule.module_name: DateModule.new,
-  HtmlModule.module_name: HtmlModule.new,
-  AnimeModelsModule.module_name: AnimeModelsModule.new,
-  MangaModelsModule.module_name: MangaModelsModule.new,
-  RegexModule.module_name: RegexModule.new,
+  HttpModule.module_name: (_) => HttpModule(),
+  IOModule.module_name: (_) => IOModule(),
+  JsonModule.module_name: (_) => JsonModule(),
+  ConverterModule.module_name: (_) => ConverterModule(),
+  DateModule.module_name: (_) => DateModule(),
+  HtmlModule.module_name: (_) => HtmlModule(),
+  AnimeModelsModule.module_name: (_) => AnimeModelsModule(),
+  MangaModelsModule.module_name: (_) => MangaModelsModule(),
+  RegexModule.module_name: (_) => RegexModule(),
 };

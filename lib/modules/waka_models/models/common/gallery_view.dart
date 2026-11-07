@@ -26,6 +26,8 @@ abstract class GalleryView extends ExternalObject {
     this.latestChapter,
   });
 
+  Map<String, dynamic> toJson();
+
   dynamic getMetadataField(String name) {
     switch (name) {
       case 'subtitle':

@@ -10,10 +10,14 @@ DownloadConfig _$DownloadConfigFromJson(Map<String, dynamic> json) =>
     DownloadConfig(
       pageDelayMs: (json['pageDelayMs'] as num?)?.toInt() ?? 0,
       chapterDelayMs: (json['chapterDelayMs'] as num?)?.toInt() ?? 0,
+      segmentConcurrency: (json['segmentConcurrency'] as num?)?.toInt(),
+      episodeDelayMs: (json['episodeDelayMs'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$DownloadConfigToJson(DownloadConfig instance) =>
     <String, dynamic>{
       'pageDelayMs': instance.pageDelayMs,
       'chapterDelayMs': instance.chapterDelayMs,
+      'segmentConcurrency': instance.segmentConcurrency,
+      'episodeDelayMs': instance.episodeDelayMs,
     };

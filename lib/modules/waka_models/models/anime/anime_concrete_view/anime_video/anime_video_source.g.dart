@@ -6,24 +6,28 @@ part of 'anime_video_source.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-AnimeVideoSource _$AnimeVideoSourceFromJson(Map<String, dynamic> json) =>
-    AnimeVideoSource(
-      url: json['url'] as String,
-      quality: json['quality'] as String?,
-      format: json['format'] as String?,
-      headers:
-          (json['headers'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, e as String),
-          ) ??
-          const <String, String>{},
-      subtitles:
-          (json['subtitles'] as List<dynamic>?)
-              ?.map(
-                (e) => AnimeVideoSubtitle.fromJson(e as Map<String, dynamic>),
-              )
-              .toList() ??
-          const <AnimeVideoSubtitle>[],
-    );
+AnimeVideoSource _$AnimeVideoSourceFromJson(
+  Map<String, dynamic> json,
+) => AnimeVideoSource(
+  url: json['url'] as String,
+  quality: json['quality'] as String?,
+  format: json['format'] as String?,
+  headers:
+      (json['headers'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ) ??
+      const <String, String>{},
+  subtitles:
+      (json['subtitles'] as List<dynamic>?)
+          ?.map((e) => AnimeVideoSubtitle.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <AnimeVideoSubtitle>[],
+  skip: json['skip'] == null
+      ? const <AnimeSkipMarker>[]
+      : const AnimeSkipMarkersJsonConverter().fromJson(json['skip'] as List?),
+  audioLabel: json['audioLabel'] as String?,
+  preferForDownload: json['preferForDownload'] as bool? ?? false,
+);
 
 Map<String, dynamic> _$AnimeVideoSourceToJson(AnimeVideoSource instance) =>
     <String, dynamic>{
@@ -32,4 +36,7 @@ Map<String, dynamic> _$AnimeVideoSourceToJson(AnimeVideoSource instance) =>
       'format': instance.format,
       'headers': instance.headers,
       'subtitles': instance.subtitles.map((e) => e.toJson()).toList(),
+      'skip': const AnimeSkipMarkersJsonConverter().toJson(instance.skip),
+      'audioLabel': instance.audioLabel,
+      'preferForDownload': instance.preferForDownload,
     };

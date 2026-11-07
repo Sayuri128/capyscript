@@ -9,7 +9,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
 import 'download_config/download_config.dart';
+import 'gallery_feed/gallery_feed.dart';
+import 'preferences/extension_preference.dart';
 import 'protector_config/protector_config.dart';
+import 'request_policy/request_policy.dart';
 
 part 'config_info.g.dart';
 
@@ -39,7 +42,7 @@ ConfigInfoType deserializeLocalApiClientType(int type) {
   throw Exception("Unknown LocalApiClientType $type");
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ConfigInfo extends ExternalObject {
   factory ConfigInfo.fromJson(Map<String, dynamic> json) =>
       _$ConfigInfoFromJson(json);
@@ -65,6 +68,19 @@ class ConfigInfo extends ExternalObject {
 
   final bool searchAvailable;
 
+  @JsonKey(defaultValue: 1)
+  final int apiVersion;
+
+  final String? minAppVersion;
+
+  @ExtensionPreferencesJsonConverter()
+  final List<ExtensionPreference> preferences;
+
+  final RequestPolicy? requestPolicy;
+
+  @GalleryFeedsJsonConverter()
+  final List<GalleryFeed> feeds;
+
   @override
   getField(String name) {
     if (name == 'name') {
@@ -85,6 +101,10 @@ class ConfigInfo extends ExternalObject {
       return searchAvailable;
     } else if (name == 'uid') {
       return uid;
+    } else if (name == 'apiVersion') {
+      return apiVersion;
+    } else if (name == 'minAppVersion') {
+      return minAppVersion;
     }
   }
 
@@ -107,7 +127,12 @@ class ConfigInfo extends ExternalObject {
       required this.type,
       this.protectorConfig,
       this.downloadConfig,
-      required this.searchAvailable});
+      required this.searchAvailable,
+      this.apiVersion = 1,
+      this.minAppVersion,
+      this.preferences = const <ExtensionPreference>[],
+      this.requestPolicy,
+      this.feeds = const <GalleryFeed>[]});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

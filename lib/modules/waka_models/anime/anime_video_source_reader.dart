@@ -1,3 +1,4 @@
+import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_skip_marker.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video_source.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video_subtitle.dart';
 
@@ -33,7 +34,61 @@ class AnimeVideoSourceReader {
       format: readFormat(value['format']),
       headers: readHeaders(value['headers']),
       subtitles: readSubtitles(value['subtitles']),
+      skip: readSkipMarkers(value['skip']),
+      audioLabel: readText(value['audioLabel']),
+      preferForDownload: readFlag(value['preferForDownload']),
     );
+  }
+
+  static List<AnimeSkipMarker> readSkipMarkers(dynamic value) {
+    if (value == null) {
+      return const <AnimeSkipMarker>[];
+    }
+    if (value is AnimeSkipMarker || value is Map) {
+      final marker = readSkipMarker(value);
+      return marker == null ? const <AnimeSkipMarker>[] : [marker];
+    }
+    if (value is! Iterable) {
+      return const <AnimeSkipMarker>[];
+    }
+    final markers = <AnimeSkipMarker>[];
+    for (final item in value) {
+      final marker = readSkipMarker(item);
+      if (marker != null) {
+        markers.add(marker);
+      }
+    }
+    return markers;
+  }
+
+  static AnimeSkipMarker? readSkipMarker(dynamic value) {
+    if (value is AnimeSkipMarker) {
+      return value;
+    }
+    if (value is! Map) {
+      return null;
+    }
+    final type = animeSkipTypeNames[readText(value['type'])?.toLowerCase()];
+    final start = readSeconds(value['start']);
+    final end = readSeconds(value['end']);
+    if (type == null || start == null || end == null || end <= start) {
+      return null;
+    }
+    return AnimeSkipMarker(type: type, start: start, end: end);
+  }
+
+  static double? readSeconds(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+    if (value is String) {
+      return double.tryParse(value.trim());
+    }
+    return null;
+  }
+
+  static bool readFlag(dynamic value) {
+    return value == true;
   }
 
   static List<AnimeVideoSubtitle> readSubtitles(dynamic value) {

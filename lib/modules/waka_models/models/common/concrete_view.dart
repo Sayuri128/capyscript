@@ -40,6 +40,8 @@ abstract class ConcreteView<
       this.rating,
       this.url});
 
+  Map<String, dynamic> toJson();
+
   dynamic getMetadataField(String name) {
     switch (name) {
       case 'authors':

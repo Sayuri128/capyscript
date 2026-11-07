@@ -4,6 +4,7 @@ import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
 import 'package:capyscript/AST/throw/capyscript_error.dart';
 import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
+import 'package:capyscript/api_clients/source_error.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../ast_node.dart';
 
@@ -56,6 +57,12 @@ class ASTTryCatchNode extends ASTNode {
   dynamic _toScriptError(Object error) {
     if (error is CapyScriptRuntimeError) {
       return _toScriptError(error.cause);
+    }
+    if (error is SourceError) {
+      if (error.message.isEmpty) {
+        return error.kind.name;
+      }
+      return error.message;
     }
     if (error is CapyScriptError) {
       return error.value;

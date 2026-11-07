@@ -14,6 +14,9 @@ import 'package:capyscript/modules/json/json_module.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_models_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_models_module.dart';
 import 'package:capyscript/modules/regex/regex_module.dart';
+import 'package:capyscript/modules/preferences/preferences_module.dart';
+import 'package:capyscript/modules/storage/storage_module.dart';
+import 'package:capyscript/modules/errors/errors_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -74,4 +77,7 @@ final Map<String, ModuleFactory> moduleFactories = {
   AnimeModelsModule.module_name: (_) => AnimeModelsModule(),
   MangaModelsModule.module_name: (_) => MangaModelsModule(),
   RegexModule.module_name: (_) => RegexModule(),
+  PreferencesModule.module_name: (host) => PreferencesModule(host),
+  StorageModule.module_name: (host) => StorageModule(host),
+  ErrorsModule.module_name: (_) => ErrorsModule(),
 };

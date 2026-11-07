@@ -15,7 +15,10 @@ class AnimeBuildVideoNode extends ModuleFunctionBody {
     final uid = getVariable("uid", environment);
     final title = getVariable("title", environment);
     final timestamp = getVariable("timestamp", environment, defaultValue: null);
-    final data = getVariable("data", environment);
+    final rawData = getVariable("data", environment);
+    final Map<String, dynamic> data = rawData is Map
+        ? rawData.map((key, value) => MapEntry(key.toString(), value))
+        : <String, dynamic>{};
     final type = getVariable("type", environment);
     final src = getVariable("src", environment);
     return AnimeVideo(

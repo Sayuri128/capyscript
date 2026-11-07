@@ -15,8 +15,11 @@ import 'package:capyscript/modules/waka_models/anime/anime_build_status_ongoing_
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_paused_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_release_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_status_undefined_node.dart';
+import 'package:capyscript/modules/waka_models/anime/anime_build_type_direct_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_type_iframe_node.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_build_video_node.dart';
+import 'package:capyscript/modules/waka_models/anime/anime_build_video_source_node.dart';
+import 'package:capyscript/modules/waka_models/anime/anime_build_video_subtitle_node.dart';
 
 class AnimeModelsModule extends BaseModule {
   static const String module_name = "anime_models";
@@ -28,6 +31,8 @@ class AnimeModelsModule extends BaseModule {
     functions.add(AnimeBuildConcreteNode().toDeclarationNode());
     functions.add(AnimeBuildEpisodeGroupNode().toDeclarationNode());
     functions.add(AnimeBuildVideoNode().toDeclarationNode());
+    functions.add(AnimeBuildVideoSourceNode().toDeclarationNode());
+    functions.add(AnimeBuildVideoSubtitleNode().toDeclarationNode());
 
     functions.add(AnimeBuildStatusAnnounceNode().toDeclarationNode());
     functions.add(AnimeBuildStatusCanceledNode().toDeclarationNode());
@@ -37,6 +42,7 @@ class AnimeModelsModule extends BaseModule {
     functions.add(AnimeBuildStatusUndefinedNode().toDeclarationNode());
 
     functions.add(AnimeBuildTypeIframeNode().toDeclarationNode());
+    functions.add(AnimeBuildTypeDirectNode().toDeclarationNode());
 
     body = ASTTree(functions: functions, modules: []);
   }

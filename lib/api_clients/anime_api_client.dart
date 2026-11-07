@@ -6,7 +6,10 @@
 import 'dart:convert';
 
 import 'package:capyscript/api_clients/api_client.dart';
+import 'package:capyscript/modules/waka_models/anime/anime_video_source_reader.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_concrete_view.dart';
+import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video.dart';
+import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video_source.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_gallery_view/anime_gallery_view.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/filters/data/filters/filter_data.dart';
 
@@ -19,6 +22,11 @@ class AnimeApiClient extends ApiClient {
   static const getConcreteFunctionName = 'getConcrete';
   static const getConcreteUidParameterName = 'uid';
   static const getConcreteDataParameterName = 'data';
+
+  static const getVideoSourcesFunctionName = 'getVideoSources';
+  static const getVideoSourcesUidParameterName = 'uid';
+  static const getVideoSourcesSrcParameterName = 'src';
+  static const getVideoSourcesDataParameterName = 'data';
 
   AnimeApiClient({required super.code});
 
@@ -40,5 +48,19 @@ class AnimeApiClient extends ApiClient {
       getConcreteUidParameterName: uid,
       getConcreteDataParameterName: data
     });
+  }
+
+  Future<bool> supportsVideoSources() async {
+    return interpreter.hasFunction(getVideoSourcesFunctionName);
+  }
+
+  Future<List<AnimeVideoSource>> getVideoSources(AnimeVideo video) async {
+    final result =
+        await interpreter.runFunction(getVideoSourcesFunctionName, arguments: {
+      getVideoSourcesUidParameterName: video.uid,
+      getVideoSourcesSrcParameterName: video.src,
+      getVideoSourcesDataParameterName: video.data,
+    });
+    return AnimeVideoSourceReader.readSources(result);
   }
 }

@@ -59,12 +59,7 @@ class Interpreter {
 
   Future<dynamic> runFunction(String functionName,
       {Map<String, dynamic>? arguments}) async {
-    InterpreterTree interpreterResult = _runParser();
-
-    try {
-      interpreterResult.astTree.functions
-          .firstWhere((element) => element.functionName == functionName);
-    } catch (e) {
+    if (!hasFunction(functionName)) {
       throw Exception("function $functionName not found");
     }
 
@@ -73,6 +68,13 @@ class Interpreter {
         arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
 
     return await functionCall.execute(_environment.withBudget(budget.fresh()));
+  }
+
+  bool hasFunction(String functionName) {
+    return _runParser()
+        .astTree
+        .functions
+        .any((element) => element.functionName == functionName);
   }
 
   Future<dynamic> interpret() async {

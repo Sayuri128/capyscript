@@ -25,4 +25,7 @@ Map<String, dynamic> _$AnimeVideoToJson(AnimeVideo instance) =>
       'timestamp': instance.timestamp,
     };
 
-const _$AnimeVideoTypeEnumMap = {AnimeVideoType.IFRAME: 'IFRAME'};
+const _$AnimeVideoTypeEnumMap = {
+  AnimeVideoType.IFRAME: 'IFRAME',
+  AnimeVideoType.DIRECT: 'DIRECT',
+};

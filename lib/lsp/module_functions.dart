@@ -45,6 +45,8 @@ const Map<String, List<String>> moduleFunctions = {
     'buildConcrete',
     'buildAnimeVideo',
     'buildAnimeVideoGroup',
+    'buildAnimeVideoSource',
+    'buildAnimeVideoSubtitle',
     'statusAnnounce',
     'statusCanceled',
     'statusOngoing',
@@ -52,5 +54,6 @@ const Map<String, List<String>> moduleFunctions = {
     'statusReleased',
     'statusUndefined',
     'typeIframe',
+    'typeDirect',
   ],
 };

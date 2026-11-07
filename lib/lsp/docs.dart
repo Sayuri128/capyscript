@@ -212,7 +212,15 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   ),
   'buildAnimeVideo': (
     detail: 'buildAnimeVideo(params)',
-    doc: 'Build a single anime video model.',
+    doc: 'Build a single anime video model: uid, title, timestamp, data, type (typeIframe() or typeDirect()), src.',
+  ),
+  'buildAnimeVideoSource': (
+    detail: 'buildAnimeVideoSource(params)',
+    doc: 'Build a playable stream for getVideoSources(uid, src, data): url; optional quality ("1080p", "Auto"), format ("hls", "mp4", "dash", null = auto), headers (map), subtitles (list of buildAnimeVideoSubtitle).',
+  ),
+  'buildAnimeVideoSubtitle': (
+    detail: 'buildAnimeVideoSubtitle(params)',
+    doc: 'Build a subtitle track for buildAnimeVideoSource: url; optional label, language, format ("vtt", "srt", null = auto), headers (map).',
   ),
   'buildAnimeVideoGroup': (
     detail: 'buildAnimeVideoGroup(params)',
@@ -225,6 +233,7 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   'statusReleased': (detail: 'statusReleased', doc: 'Status constant: released/completed.'),
   'statusUndefined': (detail: 'statusUndefined', doc: 'Status constant: unknown/undefined.'),
   'typeIframe': (detail: 'typeIframe', doc: 'Video type constant: iframe embed.'),
+  'typeDirect': (detail: 'typeDirect', doc: 'Video type constant: direct stream; the app resolves playable URLs at play time by calling the script function getVideoSources(uid, src, data), which returns a list of buildAnimeVideoSource.'),
 
   // String members
   'length': (detail: '.length → int', doc: 'The number of characters (string) or elements (array/map).'),

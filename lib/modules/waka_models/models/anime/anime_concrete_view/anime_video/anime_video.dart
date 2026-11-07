@@ -41,7 +41,7 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
     } else if (name == 'src') {
       return src;
     } else if (name == 'title') {
-      return timestamp;
+      return title;
     } else if (name == 'timestamp') {
       return timestamp;
     } else if (name == 'data') {

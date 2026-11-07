@@ -5,11 +5,13 @@ import 'package:capyscript/Interpreter/interpreter.dart';
 import 'package:capyscript/api_clients/host/extension_host.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_module.dart';
+import 'package:capyscript/modules/http/http_utils.dart';
 import 'package:capyscript/modules/http/policy/http_clock.dart';
 import 'package:capyscript/modules/http/policy/http_rate_limiter.dart';
 import 'package:capyscript/modules/http/policy/http_request_policy_enforcer.dart';
 import 'package:capyscript/modules/http/policy/http_request_state.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
+import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 const String _script = '''
@@ -191,6 +193,30 @@ Future<ServerSocket> _droppingServer() async {
   return socket;
 }
 
+class _SilentServer {
+  final ServerSocket socket;
+  final List<Socket> heldConnections = <Socket>[];
+
+  _SilentServer._(this.socket) {
+    socket.listen(heldConnections.add);
+  }
+
+  static Future<_SilentServer> start() async {
+    return _SilentServer._(
+      await ServerSocket.bind(InternetAddress.loopbackIPv4, 0),
+    );
+  }
+
+  String get base => 'http://127.0.0.1:${socket.port}';
+
+  Future<void> close() async {
+    for (final Socket connection in heldConnections) {
+      connection.destroy();
+    }
+    await socket.close();
+  }
+}
+
 Future<int> _closedPort() async {
   final ServerSocket socket = await ServerSocket.bind(
     InternetAddress.loopbackIPv4,
@@ -317,6 +343,168 @@ void main() {
 
       await _fetch(first, '${siteA.base}/three');
       expect(fakeClock.waits, <Duration>[const Duration(seconds: 10)]);
+    });
+
+    test(
+      'updates the limit of one owner in place and keeps its history',
+      () async {
+        final _FakeClock clock = _FakeClock();
+        final HttpRateLimiter limiter = HttpRateLimiter.shared(clock: clock);
+        final Object owner = Object();
+
+        limiter.declare(
+          owner,
+          const HttpRateLimit(maxRequests: 1, window: Duration(seconds: 10)),
+        );
+        await limiter.acquire();
+        limiter.declare(
+          owner,
+          const HttpRateLimit(maxRequests: 2, window: Duration(seconds: 10)),
+        );
+        await limiter.acquire();
+        expect(clock.waits, isEmpty);
+
+        await limiter.acquire();
+        expect(clock.waits, <Duration>[const Duration(seconds: 10)]);
+      },
+    );
+
+    test('enforces every live declared limit at once', () async {
+      final _FakeClock clock = _FakeClock();
+      final HttpRateLimiter limiter = HttpRateLimiter.shared(clock: clock);
+      final Object strictOwner = Object();
+      final Object burstyOwner = Object();
+      limiter.declare(
+        strictOwner,
+        const HttpRateLimit(maxRequests: 2, window: Duration(seconds: 10)),
+      );
+      limiter.declare(
+        burstyOwner,
+        const HttpRateLimit(maxRequests: 1, window: Duration(seconds: 1)),
+      );
+      final List<Duration> startTimes = <Duration>[];
+
+      await Future.wait(
+        List<Future<void>>.generate(4, (_) async {
+          await limiter.acquire();
+          startTimes.add(clock.now());
+        }),
+      );
+
+      expect(startTimes, <Duration>[
+        Duration.zero,
+        const Duration(seconds: 1),
+        const Duration(seconds: 10),
+        const Duration(seconds: 11),
+      ]);
+      expect(strictOwner, isNotNull);
+      expect(burstyOwner, isNotNull);
+    });
+
+    test(
+      'keeps one limiter per extension when cached configs disagree',
+      () async {
+        final String uid = _uniqueUid('disagree');
+        final Interpreter strict = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(
+            rateLimit: RateLimit(requests: 1, perSeconds: 10),
+          ),
+        );
+        final Interpreter loose = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(
+            rateLimit: RateLimit(requests: 5, perSeconds: 10),
+          ),
+        );
+
+        await _fetch(strict, '${siteA.base}/one');
+        await _fetch(loose, '${siteA.base}/two');
+        await _fetch(strict, '${siteA.base}/three');
+
+        expect(fakeClock.waits, <Duration>[
+          const Duration(seconds: 10),
+          const Duration(seconds: 10),
+        ]);
+        expect(siteA.hits, 3);
+      },
+    );
+
+    test(
+      'serializes concurrent waiters from clients with different limits',
+      () async {
+        final String uid = _uniqueUid('concurrent');
+        final Interpreter strict = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(
+            rateLimit: RateLimit(requests: 1, perSeconds: 10),
+          ),
+        );
+        final Interpreter loose = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(
+            rateLimit: RateLimit(requests: 4, perSeconds: 10),
+          ),
+        );
+        await _fetch(strict, '${siteA.base}/warmup');
+
+        await Future.wait(<Future<void>>[
+          _fetch(strict, '${siteA.base}/strict'),
+          _fetch(loose, '${siteA.base}/loose-one'),
+          _fetch(loose, '${siteA.base}/loose-two'),
+        ]);
+
+        expect(fakeClock.current, const Duration(seconds: 30));
+        expect(siteA.hits, 4);
+      },
+    );
+
+    test(
+      'a client without a rate limit shares the live limit of its extension',
+      () async {
+        final String uid = _uniqueUid('unlimited-sibling');
+        final Interpreter limited = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(
+            rateLimit: RateLimit(requests: 1, perSeconds: 10),
+          ),
+        );
+        final Interpreter unlimited = _interpreter(
+          uid: uid,
+          policy: const RequestPolicy(userAgent: 'agent'),
+        );
+
+        await _fetch(limited, '${siteA.base}/one');
+        await _fetch(unlimited, '${siteA.base}/two');
+
+        expect(fakeClock.waits, <Duration>[const Duration(seconds: 10)]);
+        expect(await limited.runFunction('mirror'), isNull);
+      },
+    );
+
+    test('one state hands out the same limiter to every owner', () {
+      final HttpExtensionRequestState state = HttpExtensionRequestState();
+      final HttpRateLimiter? first = state.rateLimiterFor(
+        owner: Object(),
+        rateLimit: const RateLimit(requests: 1, perSeconds: 1),
+        clock: fakeClock,
+      );
+      final HttpRateLimiter? second = state.rateLimiterFor(
+        owner: Object(),
+        rateLimit: const RateLimit(requests: 3, perSeconds: 2),
+        clock: fakeClock,
+      );
+
+      expect(first, isNotNull);
+      expect(second, same(first));
+      expect(
+        HttpExtensionRequestState().rateLimiterFor(
+          owner: Object(),
+          rateLimit: null,
+          clock: fakeClock,
+        ),
+        isNull,
+      );
     });
 
     test('counts every failover attempt', () async {
@@ -622,6 +810,7 @@ void main() {
       siteA.statusCode = 503;
       await _fetch(_interpreter(uid: uid, policy: policy), '${siteA.base}/');
       siteA.statusCode = 200;
+      fakeClock.current += HttpRequestStateRegistry.mirrorFailureCooldown;
 
       final Interpreter selecting = _interpreter(
         uid: uid,
@@ -634,6 +823,124 @@ void main() {
       );
 
       expect(result['body']['site'], 'a');
+    });
+
+    test('demote a failing selected mirror until its cooldown ends', () async {
+      final String uid = _uniqueUid('cooldown');
+      final RequestPolicy policy = RequestPolicy(
+        mirrors: <String>[siteA.base, siteB.base],
+      );
+      final Interpreter selecting = _interpreter(
+        uid: uid,
+        policy: policy,
+        preferences: <String, Object?>{'__mirror': siteA.base},
+      );
+      siteA.statusCode = 503;
+
+      expect((await _fetch(selecting, '${siteA.base}/1'))['body']['site'], 'b');
+      siteA.statusCode = 200;
+      expect((await _fetch(selecting, '${siteA.base}/2'))['body']['site'], 'b');
+      expect(await selecting.runFunction('mirror'), siteB.base);
+      expect(siteA.hits, 1);
+
+      final Interpreter sibling = _interpreter(
+        uid: uid,
+        policy: policy,
+        preferences: <String, Object?>{'__mirror': siteA.base},
+      );
+      expect((await _fetch(sibling, '${siteA.base}/3'))['body']['site'], 'b');
+      expect(siteA.hits, 1);
+
+      fakeClock.current += HttpRequestStateRegistry.mirrorFailureCooldown;
+      expect((await _fetch(selecting, '${siteA.base}/4'))['body']['site'], 'a');
+      expect(siteA.hits, 2);
+    });
+
+    test('give up on a silent mirror after the failover timeout', () async {
+      final _SilentServer silent = await _SilentServer.start();
+      addTearDown(silent.close);
+      HttpRequestStateRegistry.failoverAttemptTimeout = const Duration(
+        milliseconds: 300,
+      );
+      final Interpreter interpreter = _interpreter(
+        uid: _uniqueUid('silent'),
+        policy: RequestPolicy(mirrors: <String>[silent.base, siteB.base]),
+        preferences: <String, Object?>{'__mirror': silent.base},
+      );
+      final Stopwatch stopwatch = Stopwatch()..start();
+
+      final Map<String, dynamic> first = await _fetch(
+        interpreter,
+        '${silent.base}/one',
+      );
+      final Map<String, dynamic> second = await _fetch(
+        interpreter,
+        '${silent.base}/two',
+      );
+
+      expect(first['body']['site'], 'b');
+      expect(second['body']['site'], 'b');
+      expect(silent.heldConnections, hasLength(1));
+      expect(stopwatch.elapsed, lessThan(const Duration(seconds: 10)));
+    });
+
+    test('shorten only attempts that have a fallback', () async {
+      final HttpRequestPolicyEnforcer enforcer = HttpRequestPolicyEnforcer(
+        host: const ExtensionHost(
+          requestPolicy: RequestPolicy(
+            mirrors: <String>[
+              'https://a.example',
+              'https://b.example',
+              'https://c.example',
+            ],
+          ),
+        ),
+        state: HttpExtensionRequestState(),
+      );
+      final List<Duration> timeouts = <Duration>[];
+
+      await expectLater(
+        enforcer.send('https://a.example/x', (Uri uri, Duration timeout) {
+          timeouts.add(timeout);
+          throw const SocketException('unreachable');
+        }),
+        throwsA(isA<SocketException>()),
+      );
+      await enforcer.send('https://elsewhere.example/x', (
+        Uri uri,
+        Duration timeout,
+      ) async {
+        timeouts.add(timeout);
+        return http.Response('', 200);
+      });
+
+      expect(timeouts, <Duration>[
+        HttpRequestStateRegistry.defaultFailoverAttemptTimeout,
+        HttpRequestStateRegistry.defaultFailoverAttemptTimeout,
+        HttpUtils.requestTimeout,
+        HttpUtils.requestTimeout,
+      ]);
+    });
+
+    test('do not remember a mirror that answered with a 4xx', () async {
+      final String uid = _uniqueUid('blocked');
+      final RequestPolicy policy = RequestPolicy(
+        mirrors: <String>[siteA.base, siteB.base],
+      );
+      siteA.statusCode = 503;
+      siteB.statusCode = 403;
+      final Map<String, dynamic> blocked = await _fetch(
+        _interpreter(uid: uid, policy: policy),
+        '${siteA.base}/guarded',
+      );
+      expect(blocked['status'], 403);
+
+      siteA.statusCode = 200;
+      fakeClock.current += HttpRequestStateRegistry.mirrorFailureCooldown;
+      final Interpreter next = _interpreter(uid: uid, policy: policy);
+
+      expect(await next.runFunction('mirror'), siteA.base);
+      expect((await _fetch(next, '${siteB.base}/page'))['body']['site'], 'a');
     });
 
     test(

@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:capyscript/api_clients/host/extension_host.dart';
+import 'package:capyscript/modules/http/http_utils.dart';
 import 'package:capyscript/modules/http/policy/http_request_state.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
 import 'package:http/http.dart' as http;
 
-typedef HttpAttempt = Future<http.Response> Function(Uri uri);
+typedef HttpAttempt =
+    Future<http.Response> Function(Uri uri, Duration firstResponseTimeout);
 
 class HttpRequestPolicyEnforcer {
   static const String userAgentHeader = 'User-Agent';
@@ -81,7 +83,11 @@ class HttpRequestPolicyEnforcer {
 
   Future<void> acquireSlot() async {
     await state
-        .rateLimiterFor(policy?.rateLimit, HttpRequestStateRegistry.clock)
+        .rateLimiterFor(
+          owner: this,
+          rateLimit: policy?.rateLimit,
+          clock: HttpRequestStateRegistry.clock,
+        )
         ?.acquire();
   }
 
@@ -106,7 +112,21 @@ class HttpRequestPolicyEnforcer {
         ordered.add(mirror);
       }
     }
-    return ordered;
+    return _healthyFirst(ordered);
+  }
+
+  List<String> _healthyFirst(List<String> preferenceOrder) {
+    final Duration currentTime = HttpRequestStateRegistry.clock.now();
+    final List<String> healthy = <String>[];
+    final List<String> coolingDown = <String>[];
+    for (final String mirror in preferenceOrder) {
+      if (state.isMirrorCoolingDown(mirror, currentTime)) {
+        coolingDown.add(mirror);
+      } else {
+        healthy.add(mirror);
+      }
+    }
+    return <String>[...healthy, ...coolingDown];
   }
 
   Future<String?> currentMirror() async {
@@ -171,7 +191,7 @@ class HttpRequestPolicyEnforcer {
     final String? matchedMirror = matchingMirror(url);
     if (matchedMirror == null) {
       await acquireSlot();
-      return await attempt(Uri.parse(url));
+      return await attempt(Uri.parse(url), HttpUtils.requestTimeout);
     }
     final String pathAfterMirror = url.substring(matchedMirror.length);
     final List<String> candidates = await orderedMirrors();
@@ -179,25 +199,59 @@ class HttpRequestPolicyEnforcer {
       final String mirror = candidates[index];
       final bool hasNextCandidate = index < candidates.length - 1;
       await acquireSlot();
+      final http.Response response;
       try {
-        final http.Response response = await attempt(
+        response = await attempt(
           Uri.parse('$mirror$pathAfterMirror'),
+          _firstResponseTimeout(hasNextCandidate: hasNextCandidate),
         );
-        if (isServerError(response.statusCode)) {
-          if (hasNextCandidate) {
-            continue;
-          }
-          return response;
-        }
-        state.lastWorkingMirror = mirror;
-        return response;
       } catch (error) {
-        if (!hasNextCandidate || !isConnectionError(error)) {
+        if (!isConnectionError(error)) {
           rethrow;
         }
+        _markMirrorFailed(mirror);
+        if (!hasNextCandidate) {
+          rethrow;
+        }
+        continue;
       }
+      if (isServerError(response.statusCode)) {
+        _markMirrorFailed(mirror);
+        if (hasNextCandidate) {
+          continue;
+        }
+        return response;
+      }
+      if (isSuccessful(response.statusCode)) {
+        state.markMirrorWorking(mirror);
+      }
+      return response;
     }
     throw StateError('no mirror candidates for $url');
+  }
+
+  static Duration _firstResponseTimeout({required bool hasNextCandidate}) {
+    if (!hasNextCandidate) {
+      return HttpUtils.requestTimeout;
+    }
+    final Duration failoverTimeout =
+        HttpRequestStateRegistry.failoverAttemptTimeout;
+    if (failoverTimeout < HttpUtils.requestTimeout) {
+      return failoverTimeout;
+    }
+    return HttpUtils.requestTimeout;
+  }
+
+  void _markMirrorFailed(String mirror) {
+    state.markMirrorFailed(
+      mirror,
+      HttpRequestStateRegistry.clock.now(),
+      HttpRequestStateRegistry.mirrorFailureCooldown,
+    );
+  }
+
+  static bool isSuccessful(int statusCode) {
+    return statusCode >= 200 && statusCode < 400;
   }
 
   static bool isServerError(int statusCode) {

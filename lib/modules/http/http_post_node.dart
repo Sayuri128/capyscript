@@ -9,7 +9,6 @@ import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_response.dart';
 import 'package:capyscript/modules/http/http_utils.dart';
 import 'package:capyscript/modules/http/policy/http_request_policy_enforcer.dart';
-import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class HttpPostNode extends ModuleFunctionBody {
@@ -57,11 +56,13 @@ class HttpPostNode extends ModuleFunctionBody {
           contentLength: response.body.length,
           headers: response.headers);
     } else {
-      final response = await policyEnforcer.send(url, (Uri attemptUri) {
+      final response = await policyEnforcer.send(url,
+          (Uri attemptUri, Duration firstResponseTimeout) {
         _logger.d("httpPost: $attemptUri\nheaders: $headers");
-        return http
-            .post(attemptUri, headers: headers, body: body)
-            .timeout(HttpUtils.requestTimeout);
+        return HttpUtils.sendRequest("POST", attemptUri,
+            headers: headers,
+            body: body,
+            firstResponseTimeout: firstResponseTimeout);
       });
 
       return CapyHttpResponse(

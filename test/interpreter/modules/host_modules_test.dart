@@ -4,6 +4,7 @@ import 'package:capyscript/api_clients/anime_api_client.dart';
 import 'package:capyscript/api_clients/host/extension_host.dart';
 import 'package:capyscript/api_clients/manga_api_client.dart';
 import 'package:capyscript/api_clients/source_error.dart';
+import 'package:capyscript/modules/storage/storage_module.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:test/test.dart';
 
@@ -274,6 +275,27 @@ void main() {
         const Duration(seconds: 10),
       ]);
       expect(storage.entries['named'], '5');
+    });
+
+    test('ttlSeconds is clamped to a millisecond and ten years', () async {
+      final storage = FakeStorage();
+
+      await runMain('''
+        import "storage";
+        function main() {
+          storageSet("tiny", 1, 0.0004);
+          storageSet("huge", 2, 9999999999999999);
+          storageSet("hugeFloat", 3, 99999999999999999999.5);
+          storageSet("tenYears", 4, 315360000);
+        }
+      ''', host: ExtensionHost(storage: storage));
+
+      expect(storage.writes.map((write) => write.ttl), [
+        StorageModule.minTtl,
+        StorageModule.maxTtl,
+        StorageModule.maxTtl,
+        const Duration(days: 3650),
+      ]);
     });
 
     test('invalid ttlSeconds is a script error', () async {

@@ -9,6 +9,8 @@ import 'package:capyscript/modules/abstract/native_function_node.dart';
 
 class StorageModule extends BaseModule {
   static const String module_name = "storage";
+  static const Duration minTtl = Duration(milliseconds: 1);
+  static const Duration maxTtl = Duration(days: 3650);
 
   StorageModule(ExtensionHost host) : super(moduleName: module_name) {
     body = ASTTree(
@@ -84,7 +86,14 @@ class StorageModule extends BaseModule {
         "storageSet(\"$key\"): ttlSeconds must be a positive number or null, got $ttlSeconds",
       );
     }
-    return Duration(milliseconds: (ttlSeconds * 1000).round());
+    if (ttlSeconds >= maxTtl.inSeconds) {
+      return maxTtl;
+    }
+    final int milliseconds = (ttlSeconds * 1000).round();
+    if (milliseconds < minTtl.inMilliseconds) {
+      return minTtl;
+    }
+    return Duration(milliseconds: milliseconds);
   }
 
   static String? _jsonProblem(dynamic value, String path) {

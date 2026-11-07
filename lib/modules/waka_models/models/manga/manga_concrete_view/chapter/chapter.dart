@@ -11,17 +11,23 @@ class Chapter extends ElementOfElementsGroupOfConcrete {
   Map<String, dynamic> toJson() => _$ChapterToJson(this);
 
   final String? timestamp;
+  @JsonKey(includeIfNull: false)
+  final double? number;
+  @JsonKey(includeIfNull: false)
+  final int? volume;
 
   const Chapter(
       {required String uid,
       required String title,
       this.timestamp,
-      required Map<String, dynamic> data})
+      required Map<String, dynamic> data,
+      this.number,
+      this.volume})
       : super(data: data, uid: uid, title: title);
 
   @override
   String toString() {
-    return 'Chapter{uid: $uid, title: $title, timestamp: $timestamp, data: $data}';
+    return 'Chapter{uid: $uid, title: $title, timestamp: $timestamp, number: $number, volume: $volume, data: $data}';
   }
 
   @override
@@ -34,6 +40,10 @@ class Chapter extends ElementOfElementsGroupOfConcrete {
       return timestamp;
     } else if (name == 'data') {
       return data;
+    } else if (name == 'number') {
+      return number;
+    } else if (name == 'volume') {
+      return volume;
     }
   }
 
@@ -48,12 +58,16 @@ class Chapter extends ElementOfElementsGroupOfConcrete {
     String? title,
     String? timestamp,
     Map<String, dynamic>? data,
+    double? number,
+    int? volume,
   }) {
     return Chapter(
       uid: uid ?? this.uid,
       title: title ?? this.title,
       timestamp: timestamp ?? this.timestamp,
       data: data ?? this.data,
+      number: number ?? this.number,
+      volume: volume ?? this.volume,
     );
   }
 }

@@ -11,6 +11,8 @@ Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
   title: json['title'] as String,
   timestamp: json['timestamp'] as String?,
   data: json['data'] as Map<String, dynamic>,
+  number: (json['number'] as num?)?.toDouble(),
+  volume: (json['volume'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$ChapterToJson(Chapter instance) => <String, dynamic>{
@@ -18,4 +20,6 @@ Map<String, dynamic> _$ChapterToJson(Chapter instance) => <String, dynamic>{
   'title': instance.title,
   'data': instance.data,
   'timestamp': instance.timestamp,
+  'number': ?instance.number,
+  'volume': ?instance.volume,
 };

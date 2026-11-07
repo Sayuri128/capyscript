@@ -7,6 +7,7 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
+import 'package:capyscript/modules/waka_models/element_numbering.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video/anime_video.dart';
 
 class AnimeBuildVideoNode extends ModuleFunctionBody {
@@ -21,13 +22,16 @@ class AnimeBuildVideoNode extends ModuleFunctionBody {
         : <String, dynamic>{};
     final type = getVariable("type", environment);
     final src = getVariable("src", environment);
+    final numbering = ElementNumbering.read(environment, "season");
     return AnimeVideo(
         type: type,
         uid: uid,
         src: src,
         title: title,
         timestamp: timestamp,
-        data: data);
+        data: data,
+        number: numbering.number,
+        season: numbering.group);
   }
 
   @override
@@ -41,6 +45,7 @@ class AnimeBuildVideoNode extends ModuleFunctionBody {
           ASTParameterNode("data", paramType: "Map"),
           ASTParameterNode("type", paramType: "any"),
           ASTParameterNode("src", paramType: "string"),
+          ...ElementNumbering.parameters("season"),
         ],
         returnType: "any",
         body: this);

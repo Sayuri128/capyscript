@@ -7,6 +7,7 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
+import 'package:capyscript/modules/waka_models/element_numbering.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/chapter/chapter.dart';
 
 class MangaBuildChapterNode extends ModuleFunctionBody {
@@ -17,7 +18,14 @@ class MangaBuildChapterNode extends ModuleFunctionBody {
     final timestamp = getVariable("timestamp", environment);
     final data = (getVariable("data", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
-    return Chapter(uid: uid, title: title, data: data, timestamp: timestamp);
+    final numbering = ElementNumbering.read(environment, "volume");
+    return Chapter(
+        uid: uid,
+        title: title,
+        data: data,
+        timestamp: timestamp,
+        number: numbering.number,
+        volume: numbering.group);
   }
 
   @override
@@ -29,6 +37,7 @@ class MangaBuildChapterNode extends ModuleFunctionBody {
           ASTParameterNode("title", paramType: "string"),
           ASTParameterNode("timestamp", paramType: "any"),
           ASTParameterNode("data", paramType: "Map"),
+          ...ElementNumbering.parameters("volume"),
         ],
         returnType: "any",
         body: this);

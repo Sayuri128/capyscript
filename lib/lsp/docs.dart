@@ -192,7 +192,7 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   // manga_models module
   'buildGallery': (
     detail: 'buildGallery(params)',
-    doc: 'Build a gallery (list) model for manga.',
+    doc: 'Build a gallery entry: uid, title, cover, data (anime also status); optional status (manga), subtitle, tags, year, rating (0-10), latestChapter.',
   ),
   'buildConcrete': (
     detail: 'buildConcrete(params)',

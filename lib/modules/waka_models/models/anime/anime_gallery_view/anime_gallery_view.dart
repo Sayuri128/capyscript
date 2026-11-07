@@ -36,6 +36,7 @@ class AnimeGalleryView extends GalleryView {
     } else if (name == 'status') {
       return status;
     }
+    return getMetadataField(name);
   }
 
   @override
@@ -46,7 +47,12 @@ class AnimeGalleryView extends GalleryView {
       required this.cover,
       required this.title,
       required Map<String, dynamic> data,
-      required this.status})
+      required this.status,
+      super.subtitle,
+      super.tags,
+      super.year,
+      super.rating,
+      super.latestChapter})
       : super(data: data, uid: uid);
 
   AnimeGalleryView copyWith({
@@ -62,6 +68,11 @@ class AnimeGalleryView extends GalleryView {
       title: title ?? this.title,
       data: data ?? this.data,
       status: status ?? this.status,
+      subtitle: subtitle,
+      tags: tags,
+      year: year,
+      rating: rating,
+      latestChapter: latestChapter,
     );
   }
 

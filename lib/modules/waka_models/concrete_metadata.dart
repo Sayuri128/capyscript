@@ -47,15 +47,15 @@ class ConcreteMetadata {
     }
 
     return ConcreteMetadata(
-      authors: _strings(read("authors")),
-      artists: _strings(read("artists")),
-      year: _year(read("year")),
-      rating: _rating(read("rating")),
+      authors: readStrings(read("authors")),
+      artists: readStrings(read("artists")),
+      year: readYear(read("year")),
+      rating: readRating(read("rating")),
       url: _url(read("url")),
     );
   }
 
-  static List<String> _strings(dynamic value) {
+  static List<String> readStrings(dynamic value) {
     if (value is! List) return const <String>[];
     final seen = <String>{};
     return [
@@ -65,7 +65,7 @@ class ConcreteMetadata {
     ];
   }
 
-  static int? _year(dynamic value) {
+  static int? readYear(dynamic value) {
     final int? year = value is num
         ? value.toInt()
         : value is String
@@ -74,7 +74,7 @@ class ConcreteMetadata {
     return year != null && year > 0 ? year : null;
   }
 
-  static num? _rating(dynamic value) {
+  static num? readRating(dynamic value) {
     final num? rating = value is num
         ? value
         : value is String

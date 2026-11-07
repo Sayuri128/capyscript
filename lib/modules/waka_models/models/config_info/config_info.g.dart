@@ -22,26 +22,35 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
         json['protectorConfig'],
         const ProtectorConfigJsonConverter().fromJson,
       ),
+  downloadConfig: _$JsonConverterFromJson<Map<String, dynamic>, DownloadConfig>(
+    json['downloadConfig'],
+    const DownloadConfigJsonConverter().fromJson,
+  ),
   searchAvailable: json['searchAvailable'] as bool,
 );
 
-Map<String, dynamic> _$ConfigInfoToJson(ConfigInfo instance) =>
-    <String, dynamic>{
-      'uid': instance.uid,
-      'name': instance.name,
-      'logoUrl': instance.logoUrl,
-      'type': _$ConfigInfoTypeEnumMap[instance.type]!,
-      'nsfw': instance.nsfw,
-      'language': instance.language,
-      'version': instance.version,
-      'filters': const GalleryFiltersJsonConverter().toJson(instance.filters),
-      'protectorConfig':
-          _$JsonConverterToJson<Map<String, dynamic>, ProtectorConfig>(
-            instance.protectorConfig,
-            const ProtectorConfigJsonConverter().toJson,
-          ),
-      'searchAvailable': instance.searchAvailable,
-    };
+Map<String, dynamic> _$ConfigInfoToJson(
+  ConfigInfo instance,
+) => <String, dynamic>{
+  'uid': instance.uid,
+  'name': instance.name,
+  'logoUrl': instance.logoUrl,
+  'type': _$ConfigInfoTypeEnumMap[instance.type]!,
+  'nsfw': instance.nsfw,
+  'language': instance.language,
+  'version': instance.version,
+  'filters': const GalleryFiltersJsonConverter().toJson(instance.filters),
+  'protectorConfig':
+      _$JsonConverterToJson<Map<String, dynamic>, ProtectorConfig>(
+        instance.protectorConfig,
+        const ProtectorConfigJsonConverter().toJson,
+      ),
+  'downloadConfig': _$JsonConverterToJson<Map<String, dynamic>, DownloadConfig>(
+    instance.downloadConfig,
+    const DownloadConfigJsonConverter().toJson,
+  ),
+  'searchAvailable': instance.searchAvailable,
+};
 
 const _$ConfigInfoTypeEnumMap = {
   ConfigInfoType.MANGA: 0,

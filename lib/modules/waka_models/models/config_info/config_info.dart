@@ -8,6 +8,7 @@ import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/f
 import 'package:json_annotation/json_annotation.dart';
 
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
+import 'download_config/download_config.dart';
 import 'protector_config/protector_config.dart';
 
 part 'config_info.g.dart';
@@ -59,6 +60,9 @@ class ConfigInfo extends ExternalObject {
   @ProtectorConfigJsonConverter()
   final ProtectorConfig? protectorConfig;
 
+  @DownloadConfigJsonConverter()
+  final DownloadConfig? downloadConfig;
+
   final bool searchAvailable;
 
   @override
@@ -75,6 +79,8 @@ class ConfigInfo extends ExternalObject {
       return version;
     } else if (name == 'protectorConfig') {
       return protectorConfig;
+    } else if (name == 'downloadConfig') {
+      return downloadConfig;
     } else if (name == 'searchAvailable') {
       return searchAvailable;
     } else if (name == 'uid') {
@@ -100,10 +106,26 @@ class ConfigInfo extends ExternalObject {
       required this.filters,
       required this.type,
       this.protectorConfig,
+      this.downloadConfig,
       required this.searchAvailable});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}
+}
+
+class DownloadConfigJsonConverter
+    extends JsonConverter<DownloadConfig, Map<String, dynamic>> {
+  const DownloadConfigJsonConverter();
+
+  @override
+  DownloadConfig fromJson(Map<String, dynamic> json) {
+    return DownloadConfig.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> toJson(DownloadConfig object) {
+    return object.toJson();
+  }
 }
 
 class ProtectorConfigJsonConverter

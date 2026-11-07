@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_status.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/config_info.dart';
@@ -102,6 +104,27 @@ void main() {
 
       expect(info.getField('name'), 'Source');
     });
+
+    test('download pacing is optional and defaults to no delay', () {
+      final info = ConfigInfo.fromJson(config([]));
+
+      expect(info.downloadConfig, isNull);
+    });
+
+    test('download pacing survives a json round trip', () {
+      final info = ConfigInfo.fromJson({
+        ...config([]),
+        'downloadConfig': {'pageDelayMs': 400},
+      });
+
+      expect(info.downloadConfig?.pageDelayMs, 400);
+      expect(info.downloadConfig?.chapterDelayMs, 0);
+
+      final restored = ConfigInfo.fromJson(
+        Map<String, dynamic>.from(jsonDecode(jsonEncode(info.toJson()))),
+      );
+      expect(restored.downloadConfig?.pageDelayMs, 400);
+    });
   });
 
   group('anime_models', () {
@@ -115,7 +138,7 @@ void main() {
 
       expect(result, AnimeStatus.ONGOING);
     });
-  });
+  });
 
   group('buildConcrete metadata', () {
     test('manga accepts and normalizes authors, artists, year, rating and url', () async {

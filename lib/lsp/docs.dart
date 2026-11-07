@@ -189,6 +189,27 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     doc: 'Create an HTML parser from an HTML string. Returns an object for DOM traversal.',
   ),
 
+  'getPreference': (
+    detail: 'getPreference(key)',
+    doc: 'Value of a preference declared in the config `preferences`: the stored user value, else the declared default, else null. Returns a bool (toggle), string (select, text), number (number) or list of strings (multiselect). Requires `import "preferences";`.',
+  ),
+  'storageGet': (
+    detail: 'storageGet(key)',
+    doc: 'Read a value saved with storageSet for this extension, or null when missing or expired. Requires `import "storage";`.',
+  ),
+  'storageSet': (
+    detail: 'storageSet(key, value, ttlSeconds = null)',
+    doc: 'Save a JSON-encodable value (null, bool, number, string, list, map with string keys) for this extension. ttlSeconds (positive number) lets the app expire it; null keeps it until removed. Other values are a script error. Requires `import "storage";`.',
+  ),
+  'storageRemove': (
+    detail: 'storageRemove(key)',
+    doc: 'Delete a value saved with storageSet. Requires `import "storage";`.',
+  ),
+  'throwSourceError': (
+    detail: 'throwSourceError(kind, message = "")',
+    doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
+  ),
+
   // manga_models module
   'buildGallery': (
     detail: 'buildGallery(params)',

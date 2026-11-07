@@ -27,6 +27,9 @@ const Map<String, List<String>> moduleFunctions = {
   ],
   'date': ['createDateFormatter', 'parseDate'],
   'html': ['createHTMLParser'],
+  'preferences': ['getPreference'],
+  'storage': ['storageGet', 'storageSet', 'storageRemove'],
+  'errors': ['throwSourceError'],
   'manga_models': [
     'buildGallery',
     'buildConcrete',

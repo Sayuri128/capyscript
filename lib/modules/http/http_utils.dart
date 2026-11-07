@@ -3,6 +3,8 @@
  * All right reserved
  */
 
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class HttpUtils {
@@ -60,23 +62,48 @@ class HttpUtils {
       url = url.replaceFirst(element.key, element.value);
     }
 
+    if (url.endsWith('?') && url.substring(0, url.length - 1).contains('?')) {
+      url = '${url.substring(0, url.length - 1)}&';
+    }
+
     for (var element in params.entries) {
       if (element.value is Iterable) {
         final List<dynamic> values = (element.value as Iterable).toList();
         if (values.isEmpty) {
           continue;
         }
-        url = '$url${url.endsWith('?') ? '' : '&'}'
+        url = '$url${_separator(url)}'
             '${values.map((e) => '${element.key}[]=${_encode(e)}').join('&')}';
       } else if (element.value is Map) {
-        url = '$url${url.endsWith('?') ? '' : '&'}'
+        url = '$url${_separator(url)}'
             '${(element.value as Map).entries.map((e) => '${element.key}[${e.key}]=${_encode(e.value)}').join('&')}';
       } else {
-        url =
-            '$url${url.endsWith('?') ? '' : '&'}${element.key}=${_encode(element.value)}';
+        url = '$url${_separator(url)}${element.key}=${_encode(element.value)}';
       }
     }
 
+    if (url.endsWith('?') || url.endsWith('&')) {
+      url = url.substring(0, url.length - 1);
+    }
     return url;
+  }
+
+  static String _separator(String url) {
+    if (url.endsWith('?') || url.endsWith('&')) {
+      return '';
+    }
+    return '&';
+  }
+
+  static String decodeBody(http.Response response) {
+    final String? contentType = response.headers['content-type'];
+    if (contentType != null && contentType.toLowerCase().contains('charset=')) {
+      return response.body;
+    }
+    try {
+      return utf8.decode(response.bodyBytes);
+    } on FormatException {
+      return response.body;
+    }
   }
 }

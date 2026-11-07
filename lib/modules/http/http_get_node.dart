@@ -70,7 +70,7 @@ class HttpGetNode extends ModuleFunctionBody {
 
       return CapyHttpResponse(
           statusCode: response.statusCode,
-          body: response.body,
+          body: HttpUtils.decodeBody(response),
           headers: response.headers,
           contentLength: response.contentLength);
     }

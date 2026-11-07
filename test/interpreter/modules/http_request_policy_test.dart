@@ -626,8 +626,8 @@ void main() {
 
       expect(result['status'], 200);
       expect(result['body']['site'], 'b');
-      expect(siteA.receivedPaths, <String>['/title/1?page=2?']);
-      expect(siteB.receivedPaths, <String>['/title/1?page=2?']);
+      expect(siteA.receivedPaths, <String>['/title/1?page=2']);
+      expect(siteB.receivedPaths, <String>['/title/1?page=2']);
     });
 
     test('fail over to the next mirror when a port is closed', () async {
@@ -643,7 +643,7 @@ void main() {
       );
 
       expect(result['body']['site'], 'b');
-      expect(siteB.receivedPaths, <String>['/list?']);
+      expect(siteB.receivedPaths, <String>['/list']);
     });
 
     test('fail over httpPost and resend the body', () async {
@@ -968,7 +968,7 @@ void main() {
                 as Map;
 
         expect(result['status'], 503);
-        expect(controller.loadedUrls, <String>['${siteB.base}/page?']);
+        expect(controller.loadedUrls, <String>['${siteB.base}/page']);
         expect(controller.loadedHeaders.single['User-Agent'], 'policy-agent');
       },
     );
@@ -1048,7 +1048,7 @@ void main() {
 
       expect(first['status'], 503);
       expect(siteA.hits, 2);
-      expect(siteA.receivedPaths, <String>['/a?', '/b?']);
+      expect(siteA.receivedPaths, <String>['/a', '/b']);
       expect(siteA.receivedHeaders.first['user-agent'], startsWith('Dart/'));
       expect(siteA.receivedHeaders.first['x-session'], 'session');
       expect(siteA.receivedHeaders.first['x-call'], 'call');

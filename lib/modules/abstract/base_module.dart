@@ -13,6 +13,7 @@ import 'package:capyscript/modules/html/html_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_models_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_models_module.dart';
+import 'package:capyscript/modules/waka_models/novel/novel_models_module.dart';
 import 'package:capyscript/modules/regex/regex_module.dart';
 import 'package:capyscript/modules/preferences/preferences_module.dart';
 import 'package:capyscript/modules/storage/storage_module.dart';
@@ -76,6 +77,7 @@ final Map<String, ModuleFactory> moduleFactories = {
   HtmlModule.module_name: (_) => HtmlModule(),
   AnimeModelsModule.module_name: (_) => AnimeModelsModule(),
   MangaModelsModule.module_name: (_) => MangaModelsModule(),
+  NovelModelsModule.module_name: (_) => NovelModelsModule(),
   RegexModule.module_name: (_) => RegexModule(),
   PreferencesModule.module_name: (host) => PreferencesModule(host),
   StorageModule.module_name: (host) => StorageModule(host),

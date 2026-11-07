@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:capyscript/Interpreter/interpreter.dart';
 import 'package:capyscript/api_clients/host/extension_host.dart';
 import 'package:capyscript/api_clients/manga_api_client.dart';
+import 'package:capyscript/api_clients/novel_api_client.dart';
 import 'package:capyscript/api_clients/source_error.dart';
 import 'package:capyscript/capyscript_api_version.dart';
 import 'package:capyscript/AST/ast_tree.dart';
@@ -16,6 +17,8 @@ import 'package:capyscript/modules/waka_models/models/config_info/config_info.da
 import 'package:capyscript/modules/waka_models/models/config_info/download_config/download_config.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
+import 'package:capyscript/modules/waka_models/models/novel/novel_chapter_content.dart';
 import 'package:test/test.dart';
 
 import 'helpers.dart';
@@ -306,7 +309,7 @@ void main() {
     });
 
     test('an unknown type is a format error', () {
-      for (final type in <Object?>[2, -1, 'manga', null, 0.5]) {
+      for (final type in <Object?>[3, -1, 'manga', null, 0.5]) {
         expect(
           () => parseWith(<String, dynamic>{'type': type}),
           throwsA(
@@ -325,6 +328,17 @@ void main() {
           jsonDecode(jsonEncode(parseWith(<String, dynamic>{'type': 1}).toJson())),
         ).type,
         ConfigInfoType.ANIME,
+      );
+    });
+
+    test('type 2 is a novel and survives a json round trip', () {
+      final config = parseWith(<String, dynamic>{'type': 2});
+
+      expect(config.type, ConfigInfoType.NOVEL);
+      expect(config.toJson()['type'], 2);
+      expect(
+        ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).type,
+        ConfigInfoType.NOVEL,
       );
     });
 
@@ -548,6 +562,108 @@ void main() {
       ''');
 
       expect(await client.supportsRelated(), isFalse);
+    });
+  });
+
+  group('NovelApiClient', () {
+    const novelScript = '''
+      import "novel_models";
+      function getGallery(page, query, filters, feed) {
+        return [buildGallery({"uid": "n" + page, "title": query, "cover": "c", "data": {"feed": feed}})];
+      }
+      function getConcrete(uid, data) {
+        return buildConcrete({
+          "uid": uid,
+          "cover": "",
+          "title": "Novel",
+          "description": "",
+          "tags": ["fantasy"],
+          "groups": [buildChapterGroups({"title": "Volume 1", "elements": [
+            buildChapter({"uid": "c1", "title": "One", "timestamp": null, "data": {"id": 1}, "number": 1}),
+            buildChapter({"uid": "c2", "title": "Two", "timestamp": null, "data": {"id": 2}, "number": 2})
+          ]})],
+          "status": statusOngoing(),
+          "alternativeTitles": []
+        });
+      }
+      function getRelated(uid, data) {
+        return [buildGallery({"uid": uid + "-sequel", "title": "Sequel", "cover": "", "data": {}})];
+      }
+      function getChapterText(uid, data) {
+        return buildNovelChapter({"title": "Chapter " + data["id"], "html": "<p>" + uid + "</p>"});
+      }
+    ''';
+
+    test('gallery, concrete and related use the manga models', () async {
+      final client = NovelApiClient(code: novelScript);
+
+      final gallery = await client.getGallery(page: 3, query: 'q', feed: 'top');
+      final concrete = await client.getConcrete(uid: 'n1', data: {});
+      final related = await client.getRelated(uid: 'n1', data: {});
+
+      expect(gallery.single.uid, 'n3');
+      expect(gallery.single.title, 'q');
+      expect(gallery.single.data['feed'], 'top');
+      expect(concrete, isA<MangaConcreteView>());
+      expect(concrete.groups.single.elements.map((e) => e.uid), ['c1', 'c2']);
+      expect(concrete.groups.single.elements.last.number, 2);
+      expect(related.single.uid, 'n1-sequel');
+    });
+
+    test('getChapterText returns the built chapter', () async {
+      final client = NovelApiClient(code: novelScript);
+
+      final chapter = await client.getChapterText(uid: 'c2', data: {'id': 2});
+
+      expect(chapter.title, 'Chapter 2');
+      expect(chapter.html, '<p>c2</p>');
+    });
+
+    test('buildNovelChapter title is optional', () async {
+      final client = NovelApiClient(code: '''
+        import "novel_models";
+        function getChapterText(uid, data) {
+          return buildNovelChapter({"html": "plain text"});
+        }
+      ''');
+
+      final chapter = await client.getChapterText(uid: 'c', data: {});
+
+      expect(chapter.title, '');
+      expect(chapter.html, 'plain text');
+    });
+
+    test('a plain string or map result is accepted', () async {
+      final fromString = NovelApiClient(code: '''
+        function getChapterText(uid, data) {
+          return "<p>raw</p>";
+        }
+      ''');
+      final fromMap = NovelApiClient(code: '''
+        function getChapterText(uid, data) {
+          return {"title": "T", "html": "<p>map</p>"};
+        }
+      ''');
+
+      expect((await fromString.getChapterText(uid: 'c', data: {})).html, '<p>raw</p>');
+      final mapChapter = await fromMap.getChapterText(uid: 'c', data: {});
+      expect(mapChapter.title, 'T');
+      expect(mapChapter.html, '<p>map</p>');
+    });
+
+    test('any other result is a format error', () {
+      expect(() => NovelApiClient.readChapterContent(42), throwsFormatException);
+      expect(() => NovelApiClient.readChapterContent(null), throwsFormatException);
+    });
+
+    test('chapter content survives a json round trip', () {
+      const content = NovelChapterContent(title: 'T', html: '<p>x</p>');
+
+      final decoded = NovelChapterContent.fromJson(jsonDecode(jsonEncode(content.toJson())));
+
+      expect(decoded.title, 'T');
+      expect(decoded.html, '<p>x</p>');
+      expect(content.getField('html'), '<p>x</p>');
     });
   });
 

@@ -235,6 +235,10 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'buildPages(params)',
     doc: 'Build a pages model for a chapter.',
   ),
+  'buildNovelChapter': (
+    detail: 'buildNovelChapter(params)',
+    doc: 'Build the text of a novel chapter for getChapterText(uid, data): html (chapter body as HTML or plain text); optional title. Requires `import "novel_models";` and a config with type 2.',
+  ),
   'buildAnimeVideo': (
     detail: 'buildAnimeVideo(params)',
     doc: 'Build a single anime video model: uid, title, timestamp, data, type (typeIframe() or typeDirect()), src; optional number (episode number, int/decimal/numeric string, e.g. 12.5) and season (int/numeric string). Invalid values become null. Older apps ignore number and season.',

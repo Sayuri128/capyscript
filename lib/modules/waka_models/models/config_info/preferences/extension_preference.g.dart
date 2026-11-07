@@ -29,6 +29,7 @@ ExtensionPreference _$ExtensionPreferenceFromJson(Map<String, dynamic> json) =>
           : const ExtensionPreferenceOptionsJsonConverter().fromJson(
               json['options'],
             ),
+      secret: json['secret'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ExtensionPreferenceToJson(
@@ -42,6 +43,7 @@ Map<String, dynamic> _$ExtensionPreferenceToJson(
   'options': const ExtensionPreferenceOptionsJsonConverter().toJson(
     instance.options,
   ),
+  'secret': instance.secret,
 };
 
 const _$ExtensionPreferenceTypeEnumMap = {

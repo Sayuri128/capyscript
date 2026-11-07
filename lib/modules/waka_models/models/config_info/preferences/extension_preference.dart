@@ -68,6 +68,8 @@ class ExtensionPreference {
   final Object? defaultValue;
   @ExtensionPreferenceOptionsJsonConverter()
   final List<ExtensionPreferenceOption> options;
+  @JsonKey(defaultValue: false)
+  final bool secret;
 
   const ExtensionPreference({
     required this.key,
@@ -76,6 +78,7 @@ class ExtensionPreference {
     this.summary,
     this.defaultValue,
     this.options = const <ExtensionPreferenceOption>[],
+    this.secret = false,
   });
 
   static ExtensionPreference? tryParse(Object? json) {
@@ -100,6 +103,7 @@ class ExtensionPreference {
       options: const ExtensionPreferenceOptionsJsonConverter().fromJson(
         fields['options'],
       ),
+      secret: type == ExtensionPreferenceType.text && fields['secret'] == true,
     );
   }
 

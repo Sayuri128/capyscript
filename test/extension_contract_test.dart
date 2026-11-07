@@ -505,6 +505,24 @@ void main() {
     });
   });
 
+  group('secret preferences', () {
+    test('text preferences can be marked secret, other types cannot', () {
+      final config = ConfigInfo.fromJson(<String, dynamic>{
+        ..._baseConfig(),
+        'apiVersion': 2,
+        'preferences': <dynamic>[
+          {'key': 'password', 'type': 'text', 'title': 'Password', 'secret': true},
+          {'key': 'on', 'type': 'toggle', 'title': 'On', 'secret': true},
+          {'key': 'name', 'type': 'text', 'title': 'Name'},
+        ],
+      });
+
+      expect(config.preferences.map((p) => p.secret), <bool>[true, false, false]);
+      final decoded = ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson())));
+      expect(decoded.preferences.first.secret, isTrue);
+    });
+  });
+
   group('getRelated', () {
     test('returns related titles from scripts that define it', () async {
       final client = MangaApiClient(code: '''

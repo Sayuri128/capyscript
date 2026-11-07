@@ -53,6 +53,7 @@ class ExtensionPreferenceOption {
 @JsonSerializable(explicitToJson: true)
 class ExtensionPreference {
   static const String mirrorKey = '__mirror';
+  static const String pageSizeKey = '__pageSize';
 
   factory ExtensionPreference.fromJson(Map<String, dynamic> json) =>
       _$ExtensionPreferenceFromJson(json);

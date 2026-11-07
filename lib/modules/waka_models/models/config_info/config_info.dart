@@ -10,6 +10,7 @@ import 'package:json_annotation/json_annotation.dart';
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
 import 'download_config/download_config.dart';
 import 'gallery_feed/gallery_feed.dart';
+import 'gallery_pagination/gallery_pagination.dart';
 import 'preferences/extension_preference.dart';
 import 'protector_config/protector_config.dart';
 import 'request_policy/request_policy.dart';
@@ -99,6 +100,9 @@ class ConfigInfo extends ExternalObject {
   @GalleryFeedsJsonConverter()
   final List<GalleryFeed> feeds;
 
+  @GalleryPaginationJsonConverter()
+  final GalleryPagination? pagination;
+
   @override
   getField(String name) {
     if (name == 'name') {
@@ -150,7 +154,8 @@ class ConfigInfo extends ExternalObject {
       this.minAppVersion,
       this.preferences = const <ExtensionPreference>[],
       this.requestPolicy,
-      this.feeds = const <GalleryFeed>[]});
+      this.feeds = const <GalleryFeed>[],
+      this.pagination});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

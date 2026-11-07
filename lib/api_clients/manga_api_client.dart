@@ -27,10 +27,15 @@ class MangaApiClient extends ApiClient {
       {required int page,
       String? query,
       List<FilterData>? filters,
-      String? feed}) async {
+      String? feed,
+      int? pageSize}) async {
     return (await interpreter.runFunction(ApiClient.getGalleryFunctionName,
-            arguments: galleryArguments(
-                page: page, query: query, filters: filters, feed: feed))
+            arguments: await galleryArguments(
+                page: page,
+                query: query,
+                filters: filters,
+                feed: feed,
+                pageSize: pageSize))
             as List<dynamic>)
         .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
         .toList();

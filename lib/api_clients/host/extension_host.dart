@@ -1,3 +1,4 @@
+import 'package:capyscript/modules/waka_models/models/config_info/gallery_pagination/gallery_pagination.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
 
@@ -43,6 +44,7 @@ class ExtensionHost {
   final ExtensionPreferencesProvider preferences;
   final ExtensionStorage storage;
   final RequestPolicy? requestPolicy;
+  final GalleryPagination? pagination;
 
   const ExtensionHost({
     this.extensionUid,
@@ -50,6 +52,7 @@ class ExtensionHost {
     this.preferences = const NoopExtensionPreferencesProvider(),
     this.storage = const NoopExtensionStorage(),
     this.requestPolicy,
+    this.pagination,
   });
 
   static const ExtensionHost none = ExtensionHost();
@@ -61,6 +64,21 @@ class ExtensionHost {
       }
     }
     return null;
+  }
+
+  Future<int> resolvePageSize() async {
+    final GalleryPagination? declared = pagination;
+    if (declared == null) {
+      return 0;
+    }
+    Object? selected;
+    try {
+      selected =
+          await preferences.getPreference(ExtensionPreference.pageSizeKey);
+    } catch (_) {
+      selected = null;
+    }
+    return declared.resolve(selected);
   }
 
   Future<Object?> resolvePreference(String key) async {

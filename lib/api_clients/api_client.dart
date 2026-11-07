@@ -17,6 +17,7 @@ abstract class ApiClient {
   static const getGalleryQueryParameterName = 'query';
   static const getGalleryFiltersParameterName = 'filters';
   static const getGalleryFeedParameterName = 'feed';
+  static const getGalleryPageSizeParameterName = 'pageSize';
 
   static const getConcreteFunctionName = 'getConcrete';
   static const getConcreteUidParameterName = 'uid';
@@ -33,23 +34,34 @@ abstract class ApiClient {
       {required int page,
       String? query,
       List<FilterData>? filters,
-      String? feed});
+      String? feed,
+      int? pageSize});
 
   Future<ConcreteView> getConcrete(
       {required String uid, required Map<String, dynamic> data});
 
-  Map<String, dynamic> galleryArguments(
+  Future<Map<String, dynamic>> galleryArguments(
       {required int page,
       String? query,
       List<FilterData>? filters,
-      String? feed}) {
+      String? feed,
+      int? pageSize}) async {
     return {
       getGalleryPageParameterName: page,
       getGalleryQueryParameterName: query ?? '',
       getGalleryFiltersParameterName:
           filters?.map((e) => e.toJson()).toList() ?? [],
       getGalleryFeedParameterName: feed ?? '',
+      getGalleryPageSizeParameterName: await _effectivePageSize(pageSize),
     };
+  }
+
+  Future<int> _effectivePageSize(int? requested) async {
+    final pagination = host.pagination;
+    if (requested != null && pagination != null) {
+      return pagination.resolve(requested);
+    }
+    return host.resolvePageSize();
   }
 
   Future<void> passProtector(

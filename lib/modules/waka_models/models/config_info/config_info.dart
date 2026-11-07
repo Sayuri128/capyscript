@@ -113,6 +113,11 @@ class ConfigInfo extends ExternalObject {
   @ContentKindsJsonConverter()
   final List<String> contentKinds;
 
+  @JsonKey(fromJson: readMultiInstance)
+  final bool multiInstance;
+
+  static bool readMultiInstance(Object? value) => value == true;
+
   @override
   getField(String name) {
     if (name == 'name') {
@@ -139,6 +144,8 @@ class ConfigInfo extends ExternalObject {
       return minAppVersion;
     } else if (name == 'contentKinds') {
       return contentKinds;
+    } else if (name == 'multiInstance') {
+      return multiInstance;
     }
   }
 
@@ -168,7 +175,8 @@ class ConfigInfo extends ExternalObject {
       this.requestPolicy,
       this.feeds = const <GalleryFeed>[],
       this.pagination,
-      this.contentKinds = const <String>[]});
+      this.contentKinds = const <String>[],
+      this.multiInstance = false});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

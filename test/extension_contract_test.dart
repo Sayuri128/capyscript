@@ -519,6 +519,24 @@ void main() {
     });
   });
 
+  group('multi instance', () {
+    test('only a literal true enables multiple instances', () {
+      expect(ConfigInfo.fromJson(_baseConfig()).multiInstance, isFalse);
+      expect(
+        ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'multiInstance': true})
+            .multiInstance,
+        isTrue,
+      );
+      expect(
+        ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'multiInstance': 'yes'})
+            .multiInstance,
+        isFalse,
+      );
+      final config = ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'multiInstance': true});
+      expect(ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).multiInstance, isTrue);
+    });
+  });
+
   group('secret preferences', () {
     test('text preferences can be marked secret, other types cannot', () {
       final config = ConfigInfo.fromJson(<String, dynamic>{

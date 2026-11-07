@@ -24,15 +24,11 @@ ExtensionPreference _$ExtensionPreferenceFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       summary: json['summary'] as String?,
       defaultValue: json['default'],
-      options:
-          (json['options'] as List<dynamic>?)
-              ?.map(
-                (e) => ExtensionPreferenceOption.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList() ??
-          [],
+      options: json['options'] == null
+          ? const <ExtensionPreferenceOption>[]
+          : const ExtensionPreferenceOptionsJsonConverter().fromJson(
+              json['options'],
+            ),
     );
 
 Map<String, dynamic> _$ExtensionPreferenceToJson(
@@ -43,7 +39,9 @@ Map<String, dynamic> _$ExtensionPreferenceToJson(
   'title': instance.title,
   'summary': instance.summary,
   'default': instance.defaultValue,
-  'options': instance.options.map((e) => e.toJson()).toList(),
+  'options': const ExtensionPreferenceOptionsJsonConverter().toJson(
+    instance.options,
+  ),
 };
 
 const _$ExtensionPreferenceTypeEnumMap = {

@@ -39,7 +39,23 @@ ConfigInfoType deserializeLocalApiClientType(int type) {
     case 1:
       return ConfigInfoType.ANIME;
   }
-  throw Exception("Unknown LocalApiClientType $type");
+  throw FormatException("Unknown ConfigInfo type $type");
+}
+
+class ConfigInfoTypeJsonConverter
+    extends JsonConverter<ConfigInfoType, Object?> {
+  const ConfigInfoTypeJsonConverter();
+
+  @override
+  ConfigInfoType fromJson(Object? json) {
+    if (json is num && json.isFinite && json == json.toInt()) {
+      return deserializeLocalApiClientType(json.toInt());
+    }
+    throw FormatException("Unknown ConfigInfo type $json");
+  }
+
+  @override
+  Object? toJson(ConfigInfoType object) => serializeLocalApiClientType(object);
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -52,6 +68,7 @@ class ConfigInfo extends ExternalObject {
   final String uid;
   final String name;
   final String logoUrl;
+  @ConfigInfoTypeJsonConverter()
   final ConfigInfoType type;
   final bool nsfw;
   final String language;
@@ -76,6 +93,7 @@ class ConfigInfo extends ExternalObject {
   @ExtensionPreferencesJsonConverter()
   final List<ExtensionPreference> preferences;
 
+  @RequestPolicyJsonConverter()
   final RequestPolicy? requestPolicy;
 
   @GalleryFeedsJsonConverter()

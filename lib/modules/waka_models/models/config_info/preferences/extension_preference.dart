@@ -1,3 +1,4 @@
+import 'package:capyscript/modules/waka_models/models/config_info/lenient_json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'extension_preference.g.dart';
@@ -34,6 +35,19 @@ class ExtensionPreferenceOption {
   final String label;
 
   const ExtensionPreferenceOption({required this.value, required this.label});
+
+  static ExtensionPreferenceOption? tryParse(Object? json) {
+    final Map<String, Object?>? fields = LenientJson.stringKeyedMap(json);
+    if (fields == null) {
+      return null;
+    }
+    final String? value = LenientJson.scalarAsString(fields['value']);
+    final String? label = LenientJson.scalarAsString(fields['label']);
+    if (value == null || label == null) {
+      return null;
+    }
+    return ExtensionPreferenceOption(value: value, label: label);
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -51,7 +65,7 @@ class ExtensionPreference {
   final String? summary;
   @JsonKey(name: 'default')
   final Object? defaultValue;
-  @JsonKey(defaultValue: <ExtensionPreferenceOption>[])
+  @ExtensionPreferenceOptionsJsonConverter()
   final List<ExtensionPreferenceOption> options;
 
   const ExtensionPreference({
@@ -62,6 +76,31 @@ class ExtensionPreference {
     this.defaultValue,
     this.options = const <ExtensionPreferenceOption>[],
   });
+
+  static ExtensionPreference? tryParse(Object? json) {
+    final Map<String, Object?>? fields = LenientJson.stringKeyedMap(json);
+    if (fields == null) {
+      return null;
+    }
+    final Object? key = fields['key'];
+    final ExtensionPreferenceType? type =
+        extensionPreferenceTypeNames[fields['type']];
+    final Object? title = fields['title'];
+    if (key is! String || type == null || title is! String) {
+      return null;
+    }
+    final Object? summary = fields['summary'];
+    return ExtensionPreference(
+      key: key,
+      type: type,
+      title: title,
+      summary: summary is String ? summary : null,
+      defaultValue: fields['default'],
+      options: const ExtensionPreferenceOptionsJsonConverter().fromJson(
+        fields['options'],
+      ),
+    );
+  }
 
   Object? get effectiveDefault {
     final Object? value = defaultValue;
@@ -86,22 +125,50 @@ class ExtensionPreference {
   }
 }
 
+class ExtensionPreferenceOptionsJsonConverter
+    extends JsonConverter<List<ExtensionPreferenceOption>, Object?> {
+  const ExtensionPreferenceOptionsJsonConverter();
+
+  @override
+  List<ExtensionPreferenceOption> fromJson(Object? json) {
+    if (json is! List) {
+      return const <ExtensionPreferenceOption>[];
+    }
+    final List<ExtensionPreferenceOption> options =
+        <ExtensionPreferenceOption>[];
+    for (final Object? item in json) {
+      final ExtensionPreferenceOption? option =
+          ExtensionPreferenceOption.tryParse(item);
+      if (option != null) {
+        options.add(option);
+      }
+    }
+    return options;
+  }
+
+  @override
+  List<dynamic> toJson(List<ExtensionPreferenceOption> object) {
+    return object.map((e) => e.toJson()).toList();
+  }
+}
+
 class ExtensionPreferencesJsonConverter
-    extends JsonConverter<List<ExtensionPreference>, List<dynamic>?> {
+    extends JsonConverter<List<ExtensionPreference>, Object?> {
   const ExtensionPreferencesJsonConverter();
 
   @override
-  List<ExtensionPreference> fromJson(List<dynamic>? json) {
-    if (json == null) {
+  List<ExtensionPreference> fromJson(Object? json) {
+    if (json is! List) {
       return const <ExtensionPreference>[];
     }
-    return json
-        .whereType<Map>()
-        .where((e) =>
-            e['key'] is String &&
-            extensionPreferenceTypeNames.containsKey(e['type']))
-        .map((e) => ExtensionPreference.fromJson(Map<String, dynamic>.from(e)))
-        .toList();
+    final List<ExtensionPreference> preferences = <ExtensionPreference>[];
+    for (final Object? item in json) {
+      final ExtensionPreference? preference = ExtensionPreference.tryParse(item);
+      if (preference != null) {
+        preferences.add(preference);
+      }
+    }
+    return preferences;
   }
 
   @override

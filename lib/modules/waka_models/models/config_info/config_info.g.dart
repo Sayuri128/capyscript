@@ -16,7 +16,7 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
   filters: const GalleryFiltersJsonConverter().fromJson(
     json['filters'] as List,
   ),
-  type: $enumDecode(_$ConfigInfoTypeEnumMap, json['type']),
+  type: const ConfigInfoTypeJsonConverter().fromJson(json['type']),
   protectorConfig:
       _$JsonConverterFromJson<Map<String, dynamic>, ProtectorConfig>(
         json['protectorConfig'],
@@ -31,15 +31,13 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
   minAppVersion: json['minAppVersion'] as String?,
   preferences: json['preferences'] == null
       ? const <ExtensionPreference>[]
-      : const ExtensionPreferencesJsonConverter().fromJson(
-          json['preferences'] as List?,
-        ),
-  requestPolicy: json['requestPolicy'] == null
-      ? null
-      : RequestPolicy.fromJson(json['requestPolicy'] as Map<String, dynamic>),
+      : const ExtensionPreferencesJsonConverter().fromJson(json['preferences']),
+  requestPolicy: const RequestPolicyJsonConverter().fromJson(
+    json['requestPolicy'],
+  ),
   feeds: json['feeds'] == null
       ? const <GalleryFeed>[]
-      : const GalleryFeedsJsonConverter().fromJson(json['feeds'] as List?),
+      : const GalleryFeedsJsonConverter().fromJson(json['feeds']),
 );
 
 Map<String, dynamic> _$ConfigInfoToJson(
@@ -48,7 +46,7 @@ Map<String, dynamic> _$ConfigInfoToJson(
   'uid': instance.uid,
   'name': instance.name,
   'logoUrl': instance.logoUrl,
-  'type': _$ConfigInfoTypeEnumMap[instance.type]!,
+  'type': const ConfigInfoTypeJsonConverter().toJson(instance.type),
   'nsfw': instance.nsfw,
   'language': instance.language,
   'version': instance.version,
@@ -68,13 +66,10 @@ Map<String, dynamic> _$ConfigInfoToJson(
   'preferences': const ExtensionPreferencesJsonConverter().toJson(
     instance.preferences,
   ),
-  'requestPolicy': instance.requestPolicy?.toJson(),
+  'requestPolicy': const RequestPolicyJsonConverter().toJson(
+    instance.requestPolicy,
+  ),
   'feeds': const GalleryFeedsJsonConverter().toJson(instance.feeds),
-};
-
-const _$ConfigInfoTypeEnumMap = {
-  ConfigInfoType.MANGA: 0,
-  ConfigInfoType.ANIME: 1,
 };
 
 Value? _$JsonConverterFromJson<Json, Value>(

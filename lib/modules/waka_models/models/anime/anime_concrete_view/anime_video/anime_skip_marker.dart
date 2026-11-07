@@ -35,6 +35,26 @@ class AnimeSkipMarker extends ExternalObject {
     required this.end,
   });
 
+  static AnimeSkipMarker? tryParse(Object? json) {
+    if (json is! Map) {
+      return null;
+    }
+    final AnimeSkipType? type = animeSkipTypeNames[json['type']];
+    final double? start = _validSeconds(json['start']);
+    final double? end = _validSeconds(json['end']);
+    if (type == null || start == null || end == null || end <= start) {
+      return null;
+    }
+    return AnimeSkipMarker(type: type, start: start, end: end);
+  }
+
+  static double? _validSeconds(Object? value) {
+    if (value is! num || !value.isFinite || value < 0) {
+      return null;
+    }
+    return value.toDouble();
+  }
+
   @override
   dynamic callFunction(String name, {List? ordinalArguments}) {}
 
@@ -60,22 +80,22 @@ class AnimeSkipMarker extends ExternalObject {
 }
 
 class AnimeSkipMarkersJsonConverter
-    extends JsonConverter<List<AnimeSkipMarker>, List<dynamic>?> {
+    extends JsonConverter<List<AnimeSkipMarker>, Object?> {
   const AnimeSkipMarkersJsonConverter();
 
   @override
-  List<AnimeSkipMarker> fromJson(List<dynamic>? json) {
-    if (json == null) {
+  List<AnimeSkipMarker> fromJson(Object? json) {
+    if (json is! List) {
       return const <AnimeSkipMarker>[];
     }
-    return json
-        .whereType<Map>()
-        .where((e) =>
-            animeSkipTypeNames.containsKey(e['type']) &&
-            e['start'] is num &&
-            e['end'] is num)
-        .map((e) => AnimeSkipMarker.fromJson(Map<String, dynamic>.from(e)))
-        .toList();
+    final List<AnimeSkipMarker> markers = <AnimeSkipMarker>[];
+    for (final Object? item in json) {
+      final AnimeSkipMarker? marker = AnimeSkipMarker.tryParse(item);
+      if (marker != null) {
+        markers.add(marker);
+      }
+    }
+    return markers;
   }
 
   @override

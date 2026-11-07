@@ -15,6 +15,7 @@ import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/
 import 'package:capyscript/modules/waka_models/models/config_info/config_info.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/download_config/download_config.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
+import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
 import 'package:test/test.dart';
 
 import 'helpers.dart';
@@ -138,6 +139,216 @@ void main() {
 
       expect(config.segmentConcurrency, isNull);
       expect(config.episodeDelayMs, 0);
+    });
+  });
+
+  group('ConfigInfo leniency', () {
+    ConfigInfo parseWith(Map<String, dynamic> fields) {
+      return ConfigInfo.fromJson(_baseConfig()..addAll(fields));
+    }
+
+    test('drops malformed preferences and keeps the valid ones', () {
+      final config = parseWith(<String, dynamic>{
+        'preferences': <dynamic>[
+          {'key': 'noTitle', 'type': 'toggle'},
+          {'key': 'numberTitle', 'type': 'toggle', 'title': 5},
+          {'type': 'toggle', 'title': 'No key'},
+          {'key': 'unknown', 'type': 'slider', 'title': 'Unknown'},
+          'not a map',
+          null,
+          {
+            'key': 'oddSummary',
+            'type': 'text',
+            'title': 'Odd summary',
+            'summary': ['not', 'text'],
+          },
+          {
+            'key': 'oddOptions',
+            'type': 'select',
+            'title': 'Odd options',
+            'options': {'value': 'a', 'label': 'A'},
+          },
+          {'key': 'adult', 'type': 'toggle', 'title': 'Adult'},
+        ],
+      });
+
+      expect(
+        config.preferences.map((e) => e.key),
+        ['oddSummary', 'oddOptions', 'adult'],
+      );
+      expect(config.preferences.first.summary, isNull);
+      expect(config.preferences[1].options, isEmpty);
+    });
+
+    test('drops malformed options and coerces scalar values to strings', () {
+      final config = parseWith(<String, dynamic>{
+        'preferences': <dynamic>[
+          {
+            'key': 'quality',
+            'type': 'select',
+            'title': 'Quality',
+            'options': <dynamic>[
+              {'value': 1, 'label': 'One'},
+              {'value': 'two', 'label': 2.5},
+              {'value': true, 'label': 'Yes'},
+              {'value': 'missing label'},
+              {'label': 'missing value'},
+              {'value': ['a'], 'label': 'List value'},
+              {'value': 'x', 'label': {'nested': true}},
+              'plain',
+              {'value': 'ok', 'label': 'Ok'},
+            ],
+          },
+        ],
+      });
+
+      final options = config.preferences.single.options;
+      expect(options.map((e) => e.value), ['1', 'two', 'true', 'ok']);
+      expect(options.map((e) => e.label), ['One', '2.5', 'Yes', 'Ok']);
+    });
+
+    test('a malformed rate limit is absent and the rest of the policy stays', () {
+      for (final rateLimit in <Object?>[
+        {'requests': 4},
+        {'perSeconds': 1},
+        {'requests': '4', 'perSeconds': 1},
+        {'requests': 0, 'perSeconds': 1},
+        {'requests': 4, 'perSeconds': 0},
+        {'requests': 4, 'perSeconds': -1},
+        'fast',
+        <dynamic>[4, 1],
+      ]) {
+        final config = parseWith(<String, dynamic>{
+          'requestPolicy': {
+            'rateLimit': rateLimit,
+            'userAgent': 'UA',
+          },
+        });
+
+        expect(config.requestPolicy, isNotNull, reason: '$rateLimit');
+        expect(config.requestPolicy!.rateLimit, isNull, reason: '$rateLimit');
+        expect(config.requestPolicy!.userAgent, 'UA');
+      }
+    });
+
+    test('a rate limit with a huge window is capped at a day', () {
+      final config = parseWith(<String, dynamic>{
+        'requestPolicy': {
+          'rateLimit': {'requests': 1, 'perSeconds': 1e300},
+        },
+      });
+
+      expect(config.requestPolicy!.rateLimit!.window, RateLimit.maxWindow);
+    });
+
+    test('a request policy that is not a map is absent', () {
+      for (final policy in <Object?>['strict', 1, <dynamic>[], true]) {
+        expect(
+          parseWith(<String, dynamic>{'requestPolicy': policy}).requestPolicy,
+          isNull,
+        );
+      }
+    });
+
+    test('drops malformed headers and mirrors and ignores a non-string agent', () {
+      final config = parseWith(<String, dynamic>{
+        'requestPolicy': {
+          'defaultHeaders': {
+            'Referer': 'https://example.org',
+            'X-Count': 1,
+            'X-Null': null,
+            'X-List': ['a'],
+          },
+          'userAgent': 42,
+          'mirrors': ['https://a.example', 5, null, {'url': 'x'}, 'https://b.example'],
+        },
+      });
+      final policy = config.requestPolicy!;
+
+      expect(policy.defaultHeaders, {'Referer': 'https://example.org'});
+      expect(policy.userAgent, isNull);
+      expect(policy.mirrors, ['https://a.example', 'https://b.example']);
+    });
+
+    test('headers and mirrors of the wrong shape become empty', () {
+      final config = parseWith(<String, dynamic>{
+        'requestPolicy': {
+          'defaultHeaders': ['Referer'],
+          'mirrors': 'https://a.example',
+        },
+      });
+
+      expect(config.requestPolicy!.defaultHeaders, isEmpty);
+      expect(config.requestPolicy!.mirrors, isEmpty);
+    });
+
+    test('drops feeds whose id or title are not strings', () {
+      final config = parseWith(<String, dynamic>{
+        'feeds': <dynamic>[
+          {'id': 1, 'title': 'Numeric id'},
+          {'id': 'popular', 'title': null},
+          {'id': 'latest', 'title': 'Latest'},
+          'popular',
+        ],
+      });
+
+      expect(config.feeds.map((e) => e.id), ['latest']);
+    });
+
+    test('collections of the wrong shape become empty', () {
+      final config = parseWith(<String, dynamic>{
+        'preferences': {'key': 'lang'},
+        'feeds': 'popular',
+      });
+
+      expect(config.preferences, isEmpty);
+      expect(config.feeds, isEmpty);
+    });
+
+    test('an unknown type is a format error', () {
+      for (final type in <Object?>[2, -1, 'manga', null, 0.5]) {
+        expect(
+          () => parseWith(<String, dynamic>{'type': type}),
+          throwsA(
+            isA<FormatException>().having(
+              (error) => error.message,
+              'message',
+              contains('$type'),
+            ),
+          ),
+          reason: '$type',
+        );
+      }
+      expect(parseWith(<String, dynamic>{'type': 1}).type, ConfigInfoType.ANIME);
+      expect(
+        ConfigInfo.fromJson(
+          jsonDecode(jsonEncode(parseWith(<String, dynamic>{'type': 1}).toJson())),
+        ).type,
+        ConfigInfoType.ANIME,
+      );
+    });
+
+    test('skip markers from json drop malformed entries', () {
+      final source = AnimeVideoSource.fromJson(<String, dynamic>{
+        'url': 'https://x',
+        'skip': <dynamic>[
+          {'type': 'intro', 'start': 0, 'end': 90},
+          {'type': 'intro', 'start': '0', 'end': 90},
+          {'type': 'credits', 'start': 0, 'end': 90},
+          {'type': 'outro', 'start': -1, 'end': 90},
+          {'type': 'outro', 'start': 10, 'end': double.infinity},
+          {'type': 'recap', 'start': 50, 'end': 40},
+          'intro',
+        ],
+      });
+      final notAList = AnimeVideoSource.fromJson(<String, dynamic>{
+        'url': 'https://x',
+        'skip': {'type': 'intro', 'start': 0, 'end': 90},
+      });
+
+      expect(source.skip, hasLength(1));
+      expect(source.skip.single.end, 90);
+      expect(notAList.skip, isEmpty);
     });
   });
 

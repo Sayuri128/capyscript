@@ -18,26 +18,25 @@ Map<String, dynamic> _$RateLimitToJson(RateLimit instance) => <String, dynamic>{
 
 RequestPolicy _$RequestPolicyFromJson(Map<String, dynamic> json) =>
     RequestPolicy(
-      rateLimit: json['rateLimit'] == null
-          ? null
-          : RateLimit.fromJson(json['rateLimit'] as Map<String, dynamic>),
-      defaultHeaders:
-          (json['defaultHeaders'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, e as String),
-          ) ??
-          {},
-      userAgent: json['userAgent'] as String?,
-      mirrors:
-          (json['mirrors'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+      rateLimit: const RateLimitJsonConverter().fromJson(json['rateLimit']),
+      defaultHeaders: json['defaultHeaders'] == null
+          ? const <String, String>{}
+          : const StringMapJsonConverter().fromJson(json['defaultHeaders']),
+      userAgent: const OptionalStringJsonConverter().fromJson(
+        json['userAgent'],
+      ),
+      mirrors: json['mirrors'] == null
+          ? const <String>[]
+          : const StringListJsonConverter().fromJson(json['mirrors']),
     );
 
-Map<String, dynamic> _$RequestPolicyToJson(RequestPolicy instance) =>
-    <String, dynamic>{
-      'rateLimit': instance.rateLimit?.toJson(),
-      'defaultHeaders': instance.defaultHeaders,
-      'userAgent': instance.userAgent,
-      'mirrors': instance.mirrors,
-    };
+Map<String, dynamic> _$RequestPolicyToJson(
+  RequestPolicy instance,
+) => <String, dynamic>{
+  'rateLimit': const RateLimitJsonConverter().toJson(instance.rateLimit),
+  'defaultHeaders': const StringMapJsonConverter().toJson(
+    instance.defaultHeaders,
+  ),
+  'userAgent': const OptionalStringJsonConverter().toJson(instance.userAgent),
+  'mirrors': const StringListJsonConverter().toJson(instance.mirrors),
+};

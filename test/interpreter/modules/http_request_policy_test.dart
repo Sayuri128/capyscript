@@ -630,6 +630,41 @@ void main() {
       expect(siteB.receivedPaths, <String>['/title/1?page=2']);
     });
 
+    test('fail over to the next mirror on a 403 response', () async {
+      siteA.statusCode = 403;
+      final Interpreter interpreter = _interpreter(
+        uid: _uniqueUid('forbidden'),
+        policy: RequestPolicy(mirrors: <String>[siteA.base, siteB.base]),
+      );
+
+      final Map<String, dynamic> result = await _fetch(
+        interpreter,
+        '${siteA.base}/title/1',
+      );
+
+      expect(result['status'], 200);
+      expect(result['body']['site'], 'b');
+      expect(siteA.receivedPaths, <String>['/title/1']);
+    });
+
+    test('returns the first 403 when every mirror forbids the request',
+        () async {
+      siteA.statusCode = 403;
+      siteB.statusCode = 403;
+      final Interpreter interpreter = _interpreter(
+        uid: _uniqueUid('all-forbidden'),
+        policy: RequestPolicy(mirrors: <String>[siteA.base, siteB.base]),
+      );
+
+      final Map<String, dynamic> result = await _fetch(
+        interpreter,
+        '${siteA.base}/title/1',
+      );
+
+      expect(result['status'], 403);
+      expect(result['body']['site'], 'a');
+    });
+
     test('fail over to the next mirror when a port is closed', () async {
       final String closedBase = 'http://127.0.0.1:${await _closedPort()}';
       final Interpreter interpreter = _interpreter(

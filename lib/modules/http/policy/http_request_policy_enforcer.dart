@@ -195,6 +195,8 @@ class HttpRequestPolicyEnforcer {
     }
     final String pathAfterMirror = url.substring(matchedMirror.length);
     final List<String> candidates = await orderedMirrors();
+    final List<String> forbiddenMirrors = <String>[];
+    http.Response? firstForbidden;
     for (int index = 0; index < candidates.length; index++) {
       final String mirror = candidates[index];
       final bool hasNextCandidate = index < candidates.length - 1;
@@ -210,20 +212,32 @@ class HttpRequestPolicyEnforcer {
           rethrow;
         }
         _markMirrorFailed(mirror);
-        if (!hasNextCandidate) {
-          rethrow;
+        if (hasNextCandidate) {
+          continue;
         }
-        continue;
+        if (firstForbidden != null) {
+          return firstForbidden;
+        }
+        rethrow;
+      }
+      if (isForbidden(response.statusCode)) {
+        firstForbidden ??= response;
+        forbiddenMirrors.add(mirror);
+        if (hasNextCandidate) {
+          continue;
+        }
+        return firstForbidden;
       }
       if (isServerError(response.statusCode)) {
         _markMirrorFailed(mirror);
         if (hasNextCandidate) {
           continue;
         }
-        return response;
+        return firstForbidden ?? response;
       }
       if (isSuccessful(response.statusCode)) {
         state.markMirrorWorking(mirror);
+        forbiddenMirrors.forEach(_markMirrorFailed);
       }
       return response;
     }
@@ -252,6 +266,10 @@ class HttpRequestPolicyEnforcer {
 
   static bool isSuccessful(int statusCode) {
     return statusCode >= 200 && statusCode < 400;
+  }
+
+  static bool isForbidden(int statusCode) {
+    return statusCode == 403;
   }
 
   static bool isServerError(int statusCode) {

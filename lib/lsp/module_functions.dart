@@ -6,6 +6,7 @@ const Map<String, List<String>> moduleFunctions = {
     'getHeaders',
     'registerInterceptorController',
     'executeJsScript',
+    'currentMirror',
   ],
   'io': ['print'],
   'json': ['jsonEncode', 'jsonDecode'],

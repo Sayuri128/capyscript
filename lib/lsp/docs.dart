@@ -106,6 +106,10 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'executeJsScript(script)',
     doc: 'Execute a JavaScript string inside the in-app browser and return the result.',
   ),
+  'currentMirror': (
+    detail: 'currentMirror()',
+    doc: 'Return the mirror base URL the next request will try first (user-selected, then last working, then declared order), or null when the extension declares no mirrors.',
+  ),
 
   // io module
   'print': (

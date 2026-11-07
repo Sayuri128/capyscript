@@ -68,7 +68,7 @@ class ModuleFunctionBody extends ASTNode {
 typedef ModuleFactory = BaseModule Function(ExtensionHost host);
 
 final Map<String, ModuleFactory> moduleFactories = {
-  HttpModule.module_name: (_) => HttpModule(),
+  HttpModule.module_name: (ExtensionHost host) => HttpModule(host: host),
   IOModule.module_name: (_) => IOModule(),
   JsonModule.module_name: (_) => JsonModule(),
   ConverterModule.module_name: (_) => ConverterModule(),

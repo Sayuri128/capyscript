@@ -10,6 +10,7 @@ class NovelApiClient extends ApiClient {
   static const getChapterTextFunctionName = 'getChapterText';
   static const getChapterTextUidParameterName = 'uid';
   static const getChapterTextDataParameterName = 'data';
+  static const getImageHeadersFunctionName = 'getImageHeaders';
 
   NovelApiClient({required super.code, super.host});
 
@@ -52,6 +53,15 @@ class NovelApiClient extends ApiClient {
     return (await runRelated(uid: uid, data: data))
         .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
         .toList();
+  }
+
+  @override
+  Future<Map<String, String>> getImageHeaders(
+      {required String uid, required Map<String, dynamic> data}) async {
+    if (!interpreter.hasFunction(getImageHeadersFunctionName)) {
+      return const <String, String>{};
+    }
+    return super.getImageHeaders(uid: uid, data: data);
   }
 
   Future<NovelChapterContent> getChapterText(

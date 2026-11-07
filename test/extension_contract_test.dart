@@ -651,6 +651,25 @@ void main() {
       expect(mapChapter.html, '<p>map</p>');
     });
 
+    test('getImageHeaders is optional for novels', () async {
+      final client = NovelApiClient(code: '''
+        function getChapterText(uid, data) {
+          return "text";
+        }
+      ''');
+      final withHeaders = NovelApiClient(code: '''
+        function getImageHeaders(uid, data) {
+          return {"Referer": "https://example.org"};
+        }
+      ''');
+
+      expect(await client.getImageHeaders(uid: 'n', data: {}), isEmpty);
+      expect(
+        await withHeaders.getImageHeaders(uid: 'n', data: {}),
+        {'Referer': 'https://example.org'},
+      );
+    });
+
     test('any other result is a format error', () {
       expect(() => NovelApiClient.readChapterContent(42), throwsFormatException);
       expect(() => NovelApiClient.readChapterContent(null), throwsFormatException);

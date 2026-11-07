@@ -50,6 +50,14 @@ class AnimeApiClient extends ApiClient {
         });
   }
 
+  @override
+  Future<List<AnimeGalleryView>> getRelated(
+      {required String uid, required Map<String, dynamic> data}) async {
+    return (await runRelated(uid: uid, data: data))
+        .map((e) => AnimeGalleryView.fromJson(jsonDecode(jsonEncode(e))))
+        .toList();
+  }
+
   Future<bool> supportsVideoSources() async {
     return interpreter.hasFunction(getVideoSourcesFunctionName);
   }

@@ -19,6 +19,8 @@ abstract class ApiClient {
   static const getGalleryFeedParameterName = 'feed';
   static const getGalleryPageSizeParameterName = 'pageSize';
 
+  static const getRelatedFunctionName = 'getRelated';
+
   static const getConcreteFunctionName = 'getConcrete';
   static const getConcreteUidParameterName = 'uid';
   static const getConcreteDataParameterName = 'data';
@@ -39,6 +41,26 @@ abstract class ApiClient {
 
   Future<ConcreteView> getConcrete(
       {required String uid, required Map<String, dynamic> data});
+
+  Future<bool> supportsRelated() async {
+    return interpreter.hasFunction(getRelatedFunctionName);
+  }
+
+  Future<List<GalleryView>> getRelated(
+      {required String uid, required Map<String, dynamic> data});
+
+  Future<List<dynamic>> runRelated(
+      {required String uid, required Map<String, dynamic> data}) async {
+    final Object? result = await interpreter.runFunction(getRelatedFunctionName,
+        arguments: {
+          getConcreteUidParameterName: uid,
+          getConcreteDataParameterName: data
+        });
+    if (result is List) {
+      return result;
+    }
+    return const <dynamic>[];
+  }
 
   Future<Map<String, dynamic>> galleryArguments(
       {required int page,

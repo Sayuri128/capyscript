@@ -505,6 +505,80 @@ void main() {
     });
   });
 
+  group('getRelated', () {
+    test('returns related titles from scripts that define it', () async {
+      final client = MangaApiClient(code: '''
+        import "manga_models";
+        function getRelated(uid, data) {
+          return [buildGallery({"uid": uid + "-related", "title": data["t"], "cover": "", "data": {}})];
+        }
+      ''');
+
+      expect(await client.supportsRelated(), isTrue);
+      final result = await client.getRelated(uid: 'a', data: {'t': 'Other'});
+
+      expect(result.single.uid, 'a-related');
+      expect(result.single.title, 'Other');
+    });
+
+    test('scripts without getRelated report no support', () async {
+      final client = MangaApiClient(code: '''
+        import "manga_models";
+        function getGallery(page, query, filters) {
+          return [];
+        }
+      ''');
+
+      expect(await client.supportsRelated(), isFalse);
+    });
+  });
+
+  group('content kinds and protector timeout', () {
+    test('content kinds are normalised and deduplicated', () {
+      final config = ConfigInfo.fromJson(<String, dynamic>{
+        ..._baseConfig(),
+        'contentKinds': <dynamic>[' Movie', 'series', 'movie', 3, ''],
+      });
+
+      expect(config.contentKinds, <String>['movie', 'series']);
+      expect(ConfigInfo.fromJson(_baseConfig()).contentKinds, isEmpty);
+      expect(
+        ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'contentKinds': 'anime'})
+            .contentKinds,
+        isEmpty,
+      );
+    });
+
+    test('content kinds survive a json round trip', () {
+      final config = ConfigInfo.fromJson(<String, dynamic>{
+        ..._baseConfig(),
+        'contentKinds': <dynamic>['anime'],
+      });
+
+      expect(
+        ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).contentKinds,
+        <String>['anime'],
+      );
+    });
+
+    test('the page load timeout is kept only inside its range', () {
+      Map<String, dynamic> protector(Object? seconds) => <String, dynamic>{
+            ..._baseConfig(),
+            'protectorConfig': <String, dynamic>{
+              'pingUrl': 'https://x',
+              'needToLogin': false,
+              'inAppBrowserInterceptor': true,
+              'pageLoadTimeoutSeconds': seconds,
+            },
+          };
+
+      expect(ConfigInfo.fromJson(protector(45)).protectorConfig?.pageLoadTimeoutSeconds, 45);
+      expect(ConfigInfo.fromJson(protector(2)).protectorConfig?.pageLoadTimeoutSeconds, isNull);
+      expect(ConfigInfo.fromJson(protector('45')).protectorConfig?.pageLoadTimeoutSeconds, isNull);
+      expect(ConfigInfo.fromJson(protector(null)).protectorConfig?.pageLoadTimeoutSeconds, isNull);
+    });
+  });
+
   group('AnimeVideoSource contract', () {
     test('buildAnimeVideoSource accepts skip markers, audio label and download preference',
         () async {

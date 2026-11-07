@@ -19,10 +19,29 @@ class ProtectorConfig {
   final bool inAppBrowserInterceptor;
   final String? sessionGroup;
 
+  @JsonKey(fromJson: readPageLoadTimeoutSeconds)
+  final int? pageLoadTimeoutSeconds;
+
+  static const int minPageLoadTimeoutSeconds = 5;
+  static const int maxPageLoadTimeoutSeconds = 120;
+
+  static int? readPageLoadTimeoutSeconds(Object? value) {
+    if (value is! num || !value.isFinite || value != value.truncate()) {
+      return null;
+    }
+    final int seconds = value.toInt();
+    if (seconds < minPageLoadTimeoutSeconds ||
+        seconds > maxPageLoadTimeoutSeconds) {
+      return null;
+    }
+    return seconds;
+  }
+
   const ProtectorConfig({
     required this.pingUrl,
     required this.needToLogin,
     required this.inAppBrowserInterceptor,
     this.sessionGroup,
+    this.pageLoadTimeoutSeconds,
   });
 }

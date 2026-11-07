@@ -12,6 +12,9 @@ ProtectorConfig _$ProtectorConfigFromJson(Map<String, dynamic> json) =>
       needToLogin: json['needToLogin'] as bool,
       inAppBrowserInterceptor: json['inAppBrowserInterceptor'] as bool,
       sessionGroup: json['sessionGroup'] as String?,
+      pageLoadTimeoutSeconds: ProtectorConfig.readPageLoadTimeoutSeconds(
+        json['pageLoadTimeoutSeconds'],
+      ),
     );
 
 Map<String, dynamic> _$ProtectorConfigToJson(ProtectorConfig instance) =>
@@ -20,4 +23,5 @@ Map<String, dynamic> _$ProtectorConfigToJson(ProtectorConfig instance) =>
       'needToLogin': instance.needToLogin,
       'inAppBrowserInterceptor': instance.inAppBrowserInterceptor,
       'sessionGroup': instance.sessionGroup,
+      'pageLoadTimeoutSeconds': instance.pageLoadTimeoutSeconds,
     };

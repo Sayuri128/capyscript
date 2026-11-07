@@ -41,6 +41,9 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
   pagination: const GalleryPaginationJsonConverter().fromJson(
     json['pagination'],
   ),
+  contentKinds: json['contentKinds'] == null
+      ? const <String>[]
+      : const ContentKindsJsonConverter().fromJson(json['contentKinds']),
 );
 
 Map<String, dynamic> _$ConfigInfoToJson(
@@ -75,6 +78,9 @@ Map<String, dynamic> _$ConfigInfoToJson(
   'feeds': const GalleryFeedsJsonConverter().toJson(instance.feeds),
   'pagination': const GalleryPaginationJsonConverter().toJson(
     instance.pagination,
+  ),
+  'contentKinds': const ContentKindsJsonConverter().toJson(
+    instance.contentKinds,
   ),
 };
 

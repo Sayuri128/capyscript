@@ -8,6 +8,7 @@ import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/f
 import 'package:json_annotation/json_annotation.dart';
 
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
+import 'content_kinds/content_kinds.dart';
 import 'download_config/download_config.dart';
 import 'gallery_feed/gallery_feed.dart';
 import 'gallery_pagination/gallery_pagination.dart';
@@ -103,6 +104,9 @@ class ConfigInfo extends ExternalObject {
   @GalleryPaginationJsonConverter()
   final GalleryPagination? pagination;
 
+  @ContentKindsJsonConverter()
+  final List<String> contentKinds;
+
   @override
   getField(String name) {
     if (name == 'name') {
@@ -127,6 +131,8 @@ class ConfigInfo extends ExternalObject {
       return apiVersion;
     } else if (name == 'minAppVersion') {
       return minAppVersion;
+    } else if (name == 'contentKinds') {
+      return contentKinds;
     }
   }
 
@@ -155,7 +161,8 @@ class ConfigInfo extends ExternalObject {
       this.preferences = const <ExtensionPreference>[],
       this.requestPolicy,
       this.feeds = const <GalleryFeed>[],
-      this.pagination});
+      this.pagination,
+      this.contentKinds = const <String>[]});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}

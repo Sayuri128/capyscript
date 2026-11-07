@@ -51,6 +51,14 @@ class MangaApiClient extends ApiClient {
         }));
   }
 
+  @override
+  Future<List<MangaGalleryView>> getRelated(
+      {required String uid, required Map<String, dynamic> data}) async {
+    return (await runRelated(uid: uid, data: data))
+        .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
+        .toList();
+  }
+
   Future<List<Chapter>> getChapters({required String uid}) async {
     return (await interpreter.runFunction(getChaptersFunctionName,
             arguments: {getChaptersUidParameterName: uid}) as List<dynamic>)

@@ -78,13 +78,16 @@ class AnimeVideoSourceReader {
   }
 
   static double? readSeconds(dynamic value) {
+    double? seconds;
     if (value is num) {
-      return value.toDouble();
+      seconds = value.toDouble();
+    } else if (value is String) {
+      seconds = double.tryParse(value.trim());
     }
-    if (value is String) {
-      return double.tryParse(value.trim());
+    if (seconds == null || !seconds.isFinite || seconds < 0) {
+      return null;
     }
-    return null;
+    return seconds;
   }
 
   static bool readFlag(dynamic value) {

@@ -322,6 +322,25 @@ void main() {
       expect(source.skip.last.start, 1300);
     });
 
+    test('skip markers drop non-finite and negative times', () {
+      final source = AnimeVideoSourceReader.readSource({
+        'url': 'https://x',
+        'skip': [
+          {'type': 'intro', 'start': double.nan, 'end': 90},
+          {'type': 'intro', 'start': 0, 'end': double.infinity},
+          {'type': 'intro', 'start': 'NaN', 'end': '90'},
+          {'type': 'intro', 'start': '0', 'end': 'Infinity'},
+          {'type': 'intro', 'start': double.negativeInfinity, 'end': 10},
+          {'type': 'recap', 'start': -5, 'end': 10},
+          {'type': 'outro', 'start': 1200, 'end': 1290},
+        ],
+      });
+
+      expect(source.skip, hasLength(1));
+      expect(source.skip.single.type, AnimeSkipType.outro);
+      expect(() => jsonEncode(source.toJson()), returnsNormally);
+    });
+
     test('sources without the new fields keep defaults', () {
       final source = AnimeVideoSourceReader.readSource({'url': 'https://x'});
 

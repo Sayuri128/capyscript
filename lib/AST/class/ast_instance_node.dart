@@ -1,4 +1,5 @@
 import 'package:capyscript/AST/ast_return_value.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/type_checker.dart';
 
@@ -33,41 +34,41 @@ class ASTInstanceNode {
 
     final owningClass = _findOwningClass(startClass, methodName, environment)!;
 
-    environment.enterScope();
+    final callEnvironment = environment.functionEnvironment();
     try {
-      environment.setVariable('this', this);
-      environment.setVariable('__currentClass__', owningClass);
+      callEnvironment.defineVariable('this', this);
+      callEnvironment.defineVariable('__currentClass__', owningClass);
 
       for (int i = 0; i < method.parameters.length; i++) {
         final param = method.parameters[i];
         if (i < resolvedArgs.length) {
-          environment.setVariable(param.paramName, resolvedArgs[i]);
+          callEnvironment.defineVariable(param.paramName, resolvedArgs[i]);
         } else if (param.isOptional && param.defaultValue != null) {
-          environment.setVariable(
+          callEnvironment.defineVariable(
             param.paramName,
-            await param.defaultValue!.execute(environment),
+            await param.defaultValue!.execute(callEnvironment),
           );
         }
         if (param.paramType != null) {
-          TypeChecker.check(
-              param.paramType!, environment.getVariable(param.paramName), environment);
+          TypeChecker.check(param.paramType!,
+              callEnvironment.getVariable(param.paramName), callEnvironment);
         }
       }
 
       dynamic res;
       try {
-        res = await method.execute(environment);
+        res = await method.execute(callEnvironment);
       } on ASTReturnValue catch (r) {
-        res = await r.execute(environment);
+        res = await r.execute(callEnvironment);
       }
 
       if (method.returnType != null && method.returnType != 'void') {
-        TypeChecker.check(method.returnType!, res, environment);
+        TypeChecker.check(method.returnType!, res, callEnvironment);
       }
 
       return res;
-    } finally {
-      environment.exitScope();
+    } catch (e, st) {
+      CapyScriptRuntimeError.rethrowWithFrame(e, st, '$owningClass.$methodName');
     }
   }
 

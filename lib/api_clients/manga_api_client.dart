@@ -13,15 +13,6 @@ import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/f
 import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/manga_gallery_view.dart';
 
 class MangaApiClient extends ApiClient {
-  static const getGalleryFunctionName = 'getGallery';
-  static const getGalleryPageParameterName = 'page';
-  static const getGalleryQueryParameterName = 'query';
-  static const getGalleryFiltersParameterName = 'filters';
-
-  static const getConcreteFunctionName = 'getConcrete';
-  static const getConcreteUidParameterName = 'uid';
-  static const getConcreteDataParameterName = 'data';
-
   static const getChaptersFunctionName = 'getChapters';
   static const getChaptersUidParameterName = 'uid';
 
@@ -29,26 +20,43 @@ class MangaApiClient extends ApiClient {
   static const getPagesUidParameterName = 'uid';
   static const getPagesDataParameterName = 'data';
 
-  MangaApiClient({required super.code});
+  MangaApiClient({required super.code, super.host});
 
+  @override
   Future<List<MangaGalleryView>> getGallery(
-      {required int page, String? query, List<FilterData>? filters}) async {
-    return (await interpreter.runFunction(getGalleryFunctionName, arguments: {
-      getGalleryPageParameterName: page,
-      getGalleryQueryParameterName: query ?? '',
-      getGalleryFiltersParameterName:
-          filters?.map((e) => e.toJson()).toList() ?? []
-    }) as List<dynamic>)
+      {required int page,
+      String? query,
+      List<FilterData>? filters,
+      String? feed,
+      int? pageSize}) async {
+    return (await interpreter.runFunction(ApiClient.getGalleryFunctionName,
+            arguments: await galleryArguments(
+                page: page,
+                query: query,
+                filters: filters,
+                feed: feed,
+                pageSize: pageSize))
+            as List<dynamic>)
         .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
         .toList();
   }
 
+  @override
   Future<MangaConcreteView> getConcrete(
       {required String uid, required Map<String, dynamic> data}) async {
-    return (await interpreter.runFunction(getConcreteFunctionName, arguments: {
-      getConcreteUidParameterName: uid,
-      getConcreteDataParameterName: data
-    }));
+    return (await interpreter.runFunction(ApiClient.getConcreteFunctionName,
+        arguments: {
+          ApiClient.getConcreteUidParameterName: uid,
+          ApiClient.getConcreteDataParameterName: data
+        }));
+  }
+
+  @override
+  Future<List<MangaGalleryView>> getRelated(
+      {required String uid, required Map<String, dynamic> data}) async {
+    return (await runRelated(uid: uid, data: data))
+        .map((e) => MangaGalleryView.fromJson(jsonDecode(jsonEncode(e))))
+        .toList();
   }
 
   Future<List<Chapter>> getChapters({required String uid}) async {

@@ -1,4 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
  * All right reserved

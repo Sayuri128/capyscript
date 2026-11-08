@@ -30,7 +30,6 @@ class ASTArrayNode extends ASTNode {
 
   @override
   Future execute(InterpreterEnvironment environment) async {
-    return (await Future.wait(expressions.map((e) => e.execute(environment))))
-        .toList();
+    return [for (final e in expressions) await e.execute(environment)];
   }
 }

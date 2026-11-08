@@ -11,6 +11,7 @@ import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_concrete_view/anime_video_group/anime_video_group.dart';
+import 'package:capyscript/modules/waka_models/concrete_metadata.dart';
 
 class AnimeBuildConcreteNode extends ModuleFunctionBody {
   @override
@@ -29,7 +30,13 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
             .map((e) => e.toString())
             .toList();
     final status = getVariable("status", environment);
+    final metadata = ConcreteMetadata.read(this, environment);
     return AnimeConcreteView(
+        authors: metadata.authors,
+        artists: metadata.artists,
+        year: metadata.year,
+        rating: metadata.rating,
+        url: metadata.url,
         uid: uid,
         cover: cover,
         title: title,
@@ -55,6 +62,7 @@ class AnimeBuildConcreteNode extends ModuleFunctionBody {
           ASTParameterNode("groups", paramType: "List"),
           ASTParameterNode("alternativeTitles", paramType: "List"),
           ASTParameterNode("status", paramType: "any"),
+          ...ConcreteMetadata.parameters(),
         ],
         returnType: "any",
         body: this);

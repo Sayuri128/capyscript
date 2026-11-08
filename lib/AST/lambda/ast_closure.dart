@@ -1,6 +1,7 @@
 import 'package:capyscript/AST/ast_node.dart';
 import 'package:capyscript/AST/ast_return_value.dart';
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_scoped_environment.dart';
 import 'package:capyscript/Interpreter/type_checker.dart';
@@ -20,37 +21,36 @@ class ASTClosure {
 
   Future<dynamic> call(
       InterpreterEnvironment environment, List<dynamic> arguments) async {
-    final saved = environment.currentScope;
-    environment.enterScopeWith(capturedScope);
+    final callEnvironment = environment.closureEnvironment(capturedScope);
     try {
       for (int i = 0; i < parameters.length; i++) {
         final param = parameters[i];
         if (i < arguments.length) {
-          environment.setVariable(param.paramName, arguments[i]);
+          callEnvironment.defineVariable(param.paramName, arguments[i]);
         } else if (param.isOptional && param.defaultValue != null) {
-          environment.setVariable(
-              param.paramName, await param.defaultValue!.execute(environment));
+          callEnvironment.defineVariable(param.paramName,
+              await param.defaultValue!.execute(callEnvironment));
         }
         if (param.paramType != null) {
           TypeChecker.check(param.paramType!,
-              environment.getVariable(param.paramName), environment);
+              callEnvironment.getVariable(param.paramName), callEnvironment);
         }
       }
 
       dynamic res;
       try {
-        res = await body.execute(environment);
+        res = await body.execute(callEnvironment);
       } on ASTReturnValue catch (r) {
-        res = await r.execute(environment);
+        res = await r.execute(callEnvironment);
       }
 
       if (returnType != null && returnType != 'void') {
-        TypeChecker.check(returnType!, res, environment);
+        TypeChecker.check(returnType!, res, callEnvironment);
       }
 
       return res;
-    } finally {
-      environment.restoreScope(saved);
+    } catch (e, st) {
+      CapyScriptRuntimeError.rethrowWithFrame(e, st, '<lambda>');
     }
   }
 

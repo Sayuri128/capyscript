@@ -19,6 +19,10 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
   final AnimeVideoType type;
   final String src;
   final String? timestamp;
+  @JsonKey(includeIfNull: false)
+  final double? number;
+  @JsonKey(includeIfNull: false)
+  final int? season;
 
   const AnimeVideo(
       {required this.type,
@@ -26,7 +30,9 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
       required this.src,
       required String title,
       required this.timestamp,
-      required Map<String, dynamic> data})
+      required Map<String, dynamic> data,
+      this.number,
+      this.season})
       : super(title: title, uid: uid, data: data);
 
   @override
@@ -41,11 +47,15 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
     } else if (name == 'src') {
       return src;
     } else if (name == 'title') {
-      return timestamp;
+      return title;
     } else if (name == 'timestamp') {
       return timestamp;
     } else if (name == 'data') {
       return data;
+    } else if (name == 'number') {
+      return number;
+    } else if (name == 'season') {
+      return season;
     }
   }
 
@@ -59,6 +69,8 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
     String? title,
     String? timestamp,
     Map<String, dynamic>? data,
+    double? number,
+    int? season,
   }) {
     return AnimeVideo(
       type: type ?? this.type,
@@ -67,6 +79,8 @@ class AnimeVideo extends ElementOfElementsGroupOfConcrete {
       title: title ?? this.title,
       timestamp: timestamp ?? this.timestamp,
       data: data ?? this.data,
+      number: number ?? this.number,
+      season: season ?? this.season,
     );
   }
 }

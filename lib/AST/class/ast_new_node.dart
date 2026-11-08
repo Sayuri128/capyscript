@@ -43,7 +43,7 @@ class ASTNewNode extends ASTNode {
 
     // Call constructor if one exists anywhere in the hierarchy
     if (_classHasMethod(className, 'constructor', environment)) {
-      final resolvedArgs = await Future.wait(arguments.map((a) => a.execute(environment)));
+      final resolvedArgs = [for (final a in arguments) await a.execute(environment)];
       await instance.callMethod('constructor', resolvedArgs, environment);
     }
 

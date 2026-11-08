@@ -6,7 +6,8 @@ const _topLevelKeywords = ['import', 'function', 'class', 'interface'];
 
 const _blockKeywords = [
   'if', 'else', 'for', 'return', 'break', 'continue', 'null', 'true', 'false',
-  'new', 'this', 'super', 'var',
+  'new', 'this', 'super', 'var', 'while', 'in', 'try', 'catch', 'finally',
+  'throw',
 ];
 
 const _typeNames = [

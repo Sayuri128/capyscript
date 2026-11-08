@@ -13,6 +13,8 @@ AnimeVideo _$AnimeVideoFromJson(Map<String, dynamic> json) => AnimeVideo(
   title: json['title'] as String,
   timestamp: json['timestamp'] as String?,
   data: json['data'] as Map<String, dynamic>,
+  number: (json['number'] as num?)?.toDouble(),
+  season: (json['season'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$AnimeVideoToJson(AnimeVideo instance) =>
@@ -23,6 +25,11 @@ Map<String, dynamic> _$AnimeVideoToJson(AnimeVideo instance) =>
       'type': _$AnimeVideoTypeEnumMap[instance.type]!,
       'src': instance.src,
       'timestamp': instance.timestamp,
+      'number': ?instance.number,
+      'season': ?instance.season,
     };
 
-const _$AnimeVideoTypeEnumMap = {AnimeVideoType.IFRAME: 'IFRAME'};
+const _$AnimeVideoTypeEnumMap = {
+  AnimeVideoType.IFRAME: 'IFRAME',
+  AnimeVideoType.DIRECT: 'DIRECT',
+};

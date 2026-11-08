@@ -1,4 +1,5 @@
 import 'package:capyscript/modules/waka_models/models/common/gallery_view.dart';
+import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_status.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'manga_gallery_view.g.dart';
@@ -12,12 +13,19 @@ class MangaGalleryView extends GalleryView {
 
   final String cover;
   final String title;
+  final MangaStatus? status;
 
   const MangaGalleryView(
       {required String uid,
       required this.cover,
       required this.title,
-      Map<String, dynamic> data = const {}})
+      Map<String, dynamic> data = const {},
+      this.status,
+      super.subtitle,
+      super.tags,
+      super.year,
+      super.rating,
+      super.latestChapter})
       : super(uid: uid, data: data);
 
   @override
@@ -35,7 +43,10 @@ class MangaGalleryView extends GalleryView {
       return title;
     } else if (name == 'data') {
       return data;
+    } else if (name == 'status') {
+      return status;
     }
+    return getMetadataField(name);
   }
 
   @override

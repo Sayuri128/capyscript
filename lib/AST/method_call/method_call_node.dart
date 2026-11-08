@@ -37,8 +37,7 @@ class ASTMethodCallNode extends ASTNode {
   @override
   Future execute(InterpreterEnvironment environment) async {
     final obj = await variable.execute(environment);
-    final args = await Future.wait(
-        arguments.map((e) async => await e.execute(environment)));
+    final args = [for (final e in arguments) await e.execute(environment)];
 
     if (obj is List) {
       switch (methodName) {

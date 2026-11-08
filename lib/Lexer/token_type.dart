@@ -54,5 +54,12 @@ enum TokenType {
   TRY,
   CATCH,
   FINALLY,
-  THROW
+  THROW,
+  NOT,
+  WHILE,
+  IN,
+  PLUS_EQUALS,
+  MINUS_EQUALS,
+  MULTIPLY_EQUALS,
+  DIVIDE_EQUALS
 }

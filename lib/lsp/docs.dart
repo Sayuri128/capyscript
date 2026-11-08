@@ -106,6 +106,10 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'executeJsScript(script)',
     doc: 'Execute a JavaScript string inside the in-app browser and return the result.',
   ),
+  'currentMirror': (
+    detail: 'currentMirror()',
+    doc: 'Return the mirror base URL the next request will try first (user-selected, then last working, then declared order), or null when the extension declares no mirrors.',
+  ),
 
   // io module
   'print': (
@@ -136,6 +140,42 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'parseString(value)',
     doc: 'Convert a value to its string representation.',
   ),
+  'base64Encode': (
+    detail: 'base64Encode(value)',
+    doc: 'Encode a string as UTF-8 base64.',
+  ),
+  'base64Decode': (
+    detail: 'base64Decode(value)',
+    doc: 'Decode UTF-8 base64 (padding optional) into a string.',
+  ),
+  'urlEncode': (
+    detail: 'urlEncode(value)',
+    doc: 'Percent-encode a value for use in a URL component.',
+  ),
+  'urlDecode': (
+    detail: 'urlDecode(value)',
+    doc: 'Decode a percent-encoded URL component.',
+  ),
+  'regexTest': (
+    detail: 'regexTest(pattern, input, flags = "")',
+    doc: 'Whether the pattern matches anywhere in input. Flags: i (ignore case), m (multiline), s (dot matches newline).',
+  ),
+  'regexMatch': (
+    detail: 'regexMatch(pattern, input, flags = "")',
+    doc: 'First match as [whole, group1, ...], or null.',
+  ),
+  'regexMatchAll': (
+    detail: 'regexMatchAll(pattern, input, flags = "")',
+    doc: 'Every match as a list of [whole, group1, ...].',
+  ),
+  'regexSplit': (
+    detail: 'regexSplit(pattern, input, flags = "")',
+    doc: 'Split input on the pattern.',
+  ),
+  'regexReplace': (
+    detail: 'regexReplace(pattern, input, replacement, flags = "")',
+    doc: 'Replace every match; \$1 inserts a group, \$\$ a literal dollar.',
+  ),
 
   // date module
   'createDateFormatter': (
@@ -153,18 +193,39 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     doc: 'Create an HTML parser from an HTML string. Returns an object for DOM traversal.',
   ),
 
+  'getPreference': (
+    detail: 'getPreference(key)',
+    doc: 'Value of a preference declared in the config `preferences`: the stored user value, else the declared default, else null. Returns a bool (toggle), string (select, text), number (number) or list of strings (multiselect). Requires `import "preferences";`.',
+  ),
+  'storageGet': (
+    detail: 'storageGet(key)',
+    doc: 'Read a value saved with storageSet for this extension, or null when missing or expired. Requires `import "storage";`.',
+  ),
+  'storageSet': (
+    detail: 'storageSet(key, value, ttlSeconds = null)',
+    doc: 'Save a JSON-encodable value (null, bool, number, string, list, map with string keys) for this extension. ttlSeconds (positive number) lets the app expire it; null keeps it until removed. Other values are a script error. Requires `import "storage";`.',
+  ),
+  'storageRemove': (
+    detail: 'storageRemove(key)',
+    doc: 'Delete a value saved with storageSet. Requires `import "storage";`.',
+  ),
+  'throwSourceError': (
+    detail: 'throwSourceError(kind, message = "")',
+    doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
+  ),
+
   // manga_models module
   'buildGallery': (
     detail: 'buildGallery(params)',
-    doc: 'Build a gallery (list) model for manga.',
+    doc: 'Build a gallery entry: uid, title, cover, data (anime also status); optional status (manga), subtitle, tags, year, rating (0-10), latestChapter.',
   ),
   'buildConcrete': (
     detail: 'buildConcrete(params)',
-    doc: 'Build a concrete manga entry model.',
+    doc: 'Build a concrete entry: uid, cover, title, description, tags, groups, status, alternativeTitles; optional authors, artists, year, rating (0-10), url.',
   ),
   'buildChapter': (
     detail: 'buildChapter(params)',
-    doc: 'Build a single chapter model.',
+    doc: 'Build a single chapter model: uid, title, timestamp, data; optional number (chapter number, int/decimal/numeric string, e.g. 12.5) and volume (int/numeric string). Invalid values become null. Older apps ignore number and volume.',
   ),
   'buildChapterGroups': (
     detail: 'buildChapterGroups(params)',
@@ -174,9 +235,29 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'buildPages(params)',
     doc: 'Build a pages model for a chapter.',
   ),
+  'buildNovelChapter': (
+    detail: 'buildNovelChapter(params)',
+    doc: 'Build the text of a novel chapter for getChapterText(uid, data): html (chapter body as HTML or plain text); optional title. Requires `import "novel_models";` and a config with type 2.',
+  ),
+  'buildAudioSource': (
+    detail: 'buildAudioSource(params)',
+    doc: 'Build a playable source of an audiobook track for getAudioSources(uid, data): url; optional format (mp3, m4a, m4b, hls), quality label, headers map, duration in seconds and markers (buildAudioMarker list of chapter starts inside the file). Requires `import "audio_models";` and a config with type 3.',
+  ),
+  'buildAudioMarker': (
+    detail: 'buildAudioMarker(params)',
+    doc: 'Build a chapter marker inside an audio file: start (seconds from the beginning of the file); optional title. Pass a list of them as markers to buildAudioSource.',
+  ),
   'buildAnimeVideo': (
     detail: 'buildAnimeVideo(params)',
-    doc: 'Build a single anime video model.',
+    doc: 'Build a single anime video model: uid, title, timestamp, data, type (typeIframe() or typeDirect()), src; optional number (episode number, int/decimal/numeric string, e.g. 12.5) and season (int/numeric string). Invalid values become null. Older apps ignore number and season.',
+  ),
+  'buildAnimeVideoSource': (
+    detail: 'buildAnimeVideoSource(params)',
+    doc: 'Build a playable stream for getVideoSources(uid, src, data): url; optional quality ("1080p", "Auto"), format ("hls", "mp4", "dash", null = auto), headers (map), subtitles (list of buildAnimeVideoSubtitle).',
+  ),
+  'buildAnimeVideoSubtitle': (
+    detail: 'buildAnimeVideoSubtitle(params)',
+    doc: 'Build a subtitle track for buildAnimeVideoSource: url; optional label, language, format ("vtt", "srt", null = auto), headers (map).',
   ),
   'buildAnimeVideoGroup': (
     detail: 'buildAnimeVideoGroup(params)',
@@ -189,6 +270,7 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   'statusReleased': (detail: 'statusReleased', doc: 'Status constant: released/completed.'),
   'statusUndefined': (detail: 'statusUndefined', doc: 'Status constant: unknown/undefined.'),
   'typeIframe': (detail: 'typeIframe', doc: 'Video type constant: iframe embed.'),
+  'typeDirect': (detail: 'typeDirect', doc: 'Video type constant: direct stream; the app resolves playable URLs at play time by calling the script function getVideoSources(uid, src, data), which returns a list of buildAnimeVideoSource.'),
 
   // String members
   'length': (detail: '.length → int', doc: 'The number of characters (string) or elements (array/map).'),

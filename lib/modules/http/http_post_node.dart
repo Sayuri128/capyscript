@@ -8,17 +8,20 @@ import 'package:capyscript/modules/http/http_browser_response.dart';
 import 'package:capyscript/modules/http/http_interceptor_controller.dart';
 import 'package:capyscript/modules/http/http_response.dart';
 import 'package:capyscript/modules/http/http_utils.dart';
-import 'package:http/http.dart' as http;
+import 'package:capyscript/modules/http/policy/http_request_policy_enforcer.dart';
 import 'package:logger/logger.dart';
 
 class HttpPostNode extends ModuleFunctionBody {
   final HttpInterceptorController? Function() getInterceptorController;
   final Map<String, String> Function() getHeaders;
+  final HttpRequestPolicyEnforcer policyEnforcer;
 
   final Logger _logger = Logger();
 
   HttpPostNode(
-      {required this.getInterceptorController, required this.getHeaders});
+      {required this.getInterceptorController,
+      required this.getHeaders,
+      required this.policyEnforcer});
 
   @override
   Future execute(InterpreterEnvironment environment) async {
@@ -31,18 +34,21 @@ class HttpPostNode extends ModuleFunctionBody {
     final scriptHeaders = (getVariable("headers", environment, defaultValue: {})
             as Map)
         .map((key, value) => MapEntry(key.toString(), value.toString()));
-    final headers = <String, String>{...getHeaders(), ...scriptHeaders};
+    final headers = policyEnforcer.composeHeaders(
+        sessionHeaders: getHeaders(), callHeaders: scriptHeaders);
     final throughWeb = getVariable("throughWeb", environment);
 
     url = await HttpUtils.buildUri(url, params: params, paths: paths);
-    final uri = Uri.parse(url);
+    Uri.parse(url);
 
     final controller = getInterceptorController();
     if (throughWeb && controller != null) {
+      final webUrl = await policyEnforcer.resolveWebUrl(url);
+      await policyEnforcer.acquireSlot();
       _logger.d(
-          "httpPost: $url through web browser interceptor controller\nheaders: $headers");
+          "httpPost: $webUrl through web browser interceptor controller\nheaders: $headers");
       final response = await controller.loadPage(
-          url: url, method: "POST", headers: headers, body: body);
+          url: webUrl, method: "POST", headers: headers, body: body);
       return CapyHttpBrowserResponse(
           cookies: response.cookies,
           statusCode: response.statusCode,
@@ -50,12 +56,18 @@ class HttpPostNode extends ModuleFunctionBody {
           contentLength: response.body.length,
           headers: response.headers);
     } else {
-      _logger.d("httpPost: $url\nheaders: $headers");
-      final response = await http.post(uri, headers: headers, body: body);
+      final response = await policyEnforcer.send(url,
+          (Uri attemptUri, Duration firstResponseTimeout) {
+        _logger.d("httpPost: $attemptUri\nheaders: $headers");
+        return HttpUtils.sendRequest("POST", attemptUri,
+            headers: headers,
+            body: body,
+            firstResponseTimeout: firstResponseTimeout);
+      });
 
       return CapyHttpResponse(
           statusCode: response.statusCode,
-          body: response.body,
+          body: HttpUtils.decodeBody(response),
           headers: response.headers,
           contentLength: response.contentLength);
     }

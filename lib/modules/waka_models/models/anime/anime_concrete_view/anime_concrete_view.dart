@@ -41,6 +41,7 @@ class AnimeConcreteView extends ConcreteView<AnimeVideoGroup> {
     } else if (name == 'status') {
       return status;
     }
+    return getMetadataField(name);
   }
 
   @override
@@ -54,7 +55,12 @@ class AnimeConcreteView extends ConcreteView<AnimeVideoGroup> {
       required super.description,
       required super.tags,
       required super.groups,
-      required this.status});
+      required this.status,
+      super.authors,
+      super.artists,
+      super.year,
+      super.rating,
+      super.url});
 
   AnimeConcreteView copyWith({
     String? uid,
@@ -65,8 +71,18 @@ class AnimeConcreteView extends ConcreteView<AnimeVideoGroup> {
     List<String>? tags,
     List<AnimeVideoGroup>? groups,
     AnimeStatus? status,
+    List<String>? authors,
+    List<String>? artists,
+    int? year,
+    num? rating,
+    String? url,
   }) {
     return AnimeConcreteView(
+      authors: authors ?? this.authors,
+      artists: artists ?? this.artists,
+      year: year ?? this.year,
+      rating: rating ?? this.rating,
+      url: url ?? this.url,
       uid: uid ?? this.uid,
       cover: cover ?? this.cover,
       title: title ?? this.title,

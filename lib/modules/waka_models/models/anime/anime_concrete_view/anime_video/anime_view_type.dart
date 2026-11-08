@@ -3,4 +3,4 @@
  * All right reserved
  */
 
-enum AnimeVideoType { IFRAME }
+enum AnimeVideoType { IFRAME, DIRECT }

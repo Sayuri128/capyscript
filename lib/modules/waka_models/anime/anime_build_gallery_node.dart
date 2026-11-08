@@ -7,6 +7,7 @@ import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_no
 import 'package:capyscript/AST/parameter/ast_parameter_node.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
+import 'package:capyscript/modules/waka_models/gallery_metadata.dart';
 import 'package:capyscript/modules/waka_models/models/anime/anime_gallery_view/anime_gallery_view.dart';
 
 class AnimeBuildGalleryNode extends ModuleFunctionBody {
@@ -18,8 +19,19 @@ class AnimeBuildGalleryNode extends ModuleFunctionBody {
     final data = (getVariable("data", environment) as Map)
         .map((key, value) => MapEntry(key.toString(), value));
     final status = getVariable("status", environment);
+    final metadata = GalleryMetadata.read(environment);
     return AnimeGalleryView(
-        uid: uid, cover: cover, title: title, data: data, status: status);
+      uid: uid,
+      cover: cover,
+      title: title,
+      data: data,
+      status: status,
+      subtitle: metadata.subtitle,
+      tags: metadata.tags,
+      year: metadata.year,
+      rating: metadata.rating,
+      latestChapter: metadata.latestChapter,
+    );
   }
 
   @override
@@ -32,6 +44,7 @@ class AnimeBuildGalleryNode extends ModuleFunctionBody {
           ASTParameterNode("cover", paramType: "string"),
           ASTParameterNode("data", paramType: "Map"),
           ASTParameterNode("status", paramType: "any"),
+          ...GalleryMetadata.parameters(),
         ],
         returnType: "any",
         body: this);

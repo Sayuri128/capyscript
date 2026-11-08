@@ -18,7 +18,7 @@ class HtmlDocument extends ExternalObject {
   getField(String name) {
     switch (name) {
       case 'text':
-        return _document.text;
+        return _document.documentElement?.text ?? "";
       case 'outerHtml':
         return _document.outerHtml;
     }
@@ -55,7 +55,7 @@ class HtmlDocument extends ExternalObject {
         final element = _document.querySelector(ordinalArguments![0]);
         return element != null ? HtmlElement(element) : null;
       case "text":
-        return _document.text;
+        return _document.documentElement?.text ?? "";
     }
     throw Exception("Method $name not found");
   }

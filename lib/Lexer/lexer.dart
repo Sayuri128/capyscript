@@ -4,6 +4,7 @@ import 'token_type.dart';
 class Lexer {
   final String source;
   int _pos;
+  int tokenStart = 0;
 
   Lexer({
     required this.source,
@@ -47,6 +48,8 @@ class Lexer {
         continue;
       }
 
+      tokenStart = _pos;
+
       if (RegExp(r'\d').hasMatch(currentChar)) {
         return _parseNumber();
       }
@@ -71,6 +74,22 @@ class Lexer {
         _advance();
         _advance();
         return Token(TokenType.GREATER_EQUAL, '>=');
+      } else if (currentChar == "+" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.PLUS_EQUALS, "+=");
+      } else if (currentChar == "-" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.MINUS_EQUALS, "-=");
+      } else if (currentChar == "*" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.MULTIPLY_EQUALS, "*=");
+      } else if (currentChar == "/" && peekNextChar() == "=") {
+        _advance();
+        _advance();
+        return Token(TokenType.DIVIDE_EQUALS, "/=");
       } else if (currentChar == "+" && peekNextChar() == "+") {
         _advance();
         _advance();
@@ -137,13 +156,29 @@ class Lexer {
           return Token(TokenType.LESS, currentChar);
         case ">":
           return Token(TokenType.GREATER, currentChar);
+        case "!":
+          return Token(TokenType.NOT, currentChar);
         default:
           throw Exception(
-              'Invalid token at ${--_pos} \n ${getRangeTokens(20)}');
+              'Invalid token at ${locationOf(--_pos)} \n ${getRangeTokens(20)}');
       }
     }
 
+    tokenStart = _pos;
     return Token(TokenType.END, '');
+  }
+
+  String locationOf(int offset) {
+    final end = offset.clamp(0, source.length);
+    var line = 1;
+    var lineStart = 0;
+    for (var i = 0; i < end; i++) {
+      if (source.codeUnitAt(i) == 10) {
+        line++;
+        lineStart = i + 1;
+      }
+    }
+    return 'line $line:${end - lineStart + 1}';
   }
 
   void _skipSingleLineComment() {
@@ -182,18 +217,37 @@ class Lexer {
     _advance();
 
     String openQuote = source[_pos - 1];
+    final escapes = openQuote != "`";
 
     while (_pos < source.length && source[_pos] != openQuote) {
+      if (escapes && source[_pos] == "\\" && _pos + 1 < source.length) {
+        final next = source[_pos + 1];
+        final escaped = _escapes[next];
+        if (escaped != null) {
+          string += escaped;
+          _pos += 2;
+          continue;
+        }
+      }
       string += source[_pos++];
     }
 
     if (_pos >= source.length || (source[_pos] != openQuote)) {
-      throw Exception('Unclosed string literal');
+      throw Exception('Unclosed string literal at ${locationOf(tokenStart)}');
     }
 
     _advance();
     return Token(TokenType.STRING, string);
   }
+
+  static const Map<String, String> _escapes = {
+    "n": "\n",
+    "t": "\t",
+    "r": "\r",
+    "\\": "\\",
+    "\"": "\"",
+    "'": "'",
+  };
 
   Token parseIdentifier() {
     var identifier = '';
@@ -247,6 +301,10 @@ class Lexer {
       return Token(TokenType.FINALLY, identifier);
     } else if (identifier == "throw") {
       return Token(TokenType.THROW, identifier);
+    } else if (identifier == "while") {
+      return Token(TokenType.WHILE, identifier);
+    } else if (identifier == "in") {
+      return Token(TokenType.IN, identifier);
     }
     return Token(TokenType.IDENTIFIER, identifier);
   }

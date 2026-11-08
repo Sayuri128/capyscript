@@ -8,7 +8,15 @@ import 'package:capyscript/modules/waka_models/models/manga/manga_gallery_view/f
 import 'package:json_annotation/json_annotation.dart';
 
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
+import 'content_kinds/content_kinds.dart';
+import 'source_pricing/source_pricing.dart';
+import 'source_type/source_type.dart';
+import 'download_config/download_config.dart';
+import 'gallery_feed/gallery_feed.dart';
+import 'gallery_pagination/gallery_pagination.dart';
+import 'preferences/extension_preference.dart';
 import 'protector_config/protector_config.dart';
+import 'request_policy/request_policy.dart';
 
 part 'config_info.g.dart';
 
@@ -16,7 +24,11 @@ enum ConfigInfoType {
   @JsonValue(0)
   MANGA,
   @JsonValue(1)
-  ANIME
+  ANIME,
+  @JsonValue(2)
+  NOVEL,
+  @JsonValue(3)
+  AUDIO
 }
 
 int serializeLocalApiClientType(ConfigInfoType type) {
@@ -25,6 +37,10 @@ int serializeLocalApiClientType(ConfigInfoType type) {
       return 0;
     case ConfigInfoType.ANIME:
       return 1;
+    case ConfigInfoType.NOVEL:
+      return 2;
+    case ConfigInfoType.AUDIO:
+      return 3;
   }
 }
 
@@ -34,11 +50,31 @@ ConfigInfoType deserializeLocalApiClientType(int type) {
       return ConfigInfoType.MANGA;
     case 1:
       return ConfigInfoType.ANIME;
+    case 2:
+      return ConfigInfoType.NOVEL;
+    case 3:
+      return ConfigInfoType.AUDIO;
   }
-  throw Exception("Unknown LocalApiClientType $type");
+  throw FormatException("Unknown ConfigInfo type $type");
 }
 
-@JsonSerializable()
+class ConfigInfoTypeJsonConverter
+    extends JsonConverter<ConfigInfoType, Object?> {
+  const ConfigInfoTypeJsonConverter();
+
+  @override
+  ConfigInfoType fromJson(Object? json) {
+    if (json is num && json.isFinite && json == json.toInt()) {
+      return deserializeLocalApiClientType(json.toInt());
+    }
+    throw FormatException("Unknown ConfigInfo type $json");
+  }
+
+  @override
+  Object? toJson(ConfigInfoType object) => serializeLocalApiClientType(object);
+}
+
+@JsonSerializable(explicitToJson: true)
 class ConfigInfo extends ExternalObject {
   factory ConfigInfo.fromJson(Map<String, dynamic> json) =>
       _$ConfigInfoFromJson(json);
@@ -48,6 +84,7 @@ class ConfigInfo extends ExternalObject {
   final String uid;
   final String name;
   final String logoUrl;
+  @ConfigInfoTypeJsonConverter()
   final ConfigInfoType type;
   final bool nsfw;
   final String language;
@@ -59,12 +96,46 @@ class ConfigInfo extends ExternalObject {
   @ProtectorConfigJsonConverter()
   final ProtectorConfig? protectorConfig;
 
+  @DownloadConfigJsonConverter()
+  final DownloadConfig? downloadConfig;
+
   final bool searchAvailable;
+
+  @JsonKey(defaultValue: 1)
+  final int apiVersion;
+
+  final String? minAppVersion;
+
+  @ExtensionPreferencesJsonConverter()
+  final List<ExtensionPreference> preferences;
+
+  @RequestPolicyJsonConverter()
+  final RequestPolicy? requestPolicy;
+
+  @GalleryFeedsJsonConverter()
+  final List<GalleryFeed> feeds;
+
+  @GalleryPaginationJsonConverter()
+  final GalleryPagination? pagination;
+
+  @ContentKindsJsonConverter()
+  final List<String> contentKinds;
+
+  @SourcePricingJsonConverter()
+  final String pricing;
+
+  @SourceTypeJsonConverter()
+  final String sourceType;
+
+  @JsonKey(fromJson: readMultiInstance)
+  final bool multiInstance;
+
+  static bool readMultiInstance(Object? value) => value == true;
 
   @override
   getField(String name) {
     if (name == 'name') {
-      return name;
+      return this.name;
     } else if (name == 'logoUrl') {
       return logoUrl;
     } else if (name == 'nsfw') {
@@ -75,10 +146,24 @@ class ConfigInfo extends ExternalObject {
       return version;
     } else if (name == 'protectorConfig') {
       return protectorConfig;
+    } else if (name == 'downloadConfig') {
+      return downloadConfig;
     } else if (name == 'searchAvailable') {
       return searchAvailable;
     } else if (name == 'uid') {
       return uid;
+    } else if (name == 'apiVersion') {
+      return apiVersion;
+    } else if (name == 'minAppVersion') {
+      return minAppVersion;
+    } else if (name == 'contentKinds') {
+      return contentKinds;
+    } else if (name == 'pricing') {
+      return pricing;
+    } else if (name == 'sourceType') {
+      return sourceType;
+    } else if (name == 'multiInstance') {
+      return multiInstance;
     }
   }
 
@@ -100,10 +185,36 @@ class ConfigInfo extends ExternalObject {
       required this.filters,
       required this.type,
       this.protectorConfig,
-      required this.searchAvailable});
+      this.downloadConfig,
+      required this.searchAvailable,
+      this.apiVersion = 1,
+      this.minAppVersion,
+      this.preferences = const <ExtensionPreference>[],
+      this.requestPolicy,
+      this.feeds = const <GalleryFeed>[],
+      this.pagination,
+      this.contentKinds = const <String>[],
+      this.pricing = SourcePricing.free,
+      this.sourceType = SourceType.website,
+      this.multiInstance = false});
 
   @override
   callFunction(String name, {List? ordinalArguments}) {}
+}
+
+class DownloadConfigJsonConverter
+    extends JsonConverter<DownloadConfig, Map<String, dynamic>> {
+  const DownloadConfigJsonConverter();
+
+  @override
+  DownloadConfig fromJson(Map<String, dynamic> json) {
+    return DownloadConfig.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> toJson(DownloadConfig object) {
+    return object.toJson();
+  }
 }
 
 class ProtectorConfigJsonConverter
@@ -176,10 +287,12 @@ class GalleryFiltersJsonConverter
   @override
   List<GalleryFilter> fromJson(List<dynamic> json) {
     final GalleryFilterJsonConverter converter = GalleryFilterJsonConverter();
+    final knownTypes = GalleryFilterModes.values.toSet();
 
-    return json.map((e) {
-      return converter.fromJson(e);
-    }).toList();
+    return json
+        .where((e) => e is Map && knownTypes.contains(e["type"]))
+        .map((e) => converter.fromJson(e))
+        .toList();
   }
 
   @override

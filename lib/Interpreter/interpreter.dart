@@ -11,6 +11,10 @@ import 'package:capyscript/AST/function_call/ast_function_call_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/map/ast_map_node.dart';
 import 'package:capyscript/AST/string/ast_string_node.dart';
+import 'package:capyscript/Interpreter/capyscript_runtime_error.dart';
+import 'package:capyscript/api_clients/host/extension_host.dart';
+import 'package:capyscript/api_clients/source_error.dart';
+import 'package:capyscript/Interpreter/execution_budget.dart';
 import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
@@ -22,20 +26,28 @@ class Interpreter {
   late final Parser parser;
 
   final File? mainFile;
+  final ExecutionBudget budget;
+  final ExtensionHost host;
 
   late final InterpreterEnvironment _environment;
   final Set<String> _loadedFilePaths = {};
 
-  Interpreter({required String data, this.mainFile}) {
+  Interpreter(
+      {required String data,
+      this.mainFile,
+      ExecutionBudget? budget,
+      this.host = ExtensionHost.none})
+      : budget = budget ?? ExecutionBudget() {
     _environment = InterpreterEnvironment(functions: {});
     this.parser = Parser(source: data);
   }
 
-  factory Interpreter.fromFile({required String path}) {
+  factory Interpreter.fromFile(
+      {required String path, ExtensionHost host = ExtensionHost.none}) {
     final file = File(path);
     final String input = file.readAsStringSync();
 
-    return Interpreter(data: input, mainFile: file);
+    return Interpreter(data: input, mainFile: file, host: host);
   }
 
   InterpreterTree? _interpreterTree;
@@ -51,17 +63,12 @@ class Interpreter {
     if (factory == null) {
       return null;
     }
-    return _builtinModules[moduleName] = factory();
+    return _builtinModules[moduleName] = factory(host);
   }
 
   Future<dynamic> runFunction(String functionName,
       {Map<String, dynamic>? arguments}) async {
-    InterpreterTree interpreterResult = _runParser();
-
-    try {
-      interpreterResult.astTree.functions
-          .firstWhere((element) => element.functionName == functionName);
-    } catch (e) {
+    if (!hasFunction(functionName)) {
       throw Exception("function $functionName not found");
     }
 
@@ -69,7 +76,23 @@ class Interpreter {
         function: ASTStringNode(value: functionName),
         arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
 
-    return await functionCall.execute(_environment);
+    try {
+      return await functionCall
+          .execute(_environment.withBudget(budget.fresh()));
+    } on CapyScriptRuntimeError catch (error, stackTrace) {
+      final cause = error.cause;
+      if (cause is SourceError) {
+        Error.throwWithStackTrace(cause, stackTrace);
+      }
+      rethrow;
+    }
+  }
+
+  bool hasFunction(String functionName) {
+    return _runParser()
+        .astTree
+        .functions
+        .any((element) => element.functionName == functionName);
   }
 
   Future<dynamic> interpret() async {
@@ -84,7 +107,7 @@ class Interpreter {
 
     final mainCall = ASTFunctionCallNode(
         function: ASTStringNode(value: 'main'), arguments: []);
-    return await mainCall.execute(_environment);
+    return await mainCall.execute(_environment.withBudget(budget.fresh()));
   }
 
   InterpreterTree _runParser() {
@@ -101,7 +124,7 @@ class Interpreter {
     }
     _importModule(tree);
     _registerClassesAndInterfaces();
-    return InterpreterTree(astTree: tree, parsedModules: modules);
+    return _interpreterTree = InterpreterTree(astTree: tree, parsedModules: modules);
   }
 
   void _importModule(ASTTree result) {

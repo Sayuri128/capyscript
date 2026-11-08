@@ -10,7 +10,9 @@ import 'package:capyscript/AST/class/ast_this_node.dart';
 import 'package:capyscript/AST/decrement/ast_decrement_node.dart';
 import 'package:capyscript/AST/for_loop/ast_break_node.dart';
 import 'package:capyscript/AST/for_loop/ast_continue_node.dart';
+import 'package:capyscript/AST/for_loop/ast_for_in_node.dart';
 import 'package:capyscript/AST/for_loop/ast_for_loop_node.dart';
+import 'package:capyscript/AST/not/ast_not_node.dart';
 import 'package:capyscript/AST/if/ast_if_node.dart';
 import 'package:capyscript/AST/import/ast_import_node.dart';
 import 'package:capyscript/AST/increment/ast_increment_node.dart';
@@ -45,14 +47,22 @@ class Parser {
   late final Lexer _lexer;
   ASTTree? _astTree;
   Token? _currentToken;
+  int _currentTokenStart = 0;
 
   final List<ASTClassDeclarationNode> parsedClasses = [];
   final List<ASTInterfaceDeclarationNode> parsedInterfaces = [];
 
   Parser({required this.source}) {
     _lexer = Lexer(source: source);
-    _currentToken = _lexer.getNextToken();
+    _nextToken();
   }
+
+  void _nextToken() {
+    _currentToken = _lexer.getNextToken();
+    _currentTokenStart = _lexer.tokenStart;
+  }
+
+  String get _location => _lexer.locationOf(_currentTokenStart);
 
   ASTTree parse() {
     if (_astTree != null) return _astTree!;
@@ -77,6 +87,11 @@ class Parser {
       }
     }
 
+    if (_currentToken!.type != TokenType.END) {
+      throw Exception("Unexpected token ${_currentToken!.type} at $_location - "
+          "expected function, import, class or interface \n ${_lexer.getRangeTokens(30)}");
+    }
+
     _astTree = ASTTree(functions: functions, modules: imports);
     return _astTree!;
   }
@@ -84,12 +99,12 @@ class Parser {
   String eat(TokenType expectedToken) {
     final cur = _currentToken!;
     if (_currentToken!.type == expectedToken) {
-      _currentToken = _lexer.getNextToken();
+      _nextToken();
       // print("eat ${_currentToken.toString()}");
       return cur.value;
     }
 
-    throw Exception("Unexpected token - ${_currentToken!.type} - expected - "
+    throw Exception("Unexpected token - ${_currentToken!.type} at $_location - expected - "
         "${expectedToken.toString()} \n ${_lexer.getRangeTokens(
       30,
     )}");
@@ -97,10 +112,10 @@ class Parser {
 
   void eatOr(List<TokenType> expectedTokens) {
     if (expectedTokens.any((element) => element == _currentToken!.type)) {
-      _currentToken = _lexer.getNextToken();
+      _nextToken();
       return;
     }
-    throw Exception("Unexpected Token! ${_currentToken!.type}");
+    throw Exception("Unexpected token ${_currentToken!.type} at $_location");
   }
 
   bool canEat(List<TokenType> tokens) {
@@ -196,6 +211,11 @@ class Parser {
       return _parseFactor(functionName: functionName);
     }
 
+    if (canEat([TokenType.NOT])) {
+      eat(TokenType.NOT);
+      return ASTNotNode(expression: _parseFactor(functionName: functionName));
+    }
+
     if (canEat([TokenType.MINUS])) {
       eat(TokenType.MINUS);
       return ASTBinaryOperatorNode(
@@ -240,7 +260,7 @@ class Parser {
           variableName: identifier, functionName: functionName);
     }
 
-    throw Exception("Unexpected token ${_currentToken.toString()}");
+    throw Exception("Unexpected token ${_currentToken.toString()} at $_location");
   }
 
   ASTNode _parseFactor({required String functionName}) {
@@ -324,9 +344,24 @@ class Parser {
       eat(TokenType.RSQUARE_BRACE);
     }
 
-    eat(TokenType.EQUALS);
+    ASTNode read() => keyExpressions.fold(
+        target, (object, key) => ASTObjectGetNode(object: object, key: key));
 
-    final ASTNode value = _parseExpression(functionName: functionName);
+    final ASTNode value;
+    if (canEat([TokenType.EQUALS])) {
+      eat(TokenType.EQUALS);
+      value = _parseExpression(functionName: functionName);
+    } else if (canEat(_compoundAssignments.keys.toList())) {
+      final operator = _currentToken!.type;
+      eat(operator);
+      value = ASTBinaryOperatorNode(
+          left: read(),
+          right: _parseExpression(functionName: functionName),
+          op: _compoundAssignments[operator]!);
+    } else {
+      return read();
+    }
+
     return ASTObjectSetNode(
         targetExpression: target,
         keyExpressions: keyExpressions,
@@ -508,6 +543,9 @@ class Parser {
       if (canEat([TokenType.EQUALS])) {
         return _parseAssignment(functionName, factor);
       }
+      if (canEat(_compoundAssignments.keys.toList())) {
+        return _parseCompoundAssignment(functionName, factor);
+      }
       return factor;
     }
 
@@ -572,6 +610,9 @@ class Parser {
         // Assuming TokenType.EQUALS represents '=' for assignment
         return _parseAssignment(functionName, factor);
       }
+      if (canEat(_compoundAssignments.keys.toList())) {
+        return _parseCompoundAssignment(functionName, factor);
+      }
 
       return factor;
     }
@@ -582,6 +623,19 @@ class Parser {
 
     if (canEat([TokenType.FOR])) {
       return _parseForLoopNode(functionName: functionName);
+    }
+
+    if (canEat([TokenType.WHILE])) {
+      eat(TokenType.WHILE);
+      eat(TokenType.LPAREN);
+      final condition = _parseExpression(functionName: functionName);
+      eat(TokenType.RPAREN);
+      final body = _parseBlock(functionName: functionName);
+      return ASTForLoopNode(
+          initialization: ASTNode(),
+          condition: condition,
+          increment: ASTNode(),
+          body: body);
     }
 
     if (canEat([TokenType.BREAK])) {
@@ -610,7 +664,7 @@ class Parser {
       return _parseTryStatement(functionName: functionName);
     }
 
-    throw Exception('Invalid statement \n ${_lexer.getRangeTokens(30)}');
+    throw Exception('Invalid statement at $_location \n ${_lexer.getRangeTokens(30)}');
   }
 
   ASTTryCatchNode _parseTryStatement({required String functionName}) {
@@ -647,7 +701,7 @@ class Parser {
     return ASTReturnNode(expression: expression);
   }
 
-  ASTForLoopNode _parseForLoopNode({required String functionName}) {
+  ASTNode _parseForLoopNode({required String functionName}) {
     eat(TokenType.FOR);
     eat(TokenType.LPAREN);
 
@@ -657,13 +711,23 @@ class Parser {
     } else {
       initialization = ASTNode();
     }
+
+    if (initialization is ASTVariableNode && canEat([TokenType.IN])) {
+      eat(TokenType.IN);
+      final iterable = _parseExpression(functionName: functionName);
+      eat(TokenType.RPAREN);
+      return ASTForInNode(
+          variableName: initialization.variableName,
+          iterable: iterable,
+          body: _parseBlock(functionName: functionName));
+    }
     eat(TokenType.SEMICOLON);
 
     late final ASTNode condition;
     if (!canEat([TokenType.SEMICOLON])) {
       condition = _parseExpression(functionName: functionName);
     } else {
-      condition = ASTNode();
+      condition = const ASTBooleanNode(value: true);
     }
     eat(TokenType.SEMICOLON);
 
@@ -692,6 +756,25 @@ class Parser {
     return func;
   }
 
+  static const Map<TokenType, TokenType> _compoundAssignments = {
+    TokenType.PLUS_EQUALS: TokenType.PLUS,
+    TokenType.MINUS_EQUALS: TokenType.MINUS,
+    TokenType.MULTIPLY_EQUALS: TokenType.MULTIPLY,
+    TokenType.DIVIDE_EQUALS: TokenType.DIVIDE,
+  };
+
+  ASTAssignmentNode _parseCompoundAssignment(
+      String functionName, ASTNode target) {
+    final operator = _currentToken!.type;
+    eat(operator);
+    final expression = _parseExpression(functionName: functionName);
+    return ASTAssignmentNode(
+        target: target,
+        expression: ASTBinaryOperatorNode(
+            left: target, right: expression, op: _compoundAssignments[operator]!),
+        functionName: functionName);
+  }
+
   ASTAssignmentNode _parseAssignment(String functionName, ASTNode target) {
     eat(TokenType.EQUALS);
     final expression = _parseExpression(functionName: functionName);
@@ -711,7 +794,7 @@ class Parser {
       final args = _parseFunctionArguments(functionName: functionName);
       return ASTSuperNode(methodName: methodName, arguments: args);
     }
-    throw Exception("Expected ( or . after super");
+    throw Exception("Expected ( or . after super at $_location");
   }
 
   ASTClassDeclarationNode _parseClassDeclaration() {
@@ -753,7 +836,7 @@ class Parser {
         fields.add(ClassField(name: fieldName, type: fieldType));
       } else {
         throw Exception(
-            "Unexpected token in class body: ${_currentToken!.type}");
+            "Unexpected token in class body: ${_currentToken!.type} at $_location");
       }
     }
 

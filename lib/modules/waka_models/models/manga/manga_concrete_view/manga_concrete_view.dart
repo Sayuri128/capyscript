@@ -38,6 +38,7 @@ class MangaConcreteView extends ConcreteView<ChaptersGroup> {
     } else if (name == 'alternativeTitles') {
       return alternativeTitles;
     }
+    return getMetadataField(name);
   }
 
   @override
@@ -52,6 +53,11 @@ class MangaConcreteView extends ConcreteView<ChaptersGroup> {
     required super.tags,
     required this.status,
     required super.groups,
+    super.authors,
+    super.artists,
+    super.year,
+    super.rating,
+    super.url,
   });
 
   @override
@@ -65,8 +71,18 @@ class MangaConcreteView extends ConcreteView<ChaptersGroup> {
       List<String>? tags,
       List<ChaptersGroup>? groups,
       List<String>? alternativeTitles,
-      MangaStatus? status}) {
+      MangaStatus? status,
+      List<String>? authors,
+      List<String>? artists,
+      int? year,
+      num? rating,
+      String? url}) {
     return MangaConcreteView(
+        authors: authors ?? this.authors,
+        artists: artists ?? this.artists,
+        year: year ?? this.year,
+        rating: rating ?? this.rating,
+        url: url ?? this.url,
         uid: uid ?? this.uid,
         cover: cover ?? this.cover,
         alternativeTitles: alternativeTitles ?? this.alternativeTitles,

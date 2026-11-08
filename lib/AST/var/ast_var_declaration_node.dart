@@ -19,7 +19,7 @@ class ASTVarDeclarationNode extends ASTNode {
     if (declaredType != null) {
       TypeChecker.check(declaredType!, val, environment);
     }
-    environment.setVariable(variableName, val);
+    environment.defineVariable(variableName, val);
     return val;
   }
 }

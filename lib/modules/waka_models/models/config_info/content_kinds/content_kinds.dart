@@ -12,6 +12,7 @@ class ContentKinds {
   static const String manhua = 'manhua';
   static const String comic = 'comic';
   static const String novel = 'novel';
+  static const String audiobook = 'audiobook';
 
   static const List<String> known = <String>[
     anime,
@@ -25,6 +26,7 @@ class ContentKinds {
     manhua,
     comic,
     novel,
+    audiobook,
   ];
 
   static List<String> parse(Object? json) {

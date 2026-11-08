@@ -309,7 +309,7 @@ void main() {
     });
 
     test('an unknown type is a format error', () {
-      for (final type in <Object?>[3, -1, 'manga', null, 0.5]) {
+      for (final type in <Object?>[4, -1, 'manga', null, 0.5]) {
         expect(
           () => parseWith(<String, dynamic>{'type': type}),
           throwsA(
@@ -339,6 +339,17 @@ void main() {
       expect(
         ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).type,
         ConfigInfoType.NOVEL,
+      );
+    });
+
+    test('type 3 is audio and survives a json round trip', () {
+      final config = parseWith(<String, dynamic>{'type': 3});
+
+      expect(config.type, ConfigInfoType.AUDIO);
+      expect(config.toJson()['type'], 3);
+      expect(
+        ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).type,
+        ConfigInfoType.AUDIO,
       );
     });
 

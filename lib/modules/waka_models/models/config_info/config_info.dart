@@ -24,7 +24,9 @@ enum ConfigInfoType {
   @JsonValue(1)
   ANIME,
   @JsonValue(2)
-  NOVEL
+  NOVEL,
+  @JsonValue(3)
+  AUDIO
 }
 
 int serializeLocalApiClientType(ConfigInfoType type) {
@@ -35,6 +37,8 @@ int serializeLocalApiClientType(ConfigInfoType type) {
       return 1;
     case ConfigInfoType.NOVEL:
       return 2;
+    case ConfigInfoType.AUDIO:
+      return 3;
   }
 }
 
@@ -46,6 +50,8 @@ ConfigInfoType deserializeLocalApiClientType(int type) {
       return ConfigInfoType.ANIME;
     case 2:
       return ConfigInfoType.NOVEL;
+    case 3:
+      return ConfigInfoType.AUDIO;
   }
   throw FormatException("Unknown ConfigInfo type $type");
 }

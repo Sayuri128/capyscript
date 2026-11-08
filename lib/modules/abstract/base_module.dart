@@ -12,6 +12,7 @@ import 'package:capyscript/modules/date/date_module.dart';
 import 'package:capyscript/modules/html/html_module.dart';
 import 'package:capyscript/modules/json/json_module.dart';
 import 'package:capyscript/modules/waka_models/anime/anime_models_module.dart';
+import 'package:capyscript/modules/waka_models/audio/audio_models_module.dart';
 import 'package:capyscript/modules/waka_models/manga/manga_models_module.dart';
 import 'package:capyscript/modules/waka_models/novel/novel_models_module.dart';
 import 'package:capyscript/modules/regex/regex_module.dart';
@@ -78,6 +79,7 @@ final Map<String, ModuleFactory> moduleFactories = {
   AnimeModelsModule.module_name: (_) => AnimeModelsModule(),
   MangaModelsModule.module_name: (_) => MangaModelsModule(),
   NovelModelsModule.module_name: (_) => NovelModelsModule(),
+  AudioModelsModule.module_name: (_) => AudioModelsModule(),
   RegexModule.module_name: (_) => RegexModule(),
   PreferencesModule.module_name: (host) => PreferencesModule(host),
   StorageModule.module_name: (host) => StorageModule(host),

@@ -47,6 +47,9 @@ ConfigInfo _$ConfigInfoFromJson(Map<String, dynamic> json) => ConfigInfo(
   pricing: json['pricing'] == null
       ? SourcePricing.free
       : const SourcePricingJsonConverter().fromJson(json['pricing']),
+  sourceType: json['sourceType'] == null
+      ? SourceType.website
+      : const SourceTypeJsonConverter().fromJson(json['sourceType']),
   multiInstance: json['multiInstance'] == null
       ? false
       : ConfigInfo.readMultiInstance(json['multiInstance']),
@@ -89,6 +92,7 @@ Map<String, dynamic> _$ConfigInfoToJson(
     instance.contentKinds,
   ),
   'pricing': const SourcePricingJsonConverter().toJson(instance.pricing),
+  'sourceType': const SourceTypeJsonConverter().toJson(instance.sourceType),
   'multiInstance': instance.multiInstance,
 };
 

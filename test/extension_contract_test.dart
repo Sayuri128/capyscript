@@ -18,6 +18,7 @@ import 'package:capyscript/modules/waka_models/models/config_info/download_confi
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/source_pricing/source_pricing.dart';
+import 'package:capyscript/modules/waka_models/models/config_info/source_type/source_type.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/novel/novel_chapter_content.dart';
 import 'package:test/test.dart';
@@ -546,6 +547,29 @@ void main() {
       );
       final config = ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'multiInstance': true});
       expect(ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).multiInstance, isTrue);
+    });
+  });
+
+  group('source type', () {
+    String typeOf(Object? value) {
+      return ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'sourceType': value}).sourceType;
+    }
+
+    test('defaults to website when missing or unknown', () {
+      expect(ConfigInfo.fromJson(_baseConfig()).sourceType, SourceType.website);
+      expect(typeOf('cloud'), SourceType.website);
+      expect(typeOf(true), SourceType.website);
+    });
+
+    test('reads self-hosted, official and local case-insensitively', () {
+      expect(typeOf('Self-Hosted'), SourceType.selfHosted);
+      expect(typeOf(' official '), SourceType.official);
+      expect(typeOf('LOCAL'), SourceType.local);
+    });
+
+    test('survives a json round trip', () {
+      final config = ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'sourceType': 'self-hosted'});
+      expect(ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).sourceType, SourceType.selfHosted);
     });
   });
 

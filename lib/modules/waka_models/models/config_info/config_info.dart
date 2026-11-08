@@ -10,6 +10,7 @@ import 'package:json_annotation/json_annotation.dart';
 import '../manga/manga_gallery_view/filters/multiple_of_any/multiple_of_any.dart';
 import 'content_kinds/content_kinds.dart';
 import 'source_pricing/source_pricing.dart';
+import 'source_type/source_type.dart';
 import 'download_config/download_config.dart';
 import 'gallery_feed/gallery_feed.dart';
 import 'gallery_pagination/gallery_pagination.dart';
@@ -123,6 +124,9 @@ class ConfigInfo extends ExternalObject {
   @SourcePricingJsonConverter()
   final String pricing;
 
+  @SourceTypeJsonConverter()
+  final String sourceType;
+
   @JsonKey(fromJson: readMultiInstance)
   final bool multiInstance;
 
@@ -156,6 +160,8 @@ class ConfigInfo extends ExternalObject {
       return contentKinds;
     } else if (name == 'pricing') {
       return pricing;
+    } else if (name == 'sourceType') {
+      return sourceType;
     } else if (name == 'multiInstance') {
       return multiInstance;
     }
@@ -189,6 +195,7 @@ class ConfigInfo extends ExternalObject {
       this.pagination,
       this.contentKinds = const <String>[],
       this.pricing = SourcePricing.free,
+      this.sourceType = SourceType.website,
       this.multiInstance = false});
 
   @override

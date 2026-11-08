@@ -107,6 +107,9 @@ abstract class ApiClient {
 
   Future<Map<String, String>> getImageHeaders(
       {required String uid, required Map<String, dynamic> data}) async {
+    if (!interpreter.hasFunction("getImageHeaders")) {
+      return <String, String>{};
+    }
     return ((await interpreter.runFunction("getImageHeaders",
             arguments: {"uid": uid, "data": data})) as Map)
         .map((key, value) => MapEntry(key.toString(), value.toString()));

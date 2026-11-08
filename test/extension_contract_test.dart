@@ -555,6 +555,19 @@ void main() {
     });
   });
 
+  group('getImageHeaders', () {
+    test('a script without getImageHeaders gets no headers', () async {
+      final client = MangaApiClient(code: '''
+        import "manga_models";
+        function getGallery(page, query, filters) {
+          return [];
+        }
+      ''');
+
+      expect(await client.getImageHeaders(uid: 'a', data: {}), isEmpty);
+    });
+  });
+
   group('getRelated', () {
     test('returns related titles from scripts that define it', () async {
       final client = MangaApiClient(code: '''

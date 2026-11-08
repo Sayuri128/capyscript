@@ -17,6 +17,7 @@ import 'package:capyscript/modules/waka_models/models/config_info/config_info.da
 import 'package:capyscript/modules/waka_models/models/config_info/download_config/download_config.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/preferences/extension_preference.dart';
 import 'package:capyscript/modules/waka_models/models/config_info/request_policy/request_policy.dart';
+import 'package:capyscript/modules/waka_models/models/config_info/source_pricing/source_pricing.dart';
 import 'package:capyscript/modules/waka_models/models/manga/manga_concrete_view/manga_concrete_view.dart';
 import 'package:capyscript/modules/waka_models/models/novel/novel_chapter_content.dart';
 import 'package:test/test.dart';
@@ -545,6 +546,29 @@ void main() {
       );
       final config = ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'multiInstance': true});
       expect(ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).multiInstance, isTrue);
+    });
+  });
+
+  group('pricing', () {
+    String pricingOf(Object? value) {
+      return ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'pricing': value}).pricing;
+    }
+
+    test('defaults to free when missing or unknown', () {
+      expect(ConfigInfo.fromJson(_baseConfig()).pricing, SourcePricing.free);
+      expect(pricingOf('subscription'), SourcePricing.free);
+      expect(pricingOf(3), SourcePricing.free);
+    });
+
+    test('reads free, partial and paid case-insensitively', () {
+      expect(pricingOf('free'), SourcePricing.free);
+      expect(pricingOf(' Partial '), SourcePricing.partial);
+      expect(pricingOf('PAID'), SourcePricing.paid);
+    });
+
+    test('survives a json round trip', () {
+      final config = ConfigInfo.fromJson(<String, dynamic>{..._baseConfig(), 'pricing': 'paid'});
+      expect(ConfigInfo.fromJson(jsonDecode(jsonEncode(config.toJson()))).pricing, SourcePricing.paid);
     });
   });
 

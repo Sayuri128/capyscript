@@ -213,6 +213,26 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'throwSourceError(kind, message = "")',
     doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
   ),
+  'md5': (
+    detail: 'md5(input, output = "hex")',
+    doc: 'MD5 digest of a string (hashed as UTF-8) or a list of bytes. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',
+  ),
+  'sha1': (
+    detail: 'sha1(input, output = "hex")',
+    doc: 'SHA-1 digest of a string (hashed as UTF-8) or a list of bytes. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',
+  ),
+  'sha256': (
+    detail: 'sha256(input, output = "hex")',
+    doc: 'SHA-256 digest of a string (hashed as UTF-8) or a list of bytes. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',
+  ),
+  'sha512': (
+    detail: 'sha512(input, output = "hex")',
+    doc: 'SHA-512 digest of a string (hashed as UTF-8) or a list of bytes. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',
+  ),
+  'hmac': (
+    detail: 'hmac(algorithm, key, message, output = "hex")',
+    doc: 'HMAC of message with key; algorithm is md5, sha1, sha256 or sha512, key and message are strings (UTF-8) or byte lists. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',
+  ),
   'base64DecodeBytes': (
     detail: 'base64DecodeBytes(text)',
     doc: 'Decode base64 or base64url (padding optional, whitespace ignored) into a list of byte values 0-255. Requires `import "bytes";`.',

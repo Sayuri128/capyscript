@@ -1,3 +1,3 @@
-const int capyscriptApiVersion = 2;
+const int capyscriptApiVersion = 3;
 
 const int legacyExtensionApiVersion = 1;

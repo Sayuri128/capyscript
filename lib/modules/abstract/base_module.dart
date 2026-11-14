@@ -19,6 +19,7 @@ import 'package:capyscript/modules/regex/regex_module.dart';
 import 'package:capyscript/modules/preferences/preferences_module.dart';
 import 'package:capyscript/modules/storage/storage_module.dart';
 import 'package:capyscript/modules/errors/errors_module.dart';
+import 'package:capyscript/modules/bytes/bytes_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -84,4 +85,5 @@ final Map<String, ModuleFactory> moduleFactories = {
   PreferencesModule.module_name: (host) => PreferencesModule(host),
   StorageModule.module_name: (host) => StorageModule(host),
   ErrorsModule.module_name: (_) => ErrorsModule(),
+  BytesModule.module_name: (_) => BytesModule(),
 };

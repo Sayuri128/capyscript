@@ -213,6 +213,82 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'throwSourceError(kind, message = "")',
     doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
   ),
+  'base64DecodeBytes': (
+    detail: 'base64DecodeBytes(text)',
+    doc: 'Decode base64 or base64url (padding optional, whitespace ignored) into a list of byte values 0-255. Requires `import "bytes";`.',
+  ),
+  'base64EncodeBytes': (
+    detail: 'base64EncodeBytes(bytes)',
+    doc: 'Encode a list of byte values as base64. Requires `import "bytes";`.',
+  ),
+  'hexToBytes': (
+    detail: 'hexToBytes(text)',
+    doc: 'Turn a hex string like "0aff" into a list of bytes. Requires `import "bytes";`.',
+  ),
+  'bytesToHex': (
+    detail: 'bytesToHex(bytes)',
+    doc: 'Turn a list of bytes into a lowercase hex string. Requires `import "bytes";`.',
+  ),
+  'stringToBytes': (
+    detail: 'stringToBytes(text, encoding = "utf-8")',
+    doc: 'Encode text into bytes. encoding: utf-8, latin1, ascii, windows-1251, koi8-r or koi8-u; characters the encoding lacks become ?. Requires `import "bytes";`.',
+  ),
+  'bytesToString': (
+    detail: 'bytesToString(bytes, encoding = "utf-8")',
+    doc: 'Decode bytes into text. encoding: utf-8 (malformed sequences become U+FFFD), latin1, ascii, windows-1251, koi8-r or koi8-u. Requires `import "bytes";`.',
+  ),
+  'charCodes': (
+    detail: 'charCodes(text)',
+    doc: 'UTF-16 code units of a string, like JavaScript charCodeAt for every index. Requires `import "bytes";`.',
+  ),
+  'fromCharCodes': (
+    detail: 'fromCharCodes(codes)',
+    doc: 'Build a string from UTF-16 code units, like JavaScript String.fromCharCode. Requires `import "bytes";`.',
+  ),
+  'xorBytes': (
+    detail: 'xorBytes(bytes, key)',
+    doc: 'XOR every byte with the key, repeating the key. key is a list of bytes or a string (its UTF-8 bytes). Requires `import "bytes";`.',
+  ),
+  'bytesToInts': (
+    detail: 'bytesToInts(bytes, size = 4, bigEndian = true, signed = false)',
+    doc: 'Read consecutive size-byte integers (size 1-6); a trailing partial chunk is ignored. Requires `import "bytes";`.',
+  ),
+  'bitAnd': (
+    detail: 'bitAnd(left, right)',
+    doc: 'Bitwise AND of two integers. Requires `import "bytes";`.',
+  ),
+  'bitOr': (
+    detail: 'bitOr(left, right)',
+    doc: 'Bitwise OR of two integers. Requires `import "bytes";`.',
+  ),
+  'bitXor': (
+    detail: 'bitXor(left, right)',
+    doc: 'Bitwise XOR of two integers. Requires `import "bytes";`.',
+  ),
+  'bitNot': (
+    detail: 'bitNot(value)',
+    doc: 'Bitwise NOT (64-bit); wrap with toInt32 for JavaScript ~ semantics. Requires `import "bytes";`.',
+  ),
+  'shiftLeft': (
+    detail: 'shiftLeft(value, count)',
+    doc: 'Shift left (64-bit); wrap with toInt32 for JavaScript << semantics. Requires `import "bytes";`.',
+  ),
+  'shiftRight': (
+    detail: 'shiftRight(value, count)',
+    doc: 'Arithmetic shift right, like JavaScript >> on 32-bit values after toInt32. Requires `import "bytes";`.',
+  ),
+  'shiftRightUnsigned': (
+    detail: 'shiftRightUnsigned(value, count)',
+    doc: 'Unsigned 32-bit shift right, like JavaScript >>>. Requires `import "bytes";`.',
+  ),
+  'toInt32': (
+    detail: 'toInt32(value)',
+    doc: 'Wrap an integer to a signed 32-bit value, like JavaScript value | 0. Requires `import "bytes";`.',
+  ),
+  'toUint32': (
+    detail: 'toUint32(value)',
+    doc: 'Wrap an integer to an unsigned 32-bit value, like JavaScript value >>> 0. Requires `import "bytes";`.',
+  ),
 
   // manga_models module
   'buildGallery': (

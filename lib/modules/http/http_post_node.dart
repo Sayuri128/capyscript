@@ -68,6 +68,7 @@ class HttpPostNode extends ModuleFunctionBody {
       return CapyHttpResponse(
           statusCode: response.statusCode,
           body: HttpUtils.decodeBody(response),
+          bodyBytes: response.bodyBytes,
           headers: response.headers,
           contentLength: response.contentLength);
     }

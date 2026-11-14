@@ -84,5 +84,29 @@ void main() {
 
       expect(HttpUtils.decodeBody(response), 'Café');
     });
+
+    test('decodes a declared windows-1251 charset instead of latin-1', () {
+      final response = http.Response.bytes(<int>[0xCF, 0xF0, 0xE8, 0xE2, 0xB3, 0xF2], 200,
+          headers: {'content-type': 'text/html; charset=windows-1251'});
+
+      expect(HttpUtils.decodeBody(response), 'Привіт');
+    });
+
+    test('uses a meta charset when the header has none and utf-8 fails', () {
+      final List<int> bytes = <int>[
+        ...latin1.encode('<meta charset="koi8-r"><b>'),
+        0xF0, 0xD2, 0xC9, 0xD7, 0xC5, 0xD4,
+      ];
+      final response = http.Response.bytes(bytes, 200,
+          headers: {'content-type': 'text/html'});
+
+      expect(HttpUtils.decodeBody(response), '<meta charset="koi8-r"><b>Привет');
+    });
+
+    test('charsetOf reads quoted and unquoted parameters', () {
+      expect(HttpUtils.charsetOf('text/html; charset="CP1251"'), 'CP1251');
+      expect(HttpUtils.charsetOf('text/html;charset=utf-8'), 'utf-8');
+      expect(HttpUtils.charsetOf('text/html'), isNull);
+    });
   });
 }

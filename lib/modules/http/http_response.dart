@@ -10,18 +10,21 @@ class CapyHttpResponse extends ExternalObject {
   final String body;
   final int? contentLength;
   final Map<String, String> headers;
+  final List<int>? bodyBytes;
 
   const CapyHttpResponse(
       {required this.statusCode,
       required this.body,
       required this.contentLength,
-      required this.headers});
+      required this.headers,
+      this.bodyBytes});
 
   operator [](String key) {
     if (key == "statusCode") return statusCode;
     if (key == "body") return body;
     if (key == "contentLength") return contentLength;
     if (key == "headers") return headers;
+    if (key == "bodyBytes") return bodyBytes;
     return null;
   }
 

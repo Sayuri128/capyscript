@@ -5,6 +5,7 @@
 
 import 'dart:convert';
 
+import 'package:capyscript/modules/bytes/text_codecs.dart';
 import 'package:http/http.dart' as http;
 
 class HttpUtils {
@@ -96,14 +97,49 @@ class HttpUtils {
   }
 
   static String decodeBody(http.Response response) {
-    final String? contentType = response.headers['content-type'];
-    if (contentType != null && contentType.toLowerCase().contains('charset=')) {
+    final List<int> bytes = response.bodyBytes;
+    final String? declared = charsetOf(response.headers['content-type']);
+    if (declared != null) {
+      final String? canonical = TextCodecs.canonicalName(declared);
+      if (canonical != null && _singleByteCyrillic.contains(canonical)) {
+        return TextCodecs.decode(bytes, canonical);
+      }
       return response.body;
     }
     try {
-      return utf8.decode(response.bodyBytes);
+      return utf8.decode(bytes);
     } on FormatException {
+      final String? sniffed = _documentCharset(bytes);
+      if (sniffed != null && _singleByteCyrillic.contains(sniffed)) {
+        return TextCodecs.decode(bytes, sniffed);
+      }
       return response.body;
     }
+  }
+
+  static const Set<String> _singleByteCyrillic = {
+    'windows-1251',
+    'koi8-r',
+    'koi8-u',
+  };
+
+  static final RegExp _charsetParameter =
+      RegExp(r'''charset\s*=\s*["']?([\w.:-]+)''', caseSensitive: false);
+
+  static String? charsetOf(String? contentType) {
+    if (contentType == null) {
+      return null;
+    }
+    return _charsetParameter.firstMatch(contentType)?.group(1);
+  }
+
+  static String? _documentCharset(List<int> bytes) {
+    final int end = bytes.length < 4096 ? bytes.length : 4096;
+    final String head = latin1.decode(bytes.sublist(0, end));
+    final String? declared = charsetOf(head);
+    if (declared == null) {
+      return null;
+    }
+    return TextCodecs.canonicalName(declared);
   }
 }

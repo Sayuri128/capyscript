@@ -84,7 +84,7 @@ const Map<String, ({String detail, String doc})> completionDocs = {
   // http module
   'httpGet': (
     detail: 'httpGet(url)',
-    doc: 'Make an HTTP GET request and return the response body as a string.',
+    doc: 'Make an HTTP GET request. The response has statusCode, body (text: the declared charset, windows-1251 and koi8 included, else UTF-8, else a meta charset, else latin1), bodyBytes (raw bytes; null through the in-app browser) and headers.',
   ),
   'httpPost': (
     detail: 'httpPost(url, body)',

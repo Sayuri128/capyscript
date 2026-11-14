@@ -32,6 +32,7 @@ const Map<String, List<String>> moduleFunctions = {
   'storage': ['storageGet', 'storageSet', 'storageRemove'],
   'errors': ['throwSourceError'],
   'dependencies': ['provide', 'provideLazy', 'inject', 'isProvided', 'forget'],
+  'graphql': ['createGraphQLClient', 'hashGraphQLQuery'],
   'hash': ['md5', 'sha1', 'sha256', 'sha512', 'hmac'],
   'bytes': [
     'base64DecodeBytes',

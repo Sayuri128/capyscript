@@ -10,6 +10,8 @@ import 'package:capyscript/modules/http/http_register_interceptor_controller_nod
 import 'package:capyscript/modules/http/http_use_headers_node.dart';
 import 'package:capyscript/modules/http/policy/http_request_policy_enforcer.dart';
 import 'package:capyscript/modules/http/policy/http_request_state.dart';
+import 'package:capyscript/modules/http/http_utils.dart';
+import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:capyscript/AST/function_declaration/ast_funcation_declaration_node.dart';
 /*
@@ -34,6 +36,19 @@ class HttpModule extends BaseModule {
 
   Map<String, String> getHeaders() {
     return Map.of(_headers);
+  }
+
+  Future<http.Response> send(String method, String url,
+      {Map<String, String> headers = const {}, Object? body}) {
+    final Map<String, String> composed = _policyEnforcer.composeHeaders(
+        sessionHeaders: getHeaders(), callHeaders: headers);
+    return _policyEnforcer.send(url,
+        (Uri attemptUri, Duration firstResponseTimeout) {
+      return HttpUtils.sendRequest(method, attemptUri,
+          headers: composed,
+          body: body,
+          firstResponseTimeout: firstResponseTimeout);
+    });
   }
 
   void setHeaders(Map<String, String> headers) {

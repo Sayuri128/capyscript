@@ -213,6 +213,14 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'throwSourceError(kind, message = "")',
     doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
   ),
+  'createGraphQLClient': (
+    detail: 'createGraphQLClient(url, headers = {}, method = "POST")',
+    doc: 'GraphQL client for an absolute endpoint url. Requests go through the http module (rate limit, policy headers, useHeaders, mirror failover; not the in-app browser). Methods: query(query, variables = null, operationName = null) returns data and throws on GraphQL errors; request(query, variables, operationName) returns {statusCode, data, errors, extensions, headers} without throwing on GraphQL errors; persisted(sha256Hash, variables, operationName, query = null) sends an Apollo persisted query and retries once with the query text when the server does not know the hash (pass null as the hash to compute it from query); setHeader(name, value) sets or (value null) removes a header for later requests. HTTP 429 is a rateLimited source error. method "GET" sends the query in the url. Share one client between functions with provide in onInit. Requires `import "graphql";`.',
+  ),
+  'hashGraphQLQuery': (
+    detail: 'hashGraphQLQuery(query)',
+    doc: 'sha256 hex of the query text, as used by persisted queries. Requires `import "graphql";`.',
+  ),
   'provide': (
     detail: 'provide(name, value)',
     doc: 'Register a value (map, list, class instance, client object, function) under name for this extension client, usually in onInit. It lives as long as the client and is cleared when the app resets the client; it is never saved. Replaces an earlier entry with the same name. Requires `import "dependencies";`.',

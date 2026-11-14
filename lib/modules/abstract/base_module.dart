@@ -23,6 +23,7 @@ import 'package:capyscript/modules/bytes/bytes_module.dart';
 import 'package:capyscript/modules/hash/hash_module.dart';
 import 'package:capyscript/modules/abstract/module_context.dart';
 import 'package:capyscript/modules/dependencies/dependencies_module.dart';
+import 'package:capyscript/modules/graphql/graphql_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -97,6 +98,7 @@ typedef ContextModuleFactory = BaseModule Function(ModuleContext context);
 final Map<String, ContextModuleFactory> contextModuleFactories = {
   DependenciesModule.module_name: (ModuleContext context) =>
       DependenciesModule(context.dependencies),
+  GraphQLModule.module_name: (ModuleContext context) => GraphQLModule(context),
 };
 
 bool isBuiltinModule(String moduleName) =>

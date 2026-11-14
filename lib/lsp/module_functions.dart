@@ -31,6 +31,7 @@ const Map<String, List<String>> moduleFunctions = {
   'preferences': ['getPreference'],
   'storage': ['storageGet', 'storageSet', 'storageRemove'],
   'errors': ['throwSourceError'],
+  'dependencies': ['provide', 'provideLazy', 'inject', 'isProvided', 'forget'],
   'hash': ['md5', 'sha1', 'sha256', 'sha512', 'hmac'],
   'bytes': [
     'base64DecodeBytes',

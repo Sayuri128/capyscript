@@ -21,6 +21,8 @@ import 'package:capyscript/modules/storage/storage_module.dart';
 import 'package:capyscript/modules/errors/errors_module.dart';
 import 'package:capyscript/modules/bytes/bytes_module.dart';
 import 'package:capyscript/modules/hash/hash_module.dart';
+import 'package:capyscript/modules/abstract/module_context.dart';
+import 'package:capyscript/modules/dependencies/dependencies_module.dart';
 import 'package:json_annotation/json_annotation.dart';
 /*
  * Copyright (c) 2023 armatura24
@@ -89,3 +91,14 @@ final Map<String, ModuleFactory> moduleFactories = {
   BytesModule.module_name: (_) => BytesModule(),
   HashModule.module_name: (_) => HashModule(),
 };
+
+typedef ContextModuleFactory = BaseModule Function(ModuleContext context);
+
+final Map<String, ContextModuleFactory> contextModuleFactories = {
+  DependenciesModule.module_name: (ModuleContext context) =>
+      DependenciesModule(context.dependencies),
+};
+
+bool isBuiltinModule(String moduleName) =>
+    moduleFactories.containsKey(moduleName) ||
+    contextModuleFactories.containsKey(moduleName);

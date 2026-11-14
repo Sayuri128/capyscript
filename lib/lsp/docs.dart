@@ -213,6 +213,30 @@ const Map<String, ({String detail, String doc})> completionDocs = {
     detail: 'throwSourceError(kind, message = "")',
     doc: 'Fail with a typed error the app can act on. kind: "loginRequired", "rateLimited", "notFound", "regionBlocked", "sourceDown" or "unsupported"; any other kind is a plain script error. Propagates through any call depth. A script try/catch catches it like any error and receives the message (the kind name when the message is empty); the kind is lost unless the catch block calls throwSourceError again. Requires `import "errors";`.',
   ),
+  'provide': (
+    detail: 'provide(name, value)',
+    doc: 'Register a value (map, list, class instance, client object, function) under name for this extension client, usually in onInit. It lives as long as the client and is cleared when the app resets the client; it is never saved. Replaces an earlier entry with the same name. Requires `import "dependencies";`.',
+  ),
+  'provideLazy': (
+    detail: 'provideLazy(name, factory)',
+    doc: 'Register a function that builds the value on the first inject(name); the result is cached, concurrent first injects share one call, and a factory that throws is retried on the next inject. Requires `import "dependencies";`.',
+  ),
+  'inject': (
+    detail: 'inject(name)',
+    doc: 'Return the value registered with provide or provideLazy. Throws (naming what is provided) when nothing is registered under name. Requires `import "dependencies";`.',
+  ),
+  'isProvided': (
+    detail: 'isProvided(name)',
+    doc: 'True when provide or provideLazy registered name. Requires `import "dependencies";`.',
+  ),
+  'forget': (
+    detail: 'forget(name)',
+    doc: 'Remove a registered value, for example a token client that must be rebuilt. Requires `import "dependencies";`.',
+  ),
+  'onInit': (
+    detail: 'function onInit() { }',
+    doc: 'Optional lifecycle hook. Runs once per extension client before its first call (not before passWebBrowserInterceptorController), typically to provide shared clients. If it throws, the call fails and onInit runs again on the next call. Runs again after the app resets the client, for example when preferences change. Keep it free of network requests; use provideLazy for anything that has to fetch.',
+  ),
   'md5': (
     detail: 'md5(input, output = "hex")',
     doc: 'MD5 digest of a string (hashed as UTF-8) or a list of bytes. output: "hex" (default), "base64" or "bytes". Requires `import "hash";`.',

@@ -19,11 +19,22 @@ import 'package:capyscript/Interpreter/interpreter_environment.dart';
 import 'package:capyscript/Interpreter/interpreter_tree.dart';
 import 'package:capyscript/modules/abstract/base_module.dart';
 import 'package:capyscript/modules/abstract/imported/imported_module.dart';
+import 'package:capyscript/modules/abstract/module_context.dart';
+import 'package:capyscript/modules/dependencies/dependency_registry.dart';
 import 'package:capyscript/parser/parser.dart';
 import 'package:path/path.dart' as path;
 
 class Interpreter {
+  static const String initFunctionName = 'onInit';
+  static const Set<String> _functionsBeforeInit = {
+    initFunctionName,
+    'passWebBrowserInterceptorController',
+  };
+
   late final Parser parser;
+  final DependencyRegistry dependencies = DependencyRegistry();
+  Future<void>? _initialization;
+  int _lifecycleGeneration = 0;
 
   final File? mainFile;
   final ExecutionBudget budget;
@@ -60,10 +71,42 @@ class Interpreter {
       return existing;
     }
     final factory = moduleFactories[moduleName];
-    if (factory == null) {
+    if (factory != null) {
+      return _builtinModules[moduleName] = factory(host);
+    }
+    final contextFactory = contextModuleFactories[moduleName];
+    if (contextFactory == null) {
       return null;
     }
-    return _builtinModules[moduleName] = factory(host);
+    return _builtinModules[moduleName] = contextFactory(ModuleContext(
+        host: host, dependencies: dependencies, module: builtinModule));
+  }
+
+  bool get hasInit => hasFunction(initFunctionName);
+
+  Future<void> initialize() {
+    if (!hasInit) {
+      return Future.value();
+    }
+    return _initialization ??= _runInit();
+  }
+
+  Future<void> _runInit() async {
+    final int generation = _lifecycleGeneration;
+    try {
+      await _call(initFunctionName, null);
+    } catch (_) {
+      if (generation == _lifecycleGeneration) {
+        resetLifecycle();
+      }
+      rethrow;
+    }
+  }
+
+  void resetLifecycle() {
+    _lifecycleGeneration++;
+    _initialization = null;
+    dependencies.clear();
   }
 
   Future<dynamic> runFunction(String functionName,
@@ -71,7 +114,14 @@ class Interpreter {
     if (!hasFunction(functionName)) {
       throw Exception("function $functionName not found");
     }
+    if (!_functionsBeforeInit.contains(functionName)) {
+      await initialize();
+    }
+    return _call(functionName, arguments);
+  }
 
+  Future<dynamic> _call(String functionName,
+      Map<String, dynamic>? arguments) async {
     final functionCall = ASTFunctionCallNode(
         function: ASTStringNode(value: functionName),
         arguments: [if (arguments != null) ASTMapNode.fromMap(arguments)]);
@@ -105,6 +155,7 @@ class Interpreter {
       throw Exception("main function not found");
     }
 
+    await initialize();
     final mainCall = ASTFunctionCallNode(
         function: ASTStringNode(value: 'main'), arguments: []);
     return await mainCall.execute(_environment.withBudget(budget.fresh()));

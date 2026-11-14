@@ -32,6 +32,10 @@ abstract class ApiClient {
     interpreter = Interpreter(data: code, host: host);
   }
 
+  Future<void> initialize() => interpreter.initialize();
+
+  void resetLifecycle() => interpreter.resetLifecycle();
+
   Future<List<GalleryView>> getGallery(
       {required int page,
       String? query,
